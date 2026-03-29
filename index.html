@@ -1,273 +1,1039 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stock Management — GNR3</title>
+<title>GNR3 Stock — Management System</title>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root{
-  --bg-deep:#060b14;--bg-panel:#0c1220;--bg-card:#111827;--bg-glass:rgba(255,255,255,.04);
-  --border:rgba(255,255,255,.08);--border-hi:rgba(255,255,255,.15);
-  --t1:#f0f4ff;--t2:#8b9fc0;--t3:#4a5a7a;
-  --blue:#3b82f6;--purple:#a855f7;--orange:#f97316;--green:#22c55e;--red:#ef4444;--cyan:#06b6d4;--teal:#10b981;
-  --sw:240px;--rad:12px;
+/* ════════════════════════════════════════
+   THEME TOKENS
+════════════════════════════════════════ */
+:root {
+  --sw: 260px;
+  --topbar-h: 64px;
+  --rad: 14px;
+  --rad-sm: 10px;
+
+  /* accent palette — same both modes */
+  --indigo:  #6366f1;
+  --violet:  #8b5cf6;
+  --emerald: #10b981;
+  --teal:    #14b8a6;
+  --amber:   #f59e0b;
+  --rose:    #f43f5e;
+  --sky:     #0ea5e9;
+  --pink:    #ec4899;
+  --orange:  #f97316;
+
+  /* gradients */
+  --gr-primary: linear-gradient(135deg,#6366f1,#8b5cf6);
+  --gr-green:   linear-gradient(135deg,#10b981,#14b8a6);
+  --gr-amber:   linear-gradient(135deg,#f59e0b,#f97316);
+  --gr-rose:    linear-gradient(135deg,#f43f5e,#ec4899);
+  --gr-sky:     linear-gradient(135deg,#0ea5e9,#6366f1);
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;overflow-x:hidden;}
-body{background:var(--bg-deep);color:var(--t1);font-family:'Sarabun',sans-serif;font-size:14px;display:flex;}
-body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.025'/%3E%3C/svg%3E");pointer-events:none;z-index:0;}
 
-/* ─── SIDEBAR ─── */
-#sb{width:var(--sw);min-height:100vh;background:var(--bg-panel);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .3s;}
-.sb-logo{padding:20px 16px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-.sb-logo-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
-.sb-logo-text{font-family:'Kanit',sans-serif;font-weight:600;font-size:15px;line-height:1.2;}
-.sb-logo-text small{display:block;font-size:10px;color:var(--t2);font-weight:400;}
-.sb-nav{flex:1;padding:12px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
-.sb-section{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);padding:10px 8px 4px;font-family:'Kanit',sans-serif;}
-.nb{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;cursor:pointer;color:var(--t2);transition:all .18s;font-size:13px;user-select:none;border:1px solid transparent;position:relative;}
-.nb:hover{background:var(--bg-glass);color:var(--t1);}
-.nb.active{background:rgba(59,130,246,.15);color:#93c5fd;border-color:rgba(59,130,246,.2);}
-.nb .ni{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
-.nb .badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;font-family:'Kanit',sans-serif;}
-.sb-foot{padding:14px 12px;border-top:1px solid var(--border);}
-.bldg-pill{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:all .15s;font-size:12px;color:var(--t2);}
-.bldg-pill:hover{border-color:var(--border-hi);color:var(--t1);}
-.bldg-pill.sel{border-color:rgba(59,130,246,.4);background:rgba(59,130,246,.1);color:#93c5fd;}
-.bldg-dot{width:7px;height:7px;border-radius:50%;}
-
-/* ─── MAIN ─── */
-#main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh;position:relative;z-index:1;}
-.topbar{height:58px;background:rgba(12,18,32,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 20px;position:sticky;top:0;z-index:50;}
-.topbar-title{font-family:'Kanit',sans-serif;font-size:16px;font-weight:600;}
-.topbar-sub{font-size:11px;color:var(--t2);}
-.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
-.hamburger{display:none;background:none;border:none;color:var(--t1);font-size:20px;cursor:pointer;padding:4px;}
-#content{padding:20px;display:flex;flex-direction:column;gap:18px;}
-
-/* ─── BUTTONS ─── */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-family:'Kanit',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .18s;white-space:nowrap;}
-.btn-primary{background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;box-shadow:0 4px 14px rgba(59,130,246,.3);}
-.btn-primary:hover{opacity:.9;transform:translateY(-1px);}
-.btn-green{background:linear-gradient(135deg,var(--green),var(--teal));color:#fff;box-shadow:0 4px 14px rgba(34,197,94,.25);}
-.btn-green:hover{opacity:.9;transform:translateY(-1px);}
-.btn-orange{background:linear-gradient(135deg,var(--orange),#eab308);color:#fff;}
-.btn-orange:hover{opacity:.9;}
-.btn-ghost{background:var(--bg-glass);border:1px solid var(--border);color:var(--t2);}
-.btn-ghost:hover{border-color:var(--border-hi);color:var(--t1);}
-.btn-danger{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171;}
-.btn-danger:hover{background:rgba(239,68,68,.25);}
-.btn-sm{padding:5px 10px;font-size:12px;}
-
-/* ─── CARDS ─── */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
-.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--rad);padding:16px;position:relative;overflow:hidden;transition:border-color .2s;}
-.stat-card:hover{border-color:var(--border-hi);}
-.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
-.sc-blue::before{background:linear-gradient(90deg,var(--blue),var(--cyan));}
-.sc-purple::before{background:linear-gradient(90deg,var(--purple),#ec4899);}
-.sc-green::before{background:linear-gradient(90deg,var(--green),var(--teal));}
-.sc-orange::before{background:linear-gradient(90deg,var(--orange),#eab308);}
-.sc-red::before{background:linear-gradient(90deg,var(--red),var(--orange));}
-.stat-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;}
-.si-blue{background:rgba(59,130,246,.15);}
-.si-purple{background:rgba(168,85,247,.15);}
-.si-green{background:rgba(34,197,94,.15);}
-.si-orange{background:rgba(249,115,22,.15);}
-.si-red{background:rgba(239,68,68,.15);}
-.stat-val{font-family:'Kanit',sans-serif;font-size:24px;font-weight:700;line-height:1;margin:10px 0 3px;}
-.stat-label{font-size:12px;color:var(--t2);}
-
-/* ─── SECTION CARD ─── */
-.sec{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--rad);overflow:hidden;}
-.sec-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-.sec-title{font-family:'Kanit',sans-serif;font-size:14px;font-weight:600;margin-right:4px;}
-.sec-actions{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
-.search-wrap{display:flex;align-items:center;gap:7px;background:var(--bg-glass);border:1px solid var(--border);border-radius:8px;padding:6px 11px;}
-.search-wrap input{background:none;border:none;outline:none;color:var(--t1);font-family:'Sarabun',sans-serif;font-size:13px;min-width:140px;}
-.search-wrap input::placeholder{color:var(--t3);}
-.fsel{background:var(--bg-glass);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--t1);font-family:'Sarabun',sans-serif;font-size:12px;outline:none;cursor:pointer;}
-.fsel option{background:var(--bg-panel);}
-
-/* ─── TABLE ─── */
-.tbl-wrap{overflow-x:auto;}
-table{width:100%;border-collapse:collapse;}
-thead tr{background:rgba(255,255,255,.03);border-bottom:1px solid var(--border);}
-th{padding:9px 14px;text-align:left;font-family:'Kanit',sans-serif;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);white-space:nowrap;cursor:pointer;}
-th:hover{color:var(--t2);}
-tbody tr{border-bottom:1px solid var(--border);transition:background .12s;}
-tbody tr:last-child{border-bottom:none;}
-tbody tr:hover{background:var(--bg-glass);}
-td{padding:10px 14px;font-size:13px;vertical-align:middle;}
-.td-no{color:var(--t3);font-size:11px;font-family:'Kanit',sans-serif;}
-.td-name{font-weight:500;max-width:280px;}
-.td-name small{display:block;font-size:11px;color:var(--t2);font-weight:400;}
-.tbl-empty{padding:40px;text-align:center;color:var(--t3);}
-.tbl-empty .ei{font-size:36px;margin-bottom:10px;}
-.tbl-foot{padding:10px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--t2);}
-
-/* ─── BADGES ─── */
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-family:'Kanit',sans-serif;white-space:nowrap;}
-.b-blue{background:rgba(59,130,246,.15);color:#93c5fd;border:1px solid rgba(59,130,246,.2);}
-.b-purple{background:rgba(168,85,247,.15);color:#d8b4fe;border:1px solid rgba(168,85,247,.2);}
-.b-orange{background:rgba(249,115,22,.15);color:#fdba74;border:1px solid rgba(249,115,22,.2);}
-.b-green{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.2);}
-.b-red{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.2);}
-.b-gray{background:rgba(255,255,255,.06);color:var(--t2);border:1px solid var(--border);}
-.b-yellow{background:rgba(234,179,8,.15);color:#fde047;border:1px solid rgba(234,179,8,.2);}
-.b-cyan{background:rgba(6,182,212,.15);color:#67e8f9;border:1px solid rgba(6,182,212,.2);}
-
-/* stock level indicator */
-.stock-cell{display:flex;flex-direction:column;gap:3px;min-width:80px;}
-.stock-num{font-family:'Kanit',sans-serif;font-size:13px;font-weight:600;}
-.stock-bar-wrap{height:3px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;}
-.stock-bar{height:100%;border-radius:99px;transition:width .4s;}
-.lv-ok .stock-bar{background:var(--green);}
-.lv-ok .stock-num{color:#86efac;}
-.lv-low .stock-bar{background:var(--orange);}
-.lv-low .stock-num{color:#fdba74;}
-.lv-out .stock-bar{background:var(--red);}
-.lv-out .stock-num{color:#fca5a5;}
-
-/* ─── FORM ─── */
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:18px;}
-.fg-full{grid-column:1/-1;}
-.flabel{font-family:'Kanit',sans-serif;font-size:12px;font-weight:500;color:var(--t2);margin-bottom:5px;display:block;}
-.finput,.fselect,.ftextarea{width:100%;background:var(--bg-glass);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--t1);font-family:'Sarabun',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
-.finput:focus,.fselect:focus,.ftextarea:focus{border-color:rgba(59,130,246,.5);box-shadow:0 0 0 3px rgba(59,130,246,.1);}
-.fselect{cursor:pointer;}
-.fselect option{background:var(--bg-panel);}
-.ftextarea{resize:vertical;min-height:64px;}
-.input-row{display:flex;gap:8px;}
-.input-row .finput{flex:1;}
-.unit-badge{display:flex;align-items:center;padding:0 12px;background:var(--bg-glass);border:1px solid var(--border);border-radius:8px;color:var(--t2);font-size:12px;white-space:nowrap;}
-.form-foot{padding:14px 18px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
-
-/* ─── MODAL ─── */
-.overlay{position:fixed;inset:0;background:rgba(6,11,20,.8);backdrop-filter:blur(6px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
-.overlay.open{opacity:1;pointer-events:all;}
-.modal{background:var(--bg-panel);border:1px solid var(--border-hi);border-radius:16px;width:520px;max-width:calc(100vw - 28px);max-height:90vh;overflow-y:auto;transform:translateY(16px) scale(.97);transition:transform .25s;box-shadow:0 24px 60px rgba(0,0,0,.6);}
-.overlay.open .modal{transform:none;}
-.modal-head{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-.modal-head-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
-.modal-head h3{font-family:'Kanit',sans-serif;font-size:15px;font-weight:600;}
-.modal-head p{font-size:12px;color:var(--t2);}
-.modal-close{margin-left:auto;width:28px;height:28px;border-radius:7px;background:var(--bg-glass);border:1px solid var(--border);color:var(--t2);font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;}
-.modal-close:hover{color:var(--t1);border-color:var(--border-hi);}
-
-/* ─── ALERT CARDS ─── */
-.alert-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);transition:background .12s;}
-.alert-row:last-child{border-bottom:none;}
-.alert-row:hover{background:var(--bg-glass);}
-.alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.alert-name{flex:1;font-size:13px;}
-.alert-name small{display:block;color:var(--t2);font-size:11px;}
-
-/* ─── TOAST ─── */
-.toast-wrap{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:7px;z-index:999;}
-.toast{background:var(--bg-panel);border:1px solid var(--border-hi);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:9px;font-size:13px;min-width:220px;transform:translateX(110%);transition:transform .28s;box-shadow:0 8px 24px rgba(0,0,0,.4);}
-.toast.show{transform:none;}
-
-/* ─── APPROVAL CARDS ─── */
-.ap-card{background:var(--bg-glass);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:flex-start;gap:14px;transition:border-color .2s;}
-.ap-card:hover{border-color:var(--border-hi);}
-.ap-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
-.ap-body{flex:1;}
-.ap-name{font-weight:500;font-size:13px;margin-bottom:3px;}
-.ap-meta{font-size:12px;color:var(--t2);display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;}
-.ap-actions{display:flex;gap:7px;}
-
-/* ─── BUILDING TABS ─── */
-.bldg-tabs{display:flex;gap:6px;flex-wrap:wrap;}
-.btab{padding:5px 13px;border-radius:20px;border:1px solid var(--border);font-size:12px;font-family:'Kanit',sans-serif;cursor:pointer;transition:all .15s;color:var(--t2);background:none;}
-.btab:hover{border-color:var(--border-hi);color:var(--t1);}
-.btab.active{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.35);color:#93c5fd;}
-.page-btn{width:26px;height:26px;border-radius:6px;background:var(--bg-glass);border:1px solid var(--border);color:var(--t2);font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;}
-.page-btn:hover{border-color:var(--border-hi);color:var(--t1);}
-.page-btn.active{background:rgba(59,130,246,.2);border-color:rgba(59,130,246,.4);color:#93c5fd;}
-
-/* ─── LOADING ─── */
-.loader{position:fixed;inset:0;background:var(--bg-deep);display:flex;align-items:center;justify-content:center;z-index:999;transition:opacity .3s;}
-.loader.hide{opacity:0;pointer-events:none;}
-.spin{width:36px;height:36px;border-radius:50%;border:3px solid var(--border);border-top-color:var(--blue);animation:spin .75s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-
-/* ─── MISC ─── */
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
-.chip{padding:4px 11px;border-radius:20px;border:1px solid var(--border);font-size:12px;cursor:pointer;color:var(--t2);background:none;transition:all .15s;}
-.chip:hover{border-color:var(--border-hi);color:var(--t1);}
-.chip.on{background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.35);color:#93c5fd;}
-.divider{height:1px;background:var(--border);margin:0;}
-.fade-in{animation:fadeIn .35s ease forwards;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
-.row-gap{display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
-.tag-bldg{display:inline-block;padding:2px 8px;border-radius:5px;font-size:11px;font-family:'Kanit',sans-serif;}
-.t-ari{background:rgba(59,130,246,.15);color:#93c5fd;}
-.t-ksl{background:rgba(168,85,247,.15);color:#d8b4fe;}
-.t-esv{background:rgba(34,197,94,.15);color:#86efac;}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.info-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;}
-.info-row:last-child{border-bottom:none;}
-.info-key{color:var(--t2);}
-
-/* overlay backdrop for sidebar mobile */
-#sb-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99;}
-
-/* responsive */
-@media(max-width:900px){
-  :root{--sw:0px;}
-  #sb{transform:translateX(-240px);width:240px;}
-  #sb.open{transform:none;}
-  #sb-ov{display:block;opacity:0;pointer-events:none;transition:opacity .3s;}
-  #sb-ov.open{opacity:1;pointer-events:all;}
-  #main{margin-left:0;}
-  .hamburger{display:flex!important;}
-  .stats-row{grid-template-columns:repeat(2,1fr);}
-  .two-col{grid-template-columns:1fr;}
+/* ── DARK MODE (default) ── */
+[data-theme="dark"] {
+  --bg:        #070b18;
+  --bg-panel:  #0d1424;
+  --bg-card:   #131d30;
+  --bg-hover:  rgba(99,102,241,.08);
+  --bg-glass:  rgba(255,255,255,.04);
+  --border:    rgba(255,255,255,.08);
+  --border-hi: rgba(255,255,255,.18);
+  --t1: #f0f4ff;
+  --t2: #7e93b8;
+  --t3: #3d506e;
+  --shadow: 0 8px 32px rgba(0,0,0,.45);
+  --shadow-sm: 0 2px 12px rgba(0,0,0,.35);
+  --loader-bg: #070b18;
+  --topbar-bg: rgba(7,11,24,.85);
+  --sb-bg: #0d1424;
+  --input-bg: rgba(255,255,255,.06);
+  --tbl-head: rgba(255,255,255,.03);
+  --tbl-row-hover: rgba(255,255,255,.03);
+  --overlay-bg: rgba(0,5,18,.85);
+  --toast-bg: #0d1424;
+  --badge-text: #f0f4ff;
 }
-@media(max-width:600px){
-  .stats-row{grid-template-columns:repeat(2,1fr);}
-  #content{padding:12px;gap:12px;}
-  .form-grid{grid-template-columns:1fr;}
-  .fg-full{grid-column:1;}
+
+/* ── LIGHT MODE ── */
+[data-theme="light"] {
+  --bg:        #f0f4fc;
+  --bg-panel:  #ffffff;
+  --bg-card:   #ffffff;
+  --bg-hover:  rgba(99,102,241,.06);
+  --bg-glass:  rgba(99,102,241,.06);
+  --border:    rgba(0,0,0,.09);
+  --border-hi: rgba(99,102,241,.35);
+  --t1: #1a2340;
+  --t2: #6b7fa8;
+  --t3: #a0afc7;
+  --shadow: 0 4px 24px rgba(99,102,241,.12);
+  --shadow-sm: 0 2px 10px rgba(99,102,241,.08);
+  --loader-bg: #f0f4fc;
+  --topbar-bg: rgba(255,255,255,.9);
+  --sb-bg: #ffffff;
+  --input-bg: #f6f8ff;
+  --tbl-head: rgba(99,102,241,.04);
+  --tbl-row-hover: rgba(99,102,241,.04);
+  --overlay-bg: rgba(15,23,60,.6);
+  --toast-bg: #ffffff;
+  --badge-text: #ffffff;
 }
+
+/* ════════════════════════════════════════
+   RESET & BASE
+════════════════════════════════════════ */
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html,body { height:100%; overflow-x:hidden; }
+body {
+  background: var(--bg);
+  color: var(--t1);
+  font-family: 'Sarabun', sans-serif;
+  font-size: 14px;
+  display: flex;
+  transition: background .3s, color .3s;
+}
+
+/* ════════════════════════════════════════
+   LOADER
+════════════════════════════════════════ */
+.loader {
+  position: fixed; inset: 0;
+  background: var(--loader-bg);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+  transition: opacity .4s;
+}
+.loader.hide { opacity:0; pointer-events:none; }
+.loader-ring {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  border: 3px solid var(--border);
+  border-top-color: var(--indigo);
+  animation: spin .8s linear infinite;
+}
+.loader-dot {
+  position: absolute;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--gr-primary);
+  top: -5px; left: 50%; transform: translateX(-50%);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ════════════════════════════════════════
+   SIDEBAR
+════════════════════════════════════════ */
+#sb-ov {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(4px);
+  z-index: 98;
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s;
+}
+#sb-ov.open { opacity:1; pointer-events:all; }
+
+#sb {
+  width: var(--sw);
+  height: 100vh;
+  background: var(--sb-bg);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  position: fixed; left:0; top:0; bottom:0;
+  z-index: 100;
+  transition: transform .3s cubic-bezier(.4,0,.2,1), background .3s;
+  overflow: hidden;
+}
+
+/* Logo */
+.sb-logo {
+  padding: 20px 20px 16px;
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sb-logo-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: var(--gr-primary);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(99,102,241,.4);
+}
+.sb-logo-text {
+  font-family: 'Kanit', sans-serif;
+  font-weight: 700; font-size: 15px; line-height: 1.2;
+  color: var(--t1);
+}
+.sb-logo-text small {
+  display: block; font-size: 10px;
+  color: var(--t2); font-weight: 400;
+  margin-top: 1px;
+}
+
+/* Nav scroll area */
+.sb-nav {
+  flex: 1; padding: 12px 12px;
+  display: flex; flex-direction: column; gap: 2px;
+  overflow-y: auto;
+}
+.sb-nav::-webkit-scrollbar { width: 4px; }
+.sb-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+.sb-section {
+  font-size: 10px; font-family: 'Kanit', sans-serif;
+  text-transform: uppercase; letter-spacing: .12em;
+  color: var(--t3); padding: 12px 10px 5px;
+}
+
+/* Nav button */
+.nb {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 12px;
+  cursor: pointer; user-select: none;
+  color: var(--t2); font-size: 13px;
+  border: 1px solid transparent;
+  transition: all .2s cubic-bezier(.4,0,.2,1);
+  position: relative; overflow: hidden;
+}
+.nb::before {
+  content: '';
+  position: absolute; inset: 0; border-radius: 12px;
+  background: var(--gr-primary); opacity: 0;
+  transition: opacity .2s;
+}
+.nb:hover { color: var(--t1); background: var(--bg-hover); }
+.nb.active {
+  color: #fff;
+  background: var(--gr-primary);
+  border-color: transparent;
+  box-shadow: 0 4px 18px rgba(99,102,241,.38);
+}
+.nb.active .nb-icon svg { stroke: #fff; }
+.nb.active .nb-label { color: #fff; font-weight: 600; }
+
+.nb-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  background: transparent;
+  transition: all .2s;
+}
+.nb:hover .nb-icon { background: rgba(255,255,255,.1); }
+.nb.active .nb-icon { background: rgba(255,255,255,.2); }
+
+.nb-icon svg {
+  width: 18px; height: 18px;
+  stroke: var(--t2); fill: none;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  transition: stroke .2s, transform .2s;
+}
+.nb:hover .nb-icon svg { stroke: var(--t1); transform: scale(1.1); }
+
+.nb-label { flex: 1; font-family: 'Kanit', sans-serif; font-weight: 400; }
+
+.nb-badge {
+  background: var(--rose);
+  color: #fff; font-size: 10px; font-family: 'Kanit', sans-serif;
+  font-weight: 600; padding: 2px 7px; border-radius: 10px;
+  min-width: 20px; text-align: center;
+  box-shadow: 0 2px 8px rgba(244,63,94,.4);
+}
+
+/* Home link */
+.nb-home {
+  background: rgba(99,102,241,.1);
+  border: 1px solid rgba(99,102,241,.25) !important;
+  color: #a5b4fc !important;
+  margin-bottom: 6px;
+}
+.nb-home:hover { background: rgba(99,102,241,.18) !important; }
+.nb-home .nb-icon svg { stroke: #a5b4fc; }
+
+/* Building filter in footer */
+.sb-foot {
+  padding: 14px 14px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sb-foot-label {
+  font-size: 10px; font-family: 'Kanit', sans-serif;
+  text-transform: uppercase; letter-spacing: .1em;
+  color: var(--t3); margin-bottom: 8px;
+}
+.bldg-pills { display: flex; flex-direction: column; gap: 4px; }
+.bldg-pill {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 12px; border-radius: 10px;
+  border: 1px solid var(--border);
+  cursor: pointer; font-size: 12px; color: var(--t2);
+  transition: all .2s;
+}
+.bldg-pill:hover { border-color: var(--border-hi); color: var(--t1); }
+.bldg-pill.sel {
+  background: rgba(99,102,241,.12);
+  border-color: rgba(99,102,241,.4); color: #a5b4fc;
+}
+.bldg-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Dark mode toggle in sb-foot */
+.theme-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px; border-radius: 10px;
+  background: var(--bg-glass); border: 1px solid var(--border);
+  margin-bottom: 10px; cursor: pointer;
+  font-size: 12px; font-family: 'Kanit', sans-serif;
+  color: var(--t2); transition: all .2s;
+}
+.theme-toggle:hover { border-color: var(--border-hi); color: var(--t1); }
+.toggle-track {
+  width: 36px; height: 20px; border-radius: 99px;
+  background: var(--border); position: relative;
+  transition: background .3s;
+  flex-shrink: 0;
+}
+[data-theme="light"] .toggle-track { background: var(--indigo); }
+.toggle-thumb {
+  position: absolute; top: 2px; left: 2px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #fff;
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+}
+[data-theme="light"] .toggle-thumb { transform: translateX(16px); }
+
+/* ════════════════════════════════════════
+   MAIN CONTENT AREA
+════════════════════════════════════════ */
+#main {
+  margin-left: var(--sw);
+  flex: 1;
+  display: flex; flex-direction: column;
+  min-height: 100vh;
+  transition: margin-left .3s;
+}
+
+/* ─── TOPBAR ─── */
+.topbar {
+  height: var(--topbar-h);
+  background: var(--topbar-bg);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 24px;
+  position: sticky; top: 0; z-index: 50;
+  transition: background .3s, border-color .3s;
+}
+.hamburger {
+  display: none;
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--bg-glass); border: 1px solid var(--border);
+  color: var(--t1); cursor: pointer;
+  align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.topbar-info { flex: 1; min-width: 0; }
+.topbar-title {
+  font-family: 'Kanit', sans-serif;
+  font-size: 17px; font-weight: 700; color: var(--t1);
+  display: flex; align-items: center; gap: 8px;
+}
+.topbar-sub { font-size: 12px; color: var(--t2); margin-top: 1px; }
+.topbar-right {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 8px;
+  flex-shrink: 0;
+}
+
+/* topbar theme btn (visible on mobile too) */
+.topbar-theme-btn {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--bg-glass); border: 1px solid var(--border);
+  cursor: pointer; color: var(--t2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; transition: all .2s; flex-shrink: 0;
+}
+.topbar-theme-btn:hover { border-color: var(--border-hi); color: var(--t1); }
+
+/* ─── CONTENT ─── */
+#content {
+  padding: 24px;
+  display: flex; flex-direction: column; gap: 20px;
+  flex: 1;
+}
+
+/* ════════════════════════════════════════
+   BUTTONS
+════════════════════════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 10px;
+  font-family: 'Kanit', sans-serif; font-size: 13px; font-weight: 500;
+  cursor: pointer; border: none;
+  transition: all .2s; white-space: nowrap;
+  position: relative; overflow: hidden;
+}
+.btn::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: 10px;
+  background: rgba(255,255,255,0); transition: background .15s;
+}
+.btn:hover::after { background: rgba(255,255,255,.08); }
+.btn:active { transform: scale(.97); }
+
+.btn-primary {
+  background: var(--gr-primary); color: #fff;
+  box-shadow: 0 4px 18px rgba(99,102,241,.35);
+}
+.btn-green {
+  background: var(--gr-green); color: #fff;
+  box-shadow: 0 4px 14px rgba(16,185,129,.3);
+}
+.btn-orange {
+  background: var(--gr-amber); color: #fff;
+  box-shadow: 0 4px 14px rgba(245,158,11,.25);
+}
+.btn-danger {
+  background: rgba(244,63,94,.15);
+  border: 1px solid rgba(244,63,94,.3); color: #fb7185;
+}
+.btn-danger:hover { background: rgba(244,63,94,.25); }
+.btn-ghost {
+  background: var(--bg-glass);
+  border: 1px solid var(--border); color: var(--t2);
+}
+.btn-ghost:hover { border-color: var(--border-hi); color: var(--t1); }
+.btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+
+/* ════════════════════════════════════════
+   STAT CARDS
+════════════════════════════════════════ */
+.stats-row {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 14px;
+}
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--rad);
+  padding: 18px 20px;
+  position: relative; overflow: hidden;
+  transition: transform .2s, box-shadow .2s, border-color .2s;
+  cursor: default;
+}
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+  border-color: var(--border-hi);
+}
+.stat-card-glow {
+  position: absolute;
+  width: 80px; height: 80px; border-radius: 50%;
+  opacity: .18; top: -20px; right: -20px;
+  filter: blur(24px);
+}
+.sc-blue .stat-card-glow  { background: var(--indigo); }
+.sc-purple .stat-card-glow { background: var(--violet); }
+.sc-green .stat-card-glow  { background: var(--emerald); }
+.sc-orange .stat-card-glow { background: var(--amber); }
+.sc-red .stat-card-glow    { background: var(--rose); }
+
+.stat-card::before {
+  content: '';
+  position: absolute; top:0; left:0; right:0; height: 3px;
+  border-radius: 3px 3px 0 0;
+}
+.sc-blue::before   { background: var(--gr-primary); }
+.sc-purple::before { background: linear-gradient(90deg,var(--violet),var(--pink)); }
+.sc-green::before  { background: var(--gr-green); }
+.sc-orange::before { background: var(--gr-amber); }
+.sc-red::before    { background: var(--gr-rose); }
+
+.stat-icon {
+  width: 42px; height: 42px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 12px;
+}
+.si-blue   { background: rgba(99,102,241,.18); }
+.si-purple { background: rgba(139,92,246,.18); }
+.si-green  { background: rgba(16,185,129,.18); }
+.si-orange { background: rgba(245,158,11,.18); }
+.si-red    { background: rgba(244,63,94,.18); }
+
+.stat-icon svg { width:22px; height:22px; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; fill:none; }
+.si-blue svg   { stroke: #818cf8; }
+.si-purple svg { stroke: #c084fc; }
+.si-green svg  { stroke: #34d399; }
+.si-orange svg { stroke: #fbbf24; }
+.si-red svg    { stroke: #fb7185; }
+
+.stat-val {
+  font-family: 'Kanit', sans-serif;
+  font-size: 28px; font-weight: 700; line-height: 1;
+  margin-bottom: 4px; color: var(--t1);
+}
+.stat-label { font-size: 12px; color: var(--t2); }
+
+/* ════════════════════════════════════════
+   SECTION CARD
+════════════════════════════════════════ */
+.sec {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--rad);
+  overflow: hidden;
+  transition: border-color .2s, background .3s;
+}
+.sec-head {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+  flex-wrap: wrap;
+}
+.sec-title {
+  font-family: 'Kanit', sans-serif;
+  font-size: 14px; font-weight: 600; color: var(--t1);
+}
+.sec-actions {
+  margin-left: auto;
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+}
+
+/* ════════════════════════════════════════
+   TABLE
+════════════════════════════════════════ */
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead tr {
+  background: var(--tbl-head);
+  border-bottom: 1px solid var(--border);
+}
+th {
+  padding: 10px 16px; text-align: left;
+  font-family: 'Kanit', sans-serif;
+  font-size: 11px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: .07em;
+  color: var(--t3); white-space: nowrap; cursor: pointer;
+}
+th:hover { color: var(--t2); }
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background .12s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--tbl-row-hover); }
+td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
+.td-no { color: var(--t3); font-size: 11px; font-family: 'Kanit', sans-serif; }
+.td-name { font-weight: 500; max-width: 280px; color: var(--t1); }
+.td-name small { display: block; font-size: 11px; color: var(--t2); font-weight: 400; margin-top: 1px; }
+.tbl-empty { padding: 48px 24px; text-align: center; color: var(--t3); }
+.tbl-empty .ei { font-size: 40px; margin-bottom: 12px; display: block; }
+.tbl-foot {
+  padding: 10px 18px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 12px; color: var(--t2);
+}
+
+/* ════════════════════════════════════════
+   BADGES
+════════════════════════════════════════ */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 20px;
+  font-size: 11px; font-family: 'Kanit', sans-serif; white-space: nowrap;
+}
+.b-blue   { background: rgba(99,102,241,.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,.25); }
+.b-purple { background: rgba(139,92,246,.15); color: #c4b5fd; border: 1px solid rgba(139,92,246,.25); }
+.b-green  { background: rgba(16,185,129,.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,.25); }
+.b-orange { background: rgba(245,158,11,.15); color: #fcd34d; border: 1px solid rgba(245,158,11,.25); }
+.b-red    { background: rgba(244,63,94,.15);  color: #fda4af; border: 1px solid rgba(244,63,94,.25); }
+.b-cyan   { background: rgba(14,165,233,.15); color: #7dd3fc; border: 1px solid rgba(14,165,233,.25); }
+.b-yellow { background: rgba(234,179,8,.15);  color: #fde047; border: 1px solid rgba(234,179,8,.25); }
+.b-gray   { background: var(--bg-glass); color: var(--t2); border: 1px solid var(--border); }
+
+/* light mode badge adjustments */
+[data-theme="light"] .b-blue   { color: #4f46e5; }
+[data-theme="light"] .b-purple { color: #7c3aed; }
+[data-theme="light"] .b-green  { color: #059669; }
+[data-theme="light"] .b-orange { color: #d97706; }
+[data-theme="light"] .b-red    { color: #e11d48; }
+[data-theme="light"] .b-cyan   { color: #0284c7; }
+
+/* ════════════════════════════════════════
+   STOCK MINI BAR
+════════════════════════════════════════ */
+.stock-cell { display: flex; flex-direction: column; gap: 4px; min-width: 90px; }
+.stock-num { font-family: 'Kanit', sans-serif; font-size: 14px; font-weight: 700; }
+.stock-bar-wrap { height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.stock-bar { height: 100%; border-radius: 99px; transition: width .4s; }
+.lv-ok .stock-bar  { background: var(--emerald); }
+.lv-ok .stock-num  { color: #6ee7b7; }
+.lv-low .stock-bar { background: var(--amber); }
+.lv-low .stock-num { color: #fcd34d; }
+.lv-out .stock-bar { background: var(--rose); }
+.lv-out .stock-num { color: #fda4af; }
+
+/* ════════════════════════════════════════
+   FILTER BAR (pill buttons)
+════════════════════════════════════════ */
+.filter-bar {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 0;
+  flex-wrap: wrap; overflow-x: auto;
+  scrollbar-width: none;
+}
+.filter-bar::-webkit-scrollbar { display: none; }
+.filter-group {
+  display: flex; align-items: center; gap: 5px;
+  padding: 3px 14px 3px 0;
+  border-right: 1px solid var(--border);
+  margin-right: 14px; flex-shrink: 0;
+}
+.filter-group-label {
+  font-size: 10px; font-family: 'Kanit', sans-serif;
+  text-transform: uppercase; letter-spacing: .08em;
+  color: var(--t3); white-space: nowrap; margin-right: 4px;
+}
+.filter-pills { display: flex; gap: 4px; }
+
+.btab {
+  padding: 5px 12px; border-radius: 20px;
+  border: 1px solid var(--border);
+  font-size: 12px; font-family: 'Kanit', sans-serif;
+  cursor: pointer; color: var(--t2); background: none;
+  transition: all .18s; white-space: nowrap;
+}
+.btab:hover { border-color: var(--border-hi); color: var(--t1); }
+.btab.active {
+  background: rgba(99,102,241,.15);
+  border-color: rgba(99,102,241,.4); color: #a5b4fc;
+  font-weight: 500;
+}
+
+/* ════════════════════════════════════════
+   SEARCH BOX
+════════════════════════════════════════ */
+.search-wrap {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--input-bg);
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: 7px 12px; transition: border-color .2s;
+}
+.search-wrap:focus-within { border-color: rgba(99,102,241,.5); }
+.search-wrap svg { width:15px; height:15px; stroke:var(--t3); flex-shrink:0; stroke-width:2; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+.search-wrap input {
+  background: none; border: none; outline: none;
+  color: var(--t1); font-family: 'Sarabun', sans-serif; font-size: 13px;
+}
+.search-wrap input::placeholder { color: var(--t3); }
+
+/* ════════════════════════════════════════
+   FORM
+════════════════════════════════════════ */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 20px; }
+.fg-full { grid-column: 1/-1; }
+.flabel {
+  font-family: 'Kanit', sans-serif; font-size: 12px; font-weight: 500;
+  color: var(--t2); margin-bottom: 6px; display: block;
+}
+.finput,.fselect,.ftextarea {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: 9px 13px; color: var(--t1);
+  font-family: 'Sarabun', sans-serif; font-size: 13px;
+  outline: none; transition: border-color .2s, box-shadow .2s;
+}
+.finput:focus,.fselect:focus,.ftextarea:focus {
+  border-color: rgba(99,102,241,.55);
+  box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+}
+.fselect { cursor: pointer; }
+.fselect option { background: var(--bg-panel); color: var(--t1); }
+.ftextarea { resize: vertical; min-height: 72px; }
+.input-row { display: flex; gap: 8px; }
+.input-row .finput { flex: 1; }
+.unit-badge {
+  display: flex; align-items: center; padding: 0 13px;
+  background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px;
+  color: var(--t2); font-size: 12px; white-space: nowrap;
+}
+.form-foot {
+  padding: 14px 20px; border-top: 1px solid var(--border);
+  display: flex; gap: 8px; justify-content: flex-end;
+}
+
+/* ════════════════════════════════════════
+   MODAL
+════════════════════════════════════════ */
+.overlay {
+  position: fixed; inset: 0;
+  background: var(--overlay-bg);
+  backdrop-filter: blur(8px);
+  z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-hi);
+  border-radius: 18px;
+  width: 520px; max-width: calc(100vw - 32px);
+  max-height: 90vh; overflow-y: auto;
+  transform: translateY(16px) scale(.97);
+  transition: transform .25s;
+  box-shadow: var(--shadow);
+}
+.overlay.open .modal { transform: none; }
+.modal-head {
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+}
+.modal-head-icon {
+  width: 42px; height: 42px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.modal-head h3 { font-family: 'Kanit', sans-serif; font-size: 15px; font-weight: 600; color: var(--t1); }
+.modal-head p  { font-size: 12px; color: var(--t2); margin-top: 2px; }
+.modal-close {
+  margin-left: auto;
+  width: 30px; height: 30px; border-radius: 8px;
+  background: var(--bg-glass); border: 1px solid var(--border);
+  color: var(--t2); font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .15s;
+}
+.modal-close:hover { color: var(--t1); border-color: var(--border-hi); }
+
+/* ════════════════════════════════════════
+   ALERT ROW
+════════════════════════════════════════ */
+.alert-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  transition: background .12s; cursor: default;
+}
+.alert-row:last-child { border-bottom: none; }
+.alert-row:hover { background: var(--bg-hover); }
+.alert-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.alert-name { flex: 1; font-size: 13px; color: var(--t1); }
+.alert-name small { display: block; color: var(--t2); font-size: 11px; margin-top: 1px; }
+
+/* ════════════════════════════════════════
+   APPROVAL CARD
+════════════════════════════════════════ */
+.ap-card {
+  background: var(--bg-glass); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 16px;
+  display: flex; align-items: flex-start; gap: 14px;
+  transition: border-color .2s;
+}
+.ap-card:hover { border-color: var(--border-hi); }
+.ap-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.ap-body { flex: 1; }
+.ap-name { font-weight: 500; font-size: 13px; margin-bottom: 4px; color: var(--t1); }
+.ap-meta { font-size: 12px; color: var(--t2); display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.ap-actions { display: flex; gap: 7px; }
+
+/* ════════════════════════════════════════
+   BUILDING TAGS
+════════════════════════════════════════ */
+.tag-bldg {
+  display: inline-block; padding: 2px 9px;
+  border-radius: 6px; font-size: 11px; font-family: 'Kanit', sans-serif;
+}
+.t-ari { background: rgba(99,102,241,.15); color: #a5b4fc; }
+.t-ksl { background: rgba(139,92,246,.15); color: #c4b5fd; }
+.t-esv { background: rgba(16,185,129,.15); color: #6ee7b7; }
+[data-theme="light"] .t-ari { color: #4f46e5; }
+[data-theme="light"] .t-ksl { color: #7c3aed; }
+[data-theme="light"] .t-esv { color: #059669; }
+
+/* ════════════════════════════════════════
+   PAGINATION
+════════════════════════════════════════ */
+.page-btn {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: var(--bg-glass); border: 1px solid var(--border);
+  color: var(--t2); font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .15s;
+}
+.page-btn:hover { border-color: var(--border-hi); color: var(--t1); }
+.page-btn.active {
+  background: rgba(99,102,241,.2); border-color: rgba(99,102,241,.4); color: #a5b4fc;
+}
+
+/* ════════════════════════════════════════
+   TOAST
+════════════════════════════════════════ */
+.toast-wrap {
+  position: fixed; bottom: 24px; right: 24px;
+  display: flex; flex-direction: column; gap: 8px; z-index: 9999;
+}
+.toast {
+  background: var(--toast-bg);
+  border: 1px solid var(--border-hi);
+  border-radius: 12px; padding: 12px 16px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; min-width: 240px;
+  transform: translateX(120%); transition: transform .3s cubic-bezier(.4,0,.2,1);
+  box-shadow: var(--shadow);
+}
+.toast.show { transform: none; }
+
+/* ════════════════════════════════════════
+   MISC
+════════════════════════════════════════ */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.fade-in { animation: fadeIn .4s ease forwards; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+.fsel {
+  background: var(--input-bg);
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: 7px 11px; color: var(--t1);
+  font-family: 'Sarabun', sans-serif; font-size: 12px; outline: none; cursor: pointer;
+}
+.fsel option { background: var(--bg-panel); }
+
+/* ════════════════════════════════════════
+   MOBILE BOTTOM NAV
+════════════════════════════════════════ */
+#bottom-nav {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 90;
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border);
+  padding: 8px 0 env(safe-area-inset-bottom);
+  backdrop-filter: blur(20px);
+}
+.bnav-items {
+  display: flex; justify-content: space-around;
+  max-width: 480px; margin: 0 auto;
+}
+.bnav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 6px 12px; border-radius: 12px;
+  cursor: pointer; color: var(--t3); font-size: 10px;
+  font-family: 'Kanit', sans-serif; transition: all .2s;
+  border: none; background: none;
+  min-width: 60px;
+}
+.bnav-item svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.bnav-item.active { color: var(--indigo); }
+.bnav-item.active svg { stroke: var(--indigo); }
+[data-theme="light"] .bnav-item.active { color: var(--indigo); }
+
+/* ════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════ */
+@media (max-width: 960px) {
+  #sb { transform: translateX(-260px); width: 260px; }
+  #sb.open { transform: none; }
+  #sb-ov { display: block; }
+  #main { margin-left: 0 !important; }
+  .hamburger { display: flex !important; }
+  .stats-row { grid-template-columns: repeat(2,1fr); }
+  .two-col { grid-template-columns: 1fr; }
+  #content { padding: 16px; gap: 14px; }
+}
+
+@media (max-width: 640px) {
+  .stats-row { grid-template-columns: repeat(2,1fr); gap: 10px; }
+  #content { padding: 12px 12px 80px; gap: 12px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .fg-full { grid-column: 1; }
+  #bottom-nav { display: block; }
+  .topbar { padding: 0 14px; }
+  .toast-wrap { bottom: 80px; right: 12px; left: 12px; }
+  .toast { min-width: auto; }
+}
+
+/* scrollbar */
+* { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+*::-webkit-scrollbar { width: 6px; height: 6px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+*::-webkit-scrollbar-thumb:hover { background: var(--border-hi); }
+
+/* ════════════════════════════════════════
+   KPI CARD SYSTEM (shared across pages)
+════════════════════════════════════════ */
+.dash-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.kpi-card{
+  border-radius:20px;padding:22px 22px 18px;position:relative;overflow:hidden;cursor:default;
+  transition:transform .22s cubic-bezier(.4,0,.2,1),box-shadow .22s;
+  display:flex;flex-direction:column;min-height:150px;
+}
+.kpi-card:hover{transform:translateY(-4px);}
+.kpi-blob{
+  position:absolute;width:120px;height:120px;border-radius:50%;
+  background:rgba(255,255,255,.12);top:-30px;right:-30px;pointer-events:none;
+}
+.kpi-blob2{
+  position:absolute;width:70px;height:70px;border-radius:50%;
+  background:rgba(255,255,255,.07);bottom:-20px;left:10px;pointer-events:none;
+}
+.kpi-toprow{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:auto;}
+.kpi-icon-wrap{
+  width:52px;height:52px;border-radius:16px;
+  background:rgba(255,255,255,.2);backdrop-filter:blur(4px);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.kpi-icon-wrap svg{
+  width:26px!important;height:26px!important;
+  stroke:#fff!important;fill:none!important;
+  stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;
+}
+.kpi-badge{
+  background:rgba(255,255,255,.25);color:#fff;
+  font-size:10px;font-family:'Kanit',sans-serif;font-weight:600;
+  padding:3px 10px;border-radius:20px;backdrop-filter:blur(4px);
+  align-self:flex-start;
+}
+.kpi-num{font-family:'Kanit',sans-serif;font-size:42px;font-weight:900;color:#fff;line-height:1;margin-top:14px;}
+.kpi-label{font-size:13px;color:rgba(255,255,255,.85);margin-top:4px;font-family:'Kanit',sans-serif;font-weight:500;}
+.kpi-sub{font-size:11px;color:rgba(255,255,255,.55);margin-top:2px;}
+
+/* category cards */
+.cat-card{border-radius:20px;padding:0;overflow:hidden;cursor:pointer;transition:transform .22s cubic-bezier(.4,0,.2,1),box-shadow .22s;display:flex;flex-direction:column;position:relative;min-height:200px;}
+.cat-card:hover{transform:translateY(-5px);}
+.cat-card-inner{flex:1;padding:20px 20px 16px;display:flex;flex-direction:column;position:relative;overflow:hidden;}
+.cat-card-num-badge{position:absolute;top:14px;left:14px;width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.22);backdrop-filter:blur(4px);font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;}
+.cat-card-count-badge{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.22);backdrop-filter:blur(4px);font-family:'Kanit',sans-serif;font-size:11px;font-weight:600;color:#fff;padding:3px 9px;border-radius:20px;}
+.cat-card-icon-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:10px 0 6px;}
+.cat-card-icon-bg{width:80px;height:80px;border-radius:22px;background:rgba(255,255,255,.18);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.15);}
+.cat-card-icon-bg svg{width:40px!important;height:40px!important;stroke:#fff!important;fill:none!important;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.cat-card-footer{padding:14px 18px 16px;background:rgba(0,0,0,.18);backdrop-filter:blur(6px);}
+.cat-card-title{font-family:'Kanit',sans-serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:2px;}
+.cat-card-sub{font-size:11px;color:rgba(255,255,255,.65);}
+.cat-card-bar-wrap{height:3px;background:rgba(255,255,255,.2);border-radius:99px;margin-top:10px;overflow:hidden;}
+.cat-card-bar{height:100%;border-radius:99px;background:rgba(255,255,255,.8);transition:width .8s;}
+.cat-card-bar-label{font-size:10px;color:rgba(255,255,255,.55);margin-top:4px;}
+
+@media(max-width:960px){.dash-grid-4{grid-template-columns:repeat(2,1fr);}.cat-card{min-height:170px;}}
+@media(max-width:640px){.dash-grid-4{grid-template-columns:repeat(2,1fr);gap:10px;}.kpi-num{font-size:34px;}.cat-card-icon-bg{width:60px;height:60px;}.cat-card-icon-bg svg{width:30px!important;height:30px!important;}}
 </style>
 </head>
 <body>
 
-<div class="loader" id="loader"><div style="text-align:center"><div class="spin"></div><div style="margin-top:12px;font-size:12px;color:var(--t2);font-family:'Kanit',sans-serif">กำลังโหลด…</div></div></div>
+<!-- LOADER -->
+<div class="loader" id="loader">
+  <div style="text-align:center">
+    <div style="position:relative;width:52px;height:52px;margin:0 auto">
+      <div class="loader-ring"></div>
+    </div>
+    <div style="margin-top:16px;font-size:13px;color:var(--t2);font-family:'Kanit',sans-serif;font-weight:500">GNR3 Stock กำลังโหลด…</div>
+  </div>
+</div>
+
+<!-- SIDEBAR BACKDROP -->
 <div id="sb-ov" onclick="closeSB()"></div>
 
 <!-- SIDEBAR -->
 <nav id="sb">
   <div class="sb-logo">
-    <div class="sb-logo-icon">📦</div>
+    <div class="sb-logo-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+    </div>
     <div class="sb-logo-text">GNR3 Stock<small>Management System</small></div>
   </div>
+
   <div class="sb-nav">
-    <div class="sb-section">หลัก</div>
-    <div class="nb active" data-page="dashboard"><span class="ni">🏠</span>Dashboard</div>
-    <div class="sb-section">สต็อก</div>
-    <div class="nb" data-page="stock"><span class="ni">🛒</span>สต็อก อุปโภค บริโภค</div>
-    <div class="nb" data-page="maintenance"><span class="ni">🔧</span>สต็อก ส่วนกลาง</div>
-    <div class="sb-section">ธุรกรรม</div>
-    <div class="nb" data-page="import"><span class="ni">⬇️</span>นำเข้าสินค้า</div>
-    <div class="nb" data-page="checkin"><span class="ni">↩️</span>เช็คอิน / คืน</div>
-    <div class="nb" data-page="withdraw"><span class="ni">⬆️</span>เบิกสินค้า</div>
-    <div class="nb" data-page="approve"><span class="ni">✅</span>อนุมัติการเบิก<span class="badge" id="badge-ap" style="display:none">0</span></div>
-    <div class="sb-section">ข้อมูล</div>
-    <div class="nb" data-page="history"><span class="ni">📋</span>ประวัติทั้งหมด</div>
-    <div class="nb" data-page="settings"><span class="ni">⚙️</span>ตั้งค่าสต็อกขั้นต่ำ</div>
+    <!-- Back to main -->
+    <a href="https://add00917-hue.github.io/GNR3-Building-MS/" target="_blank" style="text-decoration:none">
+      <div class="nb nb-home">
+        <div class="nb-icon">
+          <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <span class="nb-label">กลับหน้าหลัก GNR3</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+      </div>
+    </a>
+
+    <div class="sb-section">Main Menu</div>
+
+    <div class="nb active" data-page="dashboard">
+      <div class="nb-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      </div>
+      <span class="nb-label">Dashboard</span>
+    </div>
+
+    <div class="nb" data-page="stock">
+      <div class="nb-icon">
+        <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      </div>
+      <span class="nb-label">สต็อก อุปโภค บริโภค</span>
+    </div>
+
+    <div class="nb" data-page="maintenance">
+      <div class="nb-icon">
+        <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      </div>
+      <span class="nb-label">สต็อก ส่วนกลาง</span>
+    </div>
+
+    <div class="nb" data-page="calendar">
+      <div class="nb-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <span class="nb-label">ปฏิทินสต็อก</span>
+    </div>
+
+    <div class="sb-section">Admin</div>
+
+    <div class="nb" data-page="admin" id="nb-admin">
+      <div class="nb-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <span class="nb-label">Admin Panel</span>
+      <span class="nb-badge" id="badge-ap" style="display:none">0</span>
+    </div>
   </div>
+
   <div class="sb-foot">
-    <div style="font-size:11px;color:var(--t3);margin-bottom:8px;font-family:'Kanit',sans-serif">ตัวกรองอาคาร</div>
-    <div style="display:flex;flex-direction:column;gap:5px;" id="bldg-sidebar">
-      <div class="bldg-pill sel" data-b="all"><div class="bldg-dot" style="background:var(--blue)"></div>ทุกอาคาร</div>
-      <div class="bldg-pill" data-b="Ari Hills"><div class="bldg-dot" style="background:var(--blue)"></div>Ari Hills</div>
-      <div class="bldg-pill" data-b="KSL"><div class="bldg-dot" style="background:var(--purple)"></div>KSL</div>
-      <div class="bldg-pill" data-b="ESV"><div class="bldg-dot" style="background:var(--green)"></div>ESV</div>
+    <!-- Dark/Light toggle -->
+    <div class="theme-toggle" onclick="toggleTheme()">
+      <span style="display:flex;align-items:center;gap:7px;font-size:12px;font-family:'Kanit',sans-serif">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="theme-icon-sb">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <span id="theme-label-sb">โหมดกลางคืน</span>
+      </span>
+      <div class="toggle-track"><div class="toggle-thumb">🌙</div></div>
+    </div>
+
+    <!-- Building filter -->
+    <div class="sb-foot-label">ตัวกรองอาคาร</div>
+    <div class="bldg-pills" id="bldg-sidebar">
+      <div class="bldg-pill sel" data-b="all">
+        <div class="bldg-dot" style="background:var(--indigo)"></div>ทุกอาคาร
+      </div>
+      <div class="bldg-pill" data-b="Ari Hills">
+        <div class="bldg-dot" style="background:#6366f1"></div>Ari Hills
+      </div>
+      <div class="bldg-pill" data-b="KSL">
+        <div class="bldg-dot" style="background:#8b5cf6"></div>KSL
+      </div>
+      <div class="bldg-pill" data-b="ESV">
+        <div class="bldg-dot" style="background:#10b981"></div>ESV
+      </div>
     </div>
   </div>
 </nav>
@@ -275,31 +1041,101 @@ td{padding:10px 14px;font-size:13px;vertical-align:middle;}
 <!-- MAIN -->
 <div id="main">
   <div class="topbar">
-    <button class="hamburger" onclick="toggleSB()">☰</button>
-    <div>
-      <div class="topbar-title" id="pg-title">📊 Dashboard</div>
-      <div style="font-size:11px;color:var(--t2)" id="pg-sub">ภาพรวมสต็อก GNR3</div>
+    <button class="hamburger" onclick="toggleSB()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="topbar-info">
+      <div class="topbar-title" id="pg-title" style="display:flex;align-items:center;gap:10px">
+        <div id="pg-icon" style="width:34px;height:34px;border-radius:10px;background:var(--gr-primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 10px rgba(99,102,241,.35)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        </div>
+        <span id="pg-title-text">Dashboard</span>
+      </div>
+      <div class="topbar-sub" id="pg-sub">ภาพรวมสต็อก GNR3</div>
     </div>
-    <div class="topbar-right" id="topbar-actions"></div>
+    <div class="topbar-right">
+      <!-- dark/light toggle (topbar, visible on mobile) -->
+      <button class="topbar-theme-btn" onclick="toggleTheme()" title="เปลี่ยนธีม" id="theme-icon-top-btn">
+        <svg id="theme-icon-top" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <div id="topbar-actions" style="display:flex;align-items:center;gap:8px"></div>
+    </div>
   </div>
   <div id="content"></div>
 </div>
 
-<!-- MODALS -->
+<!-- MOBILE BOTTOM NAV -->
+<nav id="bottom-nav">
+  <div class="bnav-items">
+    <button class="bnav-item active" data-page="dashboard" onclick="navigate('dashboard')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      หลัก
+    </button>
+    <button class="bnav-item" data-page="stock" onclick="navigate('stock')">
+      <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      สต็อก
+    </button>
+    <button class="bnav-item" data-page="maintenance" onclick="navigate('maintenance')">
+      <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      ส่วนกลาง
+    </button>
+    <button class="bnav-item" data-page="calendar" onclick="navigate('calendar')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      ปฏิทิน
+    </button>
+    <button class="bnav-item" data-page="admin" onclick="navigate('admin')" id="bnav-admin">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Admin
+    </button>
+  </div>
+</nav>
+
+<!-- REJECT MODAL -->
 <div class="overlay" id="ov-reject" onclick="closeOverlay('ov-reject',event)">
   <div class="modal" style="width:420px">
     <div class="modal-head">
-      <div class="modal-head-icon" style="background:rgba(239,68,68,.15)">🚫</div>
+      <div class="modal-head-icon" style="background:rgba(244,63,94,.15)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fb7185" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
       <div><h3>ปฏิเสธคำขอเบิก</h3><p id="reject-sub"></p></div>
       <div class="modal-close" onclick="closeOverlay('ov-reject')">✕</div>
     </div>
-    <div style="padding:16px 18px">
+    <div style="padding:18px 22px">
       <label class="flabel">เหตุผลที่ปฏิเสธ *</label>
       <textarea class="ftextarea" id="reject-reason" rows="3" placeholder="ระบุเหตุผล…"></textarea>
     </div>
     <div class="form-foot">
       <button class="btn btn-ghost" onclick="closeOverlay('ov-reject')">ยกเลิก</button>
       <button class="btn btn-danger" onclick="confirmReject()">🚫 ปฏิเสธ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN MODAL -->
+<div class="overlay" id="ov-login">
+  <div class="modal" style="width:380px">
+    <div class="modal-head" style="padding:24px 24px 18px;border-bottom:none">
+      <div class="modal-head-icon" style="background:var(--gr-primary);width:48px;height:48px;border-radius:14px;box-shadow:0 6px 20px rgba(99,102,241,.4)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <div>
+        <h3 style="font-size:17px">Admin Login</h3>
+        <p>กรุณาใส่รหัสเพื่อเข้าระบบ Admin</p>
+      </div>
+    </div>
+    <div style="padding:0 24px 20px">
+      <label class="flabel">Username</label>
+      <input type="text" class="finput" id="login-user" placeholder="username" style="margin-bottom:14px" autocomplete="username">
+      <label class="flabel">Password</label>
+      <div style="position:relative">
+        <input type="password" class="finput" id="login-pass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()" style="padding-right:42px">
+        <button onclick="togglePw()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--t2);cursor:pointer;font-size:15px;display:flex;align-items:center" id="pw-eye">👁️</button>
+      </div>
+      <div id="login-err" style="margin-top:10px;font-size:12px;color:#fda4af;display:none;background:rgba(244,63,94,.1);padding:8px 12px;border-radius:8px;border:1px solid rgba(244,63,94,.2)">⚠️ Username หรือ Password ไม่ถูกต้อง</div>
+    </div>
+    <div class="form-foot" style="padding:14px 24px;border-top:1px solid var(--border)">
+      <button class="btn btn-ghost" onclick="closeOverlay('ov-login')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="doLogin()" style="min-width:110px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> เข้าสู่ระบบ</button>
     </div>
   </div>
 </div>
@@ -520,44 +1356,122 @@ function genId(){
 }
 
 /* ================================================================
+   ADMIN AUTH
+================================================================ */
+const ADMIN_CREDS = {username:'admin', password:'gnr3admin'};
+let adminLoggedIn = false;
+
+function doLogin(){
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-err');
+  if(u===ADMIN_CREDS.username && p===ADMIN_CREDS.password){
+    adminLoggedIn = true;
+    err.style.display='none';
+    closeOverlay('ov-login');
+    document.getElementById('login-user').value='';
+    document.getElementById('login-pass').value='';
+    // update sidebar badge to show logged-in state
+    const nb = document.getElementById('nb-admin');
+    nb.innerHTML = `<span class="nb-icon" style="width:20px;height:20px;display:flex;align-items:center"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><span class="nb-label">Admin Panel</span>
+      <span style="margin-left:auto;font-size:10px;background:rgba(34,197,94,.2);color:#86efac;border:1px solid rgba(34,197,94,.25);padding:1px 6px;border-radius:8px;font-family:'Kanit',sans-serif">เข้าสู่ระบบแล้ว</span>
+      <span class="badge" id="badge-ap" style="display:${pendingCount()>0?'':'none'}">${pendingCount()}</span>`;
+    showToast('✅','เข้าสู่ระบบ Admin สำเร็จ');
+    const dest = _pendingPage || 'admin';
+    _pendingPage = null;
+    navigate(dest);
+  } else {
+    err.style.display='block';
+    document.getElementById('login-pass').value='';
+    document.getElementById('login-pass').focus();
+  }
+}
+
+function doLogout(){
+  adminLoggedIn = false;
+  const nb = document.getElementById('nb-admin');
+  nb.innerHTML = `<span class="nb-icon" style="width:20px;height:20px;display:flex;align-items:center"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><span class="nb-label">Admin Panel</span><span class="badge" id="badge-ap" style="display:${pendingCount()>0?'':'none'}">${pendingCount()}</span>`;
+  showToast('👋','ออกจากระบบ Admin แล้ว');
+  navigate('dashboard');
+}
+
+function togglePw(){
+  const inp = document.getElementById('login-pass');
+  inp.type = inp.type==='password'?'text':'password';
+}
+
+/* ================================================================
    NAVIGATION
 ================================================================ */
 function navigate(page){
+  // Only action pages (edit/add) require login — admin hub is public
+  const loginRequired = ['import','withdraw','approve','settings'];
+  if(loginRequired.includes(page) && !adminLoggedIn){
+    document.getElementById('ov-login').classList.add('open');
+    document.getElementById('login-user').focus();
+    _pendingPage = page;
+    return;
+  }
+
   currentPage = page;
-  document.querySelectorAll('.nb').forEach(el=>{
+  document.querySelectorAll('.nb[data-page]').forEach(el=>{
+    el.classList.toggle('active', el.dataset.page===page);
+  });
+  document.querySelectorAll('.bnav-item[data-page]').forEach(el=>{
     el.classList.toggle('active', el.dataset.page===page);
   });
   const titles = {
-    dashboard:'📊 Dashboard',
-    stock:'🛒 สต็อก อุปโภค บริโภค',
-    maintenance:'🔧 สต็อก ส่วนกลาง',
-    import:'⬇️ นำเข้าสินค้า', checkin:'↩️ เช็คอิน / คืนสินค้า',
-    withdraw:'⬆️ เบิกสินค้า', approve:'✅ อนุมัติการเบิก',
-    history:'📋 ประวัติทั้งหมด', settings:'⚙️ ตั้งค่าสต็อกขั้นต่ำ',
+    dashboard:'Dashboard',
+    stock:'สต็อก อุปโภค บริโภค',
+    maintenance:'สต็อก ส่วนกลาง',
+    calendar:'ปฏิทินสต็อก',
+    admin:'Admin Panel',
+    import:'นำเข้าสินค้า',
+    withdraw:'เบิกสินค้า', approve:'อนุมัติการเบิก',
+    history:'ประวัติทั้งหมด', settings:'ตั้งค่าสต็อกขั้นต่ำ',
   };
   const subs = {
     dashboard:'ภาพรวมสต็อกทุกอาคาร GNR3',
     stock:'สำนักงาน · อุปโภค · บริโภค (38 รายการ)',
     maintenance:'งานซ่อมบำรุง · ระบบไฟฟ้า · ระบบประปา (21 รายการ)',
+    admin:'จัดการระบบ · เฉพาะผู้ดูแล',
+    calendar:'ดูรายการนำเข้า-เบิกแยกตามวันที่',
     import:'บันทึกการรับสินค้าเข้าคลัง',
-    checkin:'คืนสินค้าหรือบันทึกของที่ตรวจนับได้',
     withdraw:'ยื่นคำขอเบิกสินค้า',
     approve:'พิจารณาคำขอเบิกที่รอดำเนินการ',
     history:'บันทึกธุรกรรมทั้งหมด',
     settings:'กำหนดจำนวนสต็อกขั้นต่ำแต่ละรายการ',
   };
-  document.getElementById('pg-title').textContent = titles[page]||page;
+  const PAGE_ICONS = {
+    dashboard: {svg:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',  grad:'linear-gradient(135deg,#6366f1,#8b5cf6)'},
+    stock:     {svg:'<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>',                               grad:'linear-gradient(135deg,#8b5cf6,#ec4899)'},
+    maintenance:{svg:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',  grad:'linear-gradient(135deg,#f59e0b,#f97316)'},
+    calendar:  {svg:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',  grad:'linear-gradient(135deg,#0ea5e9,#6366f1)'},
+    admin:     {svg:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',                                                                                  grad:'linear-gradient(135deg,#6366f1,#8b5cf6)'},
+    import:    {svg:'<polyline points="8 17 12 21 16 17"/><line x1="12" y1="3" x2="12" y2="21"/>',                                                                                             grad:'linear-gradient(135deg,#10b981,#14b8a6)'},
+    withdraw:  {svg:'<polyline points="8 7 12 3 16 7"/><line x1="12" y1="21" x2="12" y2="3"/>',                                                                                                grad:'linear-gradient(135deg,#f59e0b,#f97316)'},
+    approve:   {svg:'<polyline points="20 6 9 17 4 12"/>',                                                                                                                                      grad:'linear-gradient(135deg,#6366f1,#0ea5e9)'},
+    history:   {svg:'<path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>',                                                                                                            grad:'linear-gradient(135deg,#8b5cf6,#ec4899)'},
+    settings:  {svg:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',   grad:'linear-gradient(135deg,#64748b,#94a3b8)'},
+  };
+  const ic = PAGE_ICONS[page]||PAGE_ICONS.dashboard;
+  const pgIcon = document.getElementById('pg-icon');
+  const pgTxt  = document.getElementById('pg-title-text');
+  if(pgIcon){ pgIcon.style.background=ic.grad; pgIcon.innerHTML=`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ic.svg}</svg>`; }
+  if(pgTxt) pgTxt.textContent = titles[page]||page;
+  else document.getElementById('pg-title').textContent = titles[page]||page;
   document.getElementById('pg-sub').textContent = subs[page]||'';
   updateBadge();
   render(page);
   closeSB();
 }
 
+let _pendingPage = null;
+
 function updateBadge(){
   const cnt = pendingCount();
   const el = document.getElementById('badge-ap');
-  el.textContent = cnt;
-  el.style.display = cnt>0?'':'none';
+  if(el){ el.textContent = cnt; el.style.display = cnt>0?'':'none'; }
 }
 
 /* ================================================================
@@ -567,9 +1481,349 @@ function render(page){
   const ct = document.getElementById('content');
   ct.innerHTML = '';
   const fns = {dashboard:renderDashboard,stock:renderStock,maintenance:renderMaintenance,
-                import:renderImport,checkin:renderCheckin,withdraw:renderWithdraw,
+                calendar:renderCalendar,
+                admin:renderAdmin,import:renderImport,withdraw:renderWithdraw,
                 approve:renderApprove,history:renderHistory,settings:renderSettings};
   (fns[page]||renderDashboard)();
+}
+
+/* ================================================================
+   PAGE: CALENDAR (ปฏิทินสต็อก)
+================================================================ */
+let calState = { year: new Date().getFullYear(), month: new Date().getMonth() };
+
+function renderCalendar(){
+  document.getElementById('topbar-actions').innerHTML = '';
+  refreshCalendar();
+}
+
+function calPrev(){ calState.month--; if(calState.month<0){calState.month=11;calState.year--;} refreshCalendar(); }
+function calNext(){ calState.month++; if(calState.month>11){calState.month=0;calState.year++;} refreshCalendar(); }
+function calToday(){ calState.year=new Date().getFullYear(); calState.month=new Date().getMonth(); refreshCalendar(); }
+
+function refreshCalendar(){
+  const {year, month} = calState;
+  const bldg = globalBldg;
+  const now = new Date();
+
+  const TH_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+                     'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  const TH_DAYS_SHORT = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+  const YEARS = Array.from({length:10},(_,i)=>year-4+i);
+
+  // stats for selected month
+  const monthTxn = transactions.filter(t=>{
+    const d = new Date(t.createdAt);
+    return d.getFullYear()===year && d.getMonth()===month && t.status==='approved'
+      && (bldg==='all'||t.building===bldg);
+  });
+  const importCnt = monthTxn.filter(t=>t.type==='import').reduce((s,t)=>s+t.qty,0);
+  const withdrawCnt = monthTxn.filter(t=>t.type==='withdraw').reduce((s,t)=>s+t.qty,0);
+  const txnDays = new Set(monthTxn.map(t=>new Date(t.createdAt).getDate())).size;
+  const pendingCnt = transactions.filter(t=>t.type==='withdraw'&&t.status==='pending'
+    &&(bldg==='all'||t.building===bldg)).length;
+
+  // build calendar grid
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const isCurrentMonth = year===now.getFullYear() && month===now.getMonth();
+  const today = now.getDate();
+
+  // build day → txn map
+  const dayMap = {};
+  monthTxn.forEach(t=>{
+    const d = new Date(t.createdAt).getDate();
+    if(!dayMap[d]) dayMap[d] = {import:0,withdraw:0,pending:0};
+    if(t.type==='import') dayMap[d].import += t.qty;
+    else if(t.type==='withdraw') dayMap[d].withdraw += t.qty;
+  });
+  // add pending to current month if matching
+  transactions.filter(t=>t.type==='withdraw'&&t.status==='pending'&&(bldg==='all'||t.building===bldg))
+    .forEach(t=>{
+      const d = new Date(t.createdAt); if(d.getFullYear()===year&&d.getMonth()===month){
+        const day = d.getDate();
+        if(!dayMap[day]) dayMap[day]={import:0,withdraw:0,pending:0};
+        dayMap[day].pending++;
+      }
+    });
+
+  // grid cells
+  let cells = '';
+  for(let i=0;i<firstDay;i++) cells += `<div class="cal-cell cal-empty"></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const info = dayMap[d];
+    const isToday = isCurrentMonth && d===today;
+    const hasTxn = !!info;
+    const dots = info ? [
+      info.import>0   ? `<div class="cal-dot" style="background:var(--emerald)" title="นำเข้า ${info.import}"></div>` : '',
+      info.withdraw>0 ? `<div class="cal-dot" style="background:var(--rose)"    title="เบิก ${info.withdraw}"></div>` : '',
+      info.pending>0  ? `<div class="cal-dot" style="background:var(--amber)"   title="รอ ${info.pending}"></div>` : '',
+    ].join('') : '';
+    cells += `<div class="cal-cell ${isToday?'cal-today':''} ${hasTxn?'cal-has-txn':''}"
+      onclick="calDayClick(${d},${year},${month})" title="${d} ${TH_MONTHS[month]}">
+      <div class="cal-day-num">${d}</div>
+      ${info ? `
+      <div style="display:flex;flex-direction:column;gap:2px;margin-top:4px">
+        ${info.import>0   ? `<div class="cal-tag cal-tag-import">⬇ ${info.import}</div>`:''}
+        ${info.withdraw>0 ? `<div class="cal-tag cal-tag-withdraw">⬆ ${info.withdraw}</div>`:''}
+        ${info.pending>0  ? `<div class="cal-tag cal-tag-pending">⏳ ${info.pending}</div>`:''}
+      </div>`:''}
+      <div style="display:flex;gap:3px;margin-top:auto;padding-top:4px">${dots}</div>
+    </div>`;
+  }
+
+  // fill last row
+  const totalCells = firstDay + daysInMonth;
+  const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+  for(let i=0;i<remaining;i++) cells += `<div class="cal-cell cal-empty"></div>`;
+
+  const ct = document.getElementById('content');
+  ct.innerHTML = `
+  <style>
+  .cal-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  .cal-kpi{border-radius:16px;padding:16px 18px;position:relative;overflow:hidden;cursor:default;transition:transform .18s,box-shadow .18s;}
+  .cal-kpi:hover{transform:translateY(-2px);}
+  .cal-kpi-num{font-family:'Kanit',sans-serif;font-size:32px;font-weight:800;line-height:1;margin-bottom:4px;}
+  .cal-kpi-label{font-size:12px;opacity:.85;}
+  .cal-kpi-badge{position:absolute;top:12px;right:12px;font-size:10px;font-family:'Kanit',sans-serif;font-weight:600;padding:2px 9px;border-radius:20px;background:rgba(255,255,255,.22);color:#fff;}
+
+  .cal-nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .cal-nav select{background:var(--bg-glass);border:1px solid var(--border);border-radius:10px;padding:7px 12px;color:var(--t1);font-family:'Kanit',sans-serif;font-size:13px;outline:none;cursor:pointer;}
+  .cal-nav select option{background:var(--bg-panel);}
+  .cal-nav-btn{width:34px;height:34px;border-radius:9px;background:var(--bg-glass);border:1px solid var(--border);color:var(--t1);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+  .cal-nav-btn:hover{border-color:var(--border-hi);}
+  .cal-today-btn{padding:6px 14px;border-radius:9px;background:var(--gr-primary);color:#fff;border:none;font-family:'Kanit',sans-serif;font-size:12px;font-weight:500;cursor:pointer;box-shadow:0 3px 10px rgba(99,102,241,.35);}
+
+  .cal-legend{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .cal-leg-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t2);}
+  .cal-leg-dot{width:9px;height:9px;border-radius:50%;}
+
+  .cal-grid-wrap{overflow:hidden;}
+  .cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--border);}
+  .cal-wday{padding:8px 4px;text-align:center;font-family:'Kanit',sans-serif;font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.05em;}
+  .cal-wday:first-child{color:var(--rose);}
+  .cal-wday:last-child{color:var(--sky);}
+
+  .cal-days{display:grid;grid-template-columns:repeat(7,1fr);}
+  .cal-cell{
+    min-height:76px;padding:8px 10px 6px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);
+    cursor:pointer;transition:background .15s;display:flex;flex-direction:column;
+    position:relative;
+  }
+  .cal-cell:nth-child(7n){border-right:none;}
+  .cal-cell:hover{background:var(--bg-hover);}
+  .cal-cell.cal-empty{background:var(--bg-glass);cursor:default;}
+  .cal-cell.cal-today{background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.3);}
+  .cal-cell.cal-today .cal-day-num{
+    background:var(--gr-primary);color:#fff;border-radius:50%;
+    width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+    font-weight:700;box-shadow:0 2px 8px rgba(99,102,241,.4);
+  }
+  .cal-cell.cal-has-txn:not(.cal-empty){background:rgba(99,102,241,.04);}
+  .cal-day-num{font-family:'Kanit',sans-serif;font-size:13px;font-weight:600;color:var(--t1);min-width:26px;line-height:26px;}
+
+  .cal-tag{font-size:10px;font-family:'Kanit',sans-serif;font-weight:500;padding:1px 6px;border-radius:5px;line-height:1.5;white-space:nowrap;}
+  .cal-tag-import  {background:rgba(16,185,129,.15);color:#6ee7b7;}
+  .cal-tag-withdraw{background:rgba(244,63,94,.12);color:#fda4af;}
+  .cal-tag-pending {background:rgba(245,158,11,.12);color:#fcd34d;}
+  .cal-dot{width:6px;height:6px;border-radius:50%;}
+
+  .cal-detail{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+  .cal-detail-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+  @media(max-width:640px){
+    .cal-kpi-row{grid-template-columns:repeat(2,1fr);}
+    .cal-cell{min-height:54px;padding:5px 6px 4px;}
+    .cal-tag{display:none;}
+  }
+  </style>
+
+  <!-- KPI row -->
+  <div class="cal-kpi-row fade-in">
+    <div class="cal-kpi" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 4px 20px rgba(99,102,241,.4)">
+      <div class="cal-kpi-badge">เดือนนี้</div>
+      <div style="font-size:22px;margin-bottom:8px">📦</div>
+      <div class="cal-kpi-num" id="ck-txn">—</div>
+      <div class="cal-kpi-label">ธุรกรรมทั้งหมด</div>
+    </div>
+    <div class="cal-kpi" style="background:linear-gradient(135deg,#10b981,#14b8a6);color:#fff;box-shadow:0 4px 20px rgba(16,185,129,.4)">
+      <div class="cal-kpi-badge">รับเข้า</div>
+      <div style="margin-bottom:8px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="3" x2="12" y2="21"/></svg></div>
+      <div class="cal-kpi-num" id="ck-in">—</div>
+      <div class="cal-kpi-label">ยอดนำเข้ารวม</div>
+    </div>
+    <div class="cal-kpi" style="background:linear-gradient(135deg,#f43f5e,#ec4899);color:#fff;box-shadow:0 4px 20px rgba(244,63,94,.4)">
+      <div class="cal-kpi-badge">เบิกออก</div>
+      <div style="margin-bottom:8px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 7 12 3 16 7"/><line x1="12" y1="21" x2="12" y2="3"/></svg></div>
+      <div class="cal-kpi-num" id="ck-out">—</div>
+      <div class="cal-kpi-label">ยอดเบิกรวม</div>
+    </div>
+    <div class="cal-kpi" style="background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;box-shadow:0 4px 20px rgba(245,158,11,.4)">
+      <div class="cal-kpi-badge">รอ</div>
+      <div style="font-size:22px;margin-bottom:8px">⏳</div>
+      <div class="cal-kpi-num" id="ck-pend">—</div>
+      <div class="cal-kpi-label">รอการอนุมัติ</div>
+    </div>
+  </div>
+
+  <!-- Calendar card -->
+  <div class="sec fade-in">
+    <!-- nav bar -->
+    <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="calPrev()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <select id="cal-month-sel" onchange="calState.month=+this.value;refreshCalendar()">
+          ${TH_MONTHS.map((m,i)=>`<option value="${i}" ${i===month?'selected':''}>${m}</option>`).join('')}
+        </select>
+        <select id="cal-year-sel" onchange="calState.year=+this.value;refreshCalendar()">
+          ${YEARS.map(y=>`<option value="${y}" ${y===year?'selected':''}>${y+543}</option>`).join('')}
+        </select>
+        <button class="cal-nav-btn" onclick="calNext()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button class="cal-today-btn" onclick="calToday()">วันนี้</button>
+      </div>
+      <div class="cal-legend" style="margin-left:auto">
+        <div class="cal-leg-item"><div class="cal-leg-dot" style="background:var(--emerald)"></div>นำเข้า</div>
+        <div class="cal-leg-item"><div class="cal-leg-dot" style="background:var(--rose)"></div>เบิก</div>
+        <div class="cal-leg-item"><div class="cal-leg-dot" style="background:var(--amber)"></div>รอพิจารณา</div>
+      </div>
+    </div>
+    <!-- weekday headers -->
+    <div class="cal-weekdays">
+      ${TH_DAYS_SHORT.map(d=>`<div class="cal-wday">${d}</div>`).join('')}
+    </div>
+    <!-- day grid -->
+    <div class="cal-days">${cells}</div>
+  </div>
+
+  <!-- Detail section (clicked day) -->
+  <div class="cal-detail fade-in" id="cal-detail-wrap" style="display:none">
+    <div class="cal-detail-head">
+      <span class="sec-title" id="cal-detail-title">รายการวันที่ —</span>
+      <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="document.getElementById('cal-detail-wrap').style.display='none'">✕</button>
+    </div>
+    <div id="cal-detail-body"></div>
+  </div>`;
+
+  // animate KPI
+  animNum('ck-txn',  monthTxn.length);
+  animNum('ck-in',   importCnt);
+  animNum('ck-out',  withdrawCnt);
+  animNum('ck-pend', pendingCnt);
+}
+
+function calDayClick(day, year, month){
+  const bldg = globalBldg;
+  const TH_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+                     'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  const txns = transactions.filter(t=>{
+    const d = new Date(t.createdAt);
+    return d.getFullYear()===year && d.getMonth()===month && d.getDate()===day
+      && (bldg==='all'||t.building===bldg);
+  }).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+
+  const wrap = document.getElementById('cal-detail-wrap');
+  const title = document.getElementById('cal-detail-title');
+  const body  = document.getElementById('cal-detail-body');
+
+  title.textContent = `รายการวันที่ ${day} ${TH_MONTHS[month]} ${year+543}`;
+  wrap.style.display = 'block';
+  wrap.scrollIntoView({behavior:'smooth', block:'nearest'});
+
+  if(txns.length===0){
+    body.innerHTML = `<div class="tbl-empty"><div class="ei" style="font-size:40px;opacity:.4">○</div><p>ไม่มีธุรกรรมในวันนี้</p></div>`;
+    return;
+  }
+  body.innerHTML = `<div class="tbl-wrap"><table>
+    <thead><tr><th>สินค้า</th><th>ประเภท</th><th>อาคาร</th><th>จำนวน</th><th>สถานะ</th><th>เวลา</th></tr></thead>
+    <tbody>${txns.map(t=>{
+      const it = ITEMS.find(x=>x.id===t.itemId);
+      const time = new Date(t.createdAt).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+      return `<tr>
+        <td class="td-name">${it?.name||t.itemId}<small>${it?.unit||''}</small></td>
+        <td><span class="badge ${TYPE_CLR[t.type]}">${TYPE_LBL[t.type]}</span></td>
+        <td><span class="tag-bldg ${BLDG_CLR[t.building]}">${t.building}</span></td>
+        <td style="font-family:'Kanit',sans-serif;font-weight:600">${t.type==='withdraw'?'−':'+'}${t.qty}</td>
+        <td><span class="badge ${STATUS_CLR[t.status]}">${STATUS_LBL[t.status]}</span></td>
+        <td style="color:var(--t3);font-size:12px">${time}</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>
+  <div class="tbl-foot"><span>รวม ${txns.length} รายการ</span></div>
+  </div>`;
+}
+
+/* ================================================================
+   PAGE: ADMIN HUB
+================================================================ */
+function renderAdmin(){
+  const pending = pendingCount();
+
+  document.getElementById('topbar-actions').innerHTML = adminLoggedIn ? `
+    <button class="btn btn-green btn-sm" onclick="navigate('import')" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="3" x2="12" y2="21"/></svg> นำเข้า</button>
+    <button class="btn btn-orange btn-sm" onclick="navigate('withdraw')" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 7 12 3 16 7"/><line x1="12" y1="21" x2="12" y2="3"/></svg> เบิก</button>
+    <button class="btn btn-primary btn-sm" style="position:relative" onclick="navigate('approve')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> อนุมัติ
+      ${pending?`<span style="position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;font-size:10px;font-family:'Kanit',sans-serif;padding:1px 5px;border-radius:8px;min-width:16px;text-align:center">${pending}</span>`:''}
+    </button>
+    <button class="btn btn-ghost btn-sm" onclick="navigate('settings')" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> ตั้งค่า</button>
+    <div style="width:1px;height:24px;background:var(--border);margin:0 4px"></div>
+    <button class="btn btn-ghost btn-sm" onclick="doLogout()" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> ออกจากระบบ</button>
+  ` : `
+    <button class="btn btn-primary btn-sm" onclick="showLoginModal()" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> เข้าสู่ระบบ Admin</button>
+  `;
+
+  document.getElementById('content').innerHTML = `
+  <!-- Login prompt banner (shown when not logged in) -->
+  ${!adminLoggedIn ? `
+  <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:12px" class="fade-in">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <div style="flex:1">
+      <div style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:600;margin-bottom:2px">ดูประวัติได้เลย — เข้าสู่ระบบเพื่อแก้ไขข้อมูล</div>
+      <div style="font-size:12px;color:var(--t2)">นำเข้าสินค้า · เบิก · อนุมัติ · ตั้งค่า ต้องเข้าสู่ระบบก่อน</div>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="showLoginModal()" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Login</button>
+  </div>` : `
+  <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:10px" class="fade-in">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    <div style="font-size:13px;color:#86efac;font-family:'Kanit',sans-serif;font-weight:500">เข้าสู่ระบบแล้ว · สามารถแก้ไขข้อมูลได้</div>
+    <button class="btn btn-ghost btn-sm" style="margin-left:auto;display:flex;align-items:center;gap:6px" onclick="doLogout()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> ออกจากระบบ</button>
+  </div>`}
+
+  <!-- History table with single filter row -->
+  <div class="sec fade-in">
+    <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;flex-wrap:wrap;overflow-x:auto">
+      <div style="display:flex;align-items:center;gap:6px;padding:4px 14px 4px 0;border-right:1px solid var(--border);margin-right:14px;flex-shrink:0">
+        <span style="font-size:10px;color:var(--t3);font-family:'Kanit',sans-serif;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;margin-right:2px">📋</span>
+        <div style="display:flex;gap:4px" id="ah-type-tabs">
+          <button class="btab ${histFilter.type===''?'active':''}"        onclick="histFilter.type='';refreshHistory()">ทั้งหมด</button>
+          <button class="btab ${histFilter.type==='import'?'active':''}"   onclick="histFilter.type='import';refreshHistory()">นำเข้า</button>
+          <button class="btab ${histFilter.type==='withdraw'?'active':''}" onclick="histFilter.type='withdraw';refreshHistory()">เบิก</button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;padding:4px 14px 4px 0;border-right:1px solid var(--border);margin-right:14px;flex-shrink:0">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <div style="display:flex;gap:4px" id="ah-bldg-tabs">
+          <button class="btab ${histFilter.bldg==='all'?'active':''}" onclick="histFilter.bldg='all';refreshHistory()">ทั้งหมด</button>
+          ${BUILDINGS.map(b=>`<button class="btab ${histFilter.bldg===b?'active':''}" onclick="histFilter.bldg='${b}';refreshHistory()">${b}</button>`).join('')}
+        </div>
+      </div>
+      <div class="search-wrap" style="margin-left:auto;flex-shrink:0">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="hq-admin" placeholder="ค้นหา…" oninput="histFilter.q=this.value;refreshHistory()" value="${histFilter.q}" style="width:140px">
+      </div>
+    </div>
+    <div id="hist-table"></div>
+  </div>`;
+
+  refreshHistory(true);
+}
+
+function showLoginModal(){
+  document.getElementById('ov-login').classList.add('open');
+  document.getElementById('login-user').focus();
 }
 
 /* ================================================================
@@ -583,7 +1837,7 @@ function renderDashboard(){
     .sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,6);
 
   const ta = document.getElementById('topbar-actions');
-  ta.innerHTML = `<button class="btn btn-primary" onclick="navigate('import')">⬇️ นำเข้า</button><button class="btn btn-orange" onclick="navigate('withdraw')">⬆️ เบิก</button>`;
+  ta.innerHTML = `<button class="btn btn-ghost btn-sm" onclick="navigate('admin')" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Admin</button>`;
 
   // per-category stats
   const catStats = CATS.map(c=>{
@@ -597,50 +1851,132 @@ function renderDashboard(){
 
   const ct = document.getElementById('content');
   ct.innerHTML = `
-  <!-- KPI row -->
-  <div class="stats-row fade-in">
-    <div class="stat-card sc-blue"><div class="stat-icon si-blue">📦</div><div class="stat-val">${ITEMS.length}</div><div class="stat-label">รายการทั้งหมด</div></div>
-    <div class="stat-card sc-red"><div class="stat-icon si-red">⚠️</div><div class="stat-val">${low.length}</div><div class="stat-label">สต็อกต่ำกว่าขั้นต่ำ</div></div>
-    <div class="stat-card sc-orange"><div class="stat-icon si-orange">⏳</div><div class="stat-val">${pending.length}</div><div class="stat-label">รอการอนุมัติ</div></div>
-    <div class="stat-card sc-green"><div class="stat-icon si-green">📥</div><div class="stat-val">${todayIn()}</div><div class="stat-label">นำเข้าวันนี้</div></div>
+  <!-- ── KPI CARDS ── -->
+  <div class="dash-grid-4 fade-in">
+    <div class="kpi-card" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);box-shadow:0 8px 32px rgba(99,102,241,.45)">
+      <div class="kpi-blob"></div><div class="kpi-blob2"></div>
+      <div class="kpi-toprow">
+        <div class="kpi-icon-wrap"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
+        <span class="kpi-badge">ทั้งหมด</span>
+      </div>
+      <div class="kpi-num" id="kpi-total">—</div>
+      <div class="kpi-label">รายการสินค้า</div>
+      <div class="kpi-sub">${CATS.map(c=>c).join(' · ')}</div>
+    </div>
+    <div class="kpi-card" style="background:linear-gradient(135deg,#f43f5e,#ec4899);box-shadow:0 8px 32px rgba(244,63,94,.4)">
+      <div class="kpi-blob"></div><div class="kpi-blob2"></div>
+      <div class="kpi-toprow">
+        <div class="kpi-icon-wrap"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <span class="kpi-badge">⚠️ แจ้งเตือน</span>
+      </div>
+      <div class="kpi-num" id="kpi-low">—</div>
+      <div class="kpi-label">สต็อกต่ำกว่าขั้นต่ำ</div>
+      <div class="kpi-sub">ต้องสั่งซื้อเพิ่ม</div>
+    </div>
+    <div class="kpi-card" style="background:linear-gradient(135deg,#f59e0b,#f97316);box-shadow:0 8px 32px rgba(245,158,11,.4)">
+      <div class="kpi-blob"></div><div class="kpi-blob2"></div>
+      <div class="kpi-toprow">
+        <div class="kpi-icon-wrap"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <span class="kpi-badge">⏳ รอ</span>
+      </div>
+      <div class="kpi-num" id="kpi-pending">—</div>
+      <div class="kpi-label">รอการอนุมัติ</div>
+      <div class="kpi-sub">คำขอเบิกสินค้า</div>
+    </div>
+    <div class="kpi-card" style="background:linear-gradient(135deg,#10b981,#14b8a6);box-shadow:0 8px 32px rgba(16,185,129,.4)">
+      <div class="kpi-blob"></div><div class="kpi-blob2"></div>
+      <div class="kpi-toprow">
+        <div class="kpi-icon-wrap"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+        <span class="kpi-badge">วันนี้</span>
+      </div>
+      <div class="kpi-num" id="kpi-today">—</div>
+      <div class="kpi-label">นำเข้าวันนี้</div>
+      <div class="kpi-sub">${new Date().toLocaleDateString('th-TH',{day:'numeric',month:'long',year:'numeric'})}</div>
+    </div>
   </div>
 
-  <!-- Category overview -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px" class="fade-in">
-    ${catStats.map(cs=>{
-      const clr = CAT_CLR[cs.cat];
-      const ico = CAT_ICO[cs.cat];
-      const borderClr = {b:'rgba(59,130,246,.4)',purple:'rgba(168,85,247,.4)',cyan:'rgba(6,182,212,.4)',orange:'rgba(249,115,22,.4)'}[clr.replace('b-','')];
-      const bgClr = {b:'rgba(59,130,246,.08)',purple:'rgba(168,85,247,.08)',cyan:'rgba(6,182,212,.08)',orange:'rgba(249,115,22,.08)'}[clr.replace('b-','')];
-      return `<div style="background:${bgClr};border:1px solid ${borderClr};border-radius:12px;padding:14px;cursor:pointer;transition:opacity .15s" onclick="stFilter.cat='${cs.cat}';stPage=0;navigate('stock')" title="ดูสต็อก ${cs.cat}">
-        <div style="font-size:22px;margin-bottom:6px">${ico}</div>
-        <div style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:600;margin-bottom:4px">${cs.cat}</div>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-family:'Kanit',sans-serif;font-size:20px;font-weight:700">${cs.total}</span>
-          ${cs.low>0?`<span style="font-size:11px;background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.25);padding:2px 8px;border-radius:10px;font-family:'Kanit',sans-serif">⚠️ ${cs.low} ต่ำ</span>`
-          :`<span style="font-size:11px;color:var(--t3)">รายการ</span>`}
+  <!-- ── CATEGORY CARDS (Image-2 style) ── -->
+  <div class="dash-grid-4 fade-in">
+    ${catStats.map((cs,i)=>{
+      const cfg = [
+        {g:'linear-gradient(150deg,#6366f1,#8b5cf6)',glow:'rgba(99,102,241,.5)',no:'01',
+         sub:'Inventory · Office',navFn:`stFilter.cat='${cs.cat}';stPage=0;navigate('stock')`,
+         svg:'<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8 21 12 17 16 21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>'},
+        {g:'linear-gradient(150deg,#8b5cf6,#ec4899)',glow:'rgba(139,92,246,.5)',no:'02',
+         sub:'Daily Supplies',navFn:`stFilter.cat='${cs.cat}';stPage=0;navigate('stock')`,
+         svg:'<svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'},
+        {g:'linear-gradient(150deg,#0ea5e9,#14b8a6)',glow:'rgba(14,165,233,.5)',no:'03',
+         sub:'Food & Beverage',navFn:`stFilter.cat='${cs.cat}';stPage=0;navigate('stock')`,
+         svg:'<svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>'},
+        {g:'linear-gradient(150deg,#f59e0b,#f97316)',glow:'rgba(245,158,11,.5)',no:'04',
+         sub:'Maintenance',navFn:`navigate('maintenance')`,
+         svg:'<svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>'},
+      ][i];
+      const okCnt = cs.total - cs.low;
+      const pct = cs.total>0?Math.round(okCnt/cs.total*100):100;
+      return `<div class="cat-card" onclick="${cfg.navFn}" style="box-shadow:0 6px 24px ${cfg.glow}">
+        <div class="cat-card-inner" style="background:${cfg.g}">
+          <div class="cat-card-num-badge">${cfg.no}</div>
+          <div class="cat-card-count-badge">${cs.total} รายการ</div>
+          <div class="cat-card-icon-wrap"><div class="cat-card-icon-bg">${cfg.svg}</div></div>
+        </div>
+        <div class="cat-card-footer">
+          <div class="cat-card-title">${cs.cat}</div>
+          <div class="cat-card-sub">${cfg.sub}</div>
+          <div class="cat-card-bar-wrap">
+            <div class="cat-card-bar" style="width:${pct}%"></div>
+          </div>
+          <div class="cat-card-bar-label">${okCnt}/${cs.total} ปกติ</div>
         </div>
       </div>`;
     }).join('')}
   </div>
 
-  <!-- maintenance subcat highlight -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" class="fade-in">
-    ${['ไฟฟ้า','ประปา'].map(sc=>{
-      const items = ITEMS.filter(x=>x.subcat===sc);
+  <!-- ── MAINTENANCE SUBCATS ── -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="fade-in">
+    ${[
+      {sc:'ไฟฟ้า',g:'linear-gradient(135deg,#f59e0b,#ef4444)',glow:'rgba(245,158,11,.4)',
+       svg:'<svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+       subs:'หลอดไฟ T5/T8/LED · ไดรเวอร์ · สวิตช์ · เบรกเกอร์'},
+      {sc:'ประปา',g:'linear-gradient(135deg,#0ea5e9,#6366f1)',glow:'rgba(14,165,233,.4)',
+       svg:'<svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>',
+       subs:'สายฉีดชำระ · ก๊อก · ท่อ PVC · ซิลิโคน'},
+    ].map(p=>{
+      const items = ITEMS.filter(x=>x.subcat===p.sc);
       const lowCnt = items.filter(x=>{
         const qty=bldg==='all'?getTotalStock(x.id):getStock(x.id,bldg);
         return qty<getMin(x.id);
       }).length;
-      const ico = SUBCAT_ICO[sc];
-      return `<div style="background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.2);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="stFilter.cat='ซ่อมบำรุง';stFilter.q='';stPage=0;navigate('stock')">
-        <div style="font-size:24px">${ico}</div>
-        <div style="flex:1">
-          <div style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:600">ระบบ${sc==='ไฟฟ้า'?'ไฟฟ้า':'ประปา'}</div>
-          <div style="font-size:12px;color:var(--t2)">${items.length} รายการ</div>
+      const pct = items.length>0?Math.round((items.length-lowCnt)/items.length*100):100;
+      return `<div onclick="mFilter.subcat='${p.sc}';mPage=0;navigate('maintenance')"
+        style="background:var(--bg-card);border:1px solid var(--border);border-radius:18px;
+               overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s;
+               display:flex;align-items:stretch;"
+        onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 30px ${p.glow}'"
+        onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <!-- colored left panel -->
+        <div style="width:90px;background:${p.g};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <div style="width:52px;height:52px;border-radius:16px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p.svg}</svg>
+          </div>
         </div>
-        ${lowCnt>0?`<span class="badge b-red">⚠️ ${lowCnt} ต่ำ</span>`:
-        `<span class="badge b-green">✅ ปกติ</span>`}
+        <!-- content right -->
+        <div style="flex:1;padding:16px 18px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+            <div>
+              <div style="font-family:'Kanit',sans-serif;font-size:15px;font-weight:700;color:var(--t1)">ระบบ${p.sc==='ไฟฟ้า'?'ไฟฟ้า':'ประปา'}</div>
+              <div style="font-size:10px;color:var(--t3);font-family:'Kanit',sans-serif;margin-top:1px">${p.sc==='ไฟฟ้า'?'Electrical':'Plumbing'} · ${items.length} รายการ</div>
+            </div>
+            ${lowCnt>0
+              ?`<span style="background:rgba(244,63,94,.12);color:#fda4af;border:1px solid rgba(244,63,94,.2);padding:3px 9px;border-radius:8px;font-size:11px;font-family:'Kanit',sans-serif;white-space:nowrap">⚠ ${lowCnt} ต่ำ</span>`
+              :`<span style="background:rgba(16,185,129,.1);color:#6ee7b7;border:1px solid rgba(16,185,129,.18);padding:3px 9px;border-radius:8px;font-size:11px;font-family:'Kanit',sans-serif">✓ ปกติ</span>`}
+          </div>
+          <div style="font-size:11px;color:var(--t2);margin-bottom:10px">${p.subs}</div>
+          <div style="height:5px;background:var(--border);border-radius:99px;overflow:hidden">
+            <div style="height:100%;width:${pct}%;background:${p.g};border-radius:99px;transition:width .7s"></div>
+          </div>
+          <div style="font-size:11px;color:var(--t3);margin-top:5px;font-family:'Kanit',sans-serif">${pct}% สต็อกปกติ · ${items.length-lowCnt}/${items.length} รายการ</div>
+        </div>
       </div>`;
     }).join('')}
   </div>
@@ -649,12 +1985,12 @@ function renderDashboard(){
     <!-- low stock alerts -->
     <div class="sec">
       <div class="sec-head">
-        <span class="sec-title">⚠️ สต็อกต่ำกว่าขั้นต่ำ</span>
+        <span class="sec-title">สต็อกต่ำกว่าขั้นต่ำ</span>
         <span style="color:var(--t2);font-size:12px">${low.length} รายการ</span>
         ${low.length>0?`<button class="btn btn-sm btn-ghost" style="margin-left:auto" onclick="stFilter.showOnly='low';stFilter.cat='';stPage=0;navigate('stock')">ดูทั้งหมด</button>`:''}
       </div>
       ${low.length===0
-        ?`<div class="tbl-empty"><div class="ei">✅</div><p>ไม่มีสินค้าต่ำกว่าขั้นต่ำ</p></div>`
+        ?`<div class="tbl-empty"><div class="ei" style="font-size:40px">✓</div><p>ไม่มีสินค้าต่ำกว่าขั้นต่ำ</p></div>`
         :low.slice(0,8).map(x=>`
         <div class="alert-row">
           <div class="alert-dot" style="background:${x.qty<=0?'var(--red)':'var(--orange)'}"></div>
@@ -673,11 +2009,11 @@ function renderDashboard(){
 
     <!-- pending approvals -->
     <div class="sec">
-      <div class="sec-head"><span class="sec-title">⏳ รอการอนุมัติ</span>
+      <div class="sec-head"><span class="sec-title">รอการอนุมัติ</span>
         ${pending.length>0?`<button class="btn btn-sm btn-primary" onclick="navigate('approve')">ดูทั้งหมด</button>`:''}
       </div>
       ${pending.length===0
-        ?`<div class="tbl-empty"><div class="ei">✅</div><p>ไม่มีคำขอรอพิจารณา</p></div>`
+        ?`<div class="tbl-empty"><div class="ei" style="font-size:40px">✓</div><p>ไม่มีคำขอรอพิจารณา</p></div>`
         :pending.slice(0,5).map(t=>{
           const it=ITEMS.find(x=>x.id===t.itemId);
           return `<div class="alert-row">
@@ -693,7 +2029,7 @@ function renderDashboard(){
 
   <!-- recent transactions -->
   <div class="sec fade-in">
-    <div class="sec-head"><span class="sec-title">📈 ธุรกรรมล่าสุด</span>
+    <div class="sec-head"><span class="sec-title">ธุรกรรมล่าสุด</span>
       <button class="btn btn-sm btn-ghost" style="margin-left:auto" onclick="navigate('history')">ดูทั้งหมด</button>
     </div>
     <div class="tbl-wrap"><table>
@@ -711,6 +2047,23 @@ function renderDashboard(){
       }).join('')}</tbody>
     </table></div>
   </div>`;
+
+  animNum('kpi-total',   ITEMS.length);
+  animNum('kpi-low',     low.length);
+  animNum('kpi-pending', pending.length);
+  animNum('kpi-today',   todayIn());
+}
+
+function animNum(id, target){
+  const el = document.getElementById(id);
+  if(!el) return;
+  let n=0;
+  const step = Math.max(1, Math.ceil(target/20));
+  const iv = setInterval(()=>{
+    n = Math.min(n+step, target);
+    el.textContent = n;
+    if(n>=target) clearInterval(iv);
+  }, 30);
 }
 
 /* ================================================================
@@ -723,46 +2076,52 @@ const ST_PAGE = 20;
 let stPage = 0;
 
 function renderStock(){
-  document.getElementById('topbar-actions').innerHTML =
-    `<button class="btn btn-primary" onclick="navigate('import')">⬇️ นำเข้า</button>`;
+  document.getElementById('topbar-actions').innerHTML = '';
 
   document.getElementById('content').innerHTML = `
-  <div class="stats-row fade-in" id="st-cards"></div>
+  <div class="dash-grid-4 fade-in" id="st-cards"></div>
 
   <div class="sec fade-in">
-    <!-- row 1: อาคาร -->
-    <div style="padding:14px 18px 10px;border-bottom:1px solid var(--border)">
-      <div style="font-size:11px;color:var(--t3);font-family:'Kanit',sans-serif;margin-bottom:7px;text-transform:uppercase;letter-spacing:.08em">🏢 อาคาร</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap" id="st-bldg-tabs">
-        ${['all',...BUILDINGS].map(b=>`<button class="btab ${stFilter.bldg===b?'active':''}"
-          onclick="stFilter.bldg='${b}';stPage=0;refreshStock()">${b==='all'?'ทุกอาคาร':b}</button>`).join('')}
+    <!-- SINGLE FILTER ROW -->
+    <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;flex-wrap:wrap;overflow-x:auto">
+
+      <!-- อาคาร -->
+      <div style="display:flex;align-items:center;gap:6px;padding:4px 14px 4px 0;border-right:1px solid var(--border);margin-right:14px;flex-shrink:0">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <div style="display:flex;gap:4px" id="st-bldg-tabs">
+          ${['all',...BUILDINGS].map(b=>`<button class="btab ${stFilter.bldg===b?'active':''}"
+            onclick="stFilter.bldg='${b}';stPage=0;refreshStock()">${b==='all'?'ทั้งหมด':b}</button>`).join('')}
+        </div>
       </div>
-    </div>
-    <!-- row 2: หมวดหมู่ (เฉพาะ 3 หมวด) -->
-    <div style="padding:10px 18px;border-bottom:1px solid var(--border)">
-      <div style="font-size:11px;color:var(--t3);font-family:'Kanit',sans-serif;margin-bottom:7px;text-transform:uppercase;letter-spacing:.08em">📂 หมวดหมู่</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap" id="st-cat-tabs">
-        <button class="btab ${stFilter.cat===''?'active':''}"
-          onclick="stFilter.cat='';stPage=0;refreshStock()">ทั้งหมด</button>
-        ${CATS_STOCK.map(c=>`<button class="btab ${stFilter.cat===c?'active':''}"
-          onclick="stFilter.cat='${c}';stPage=0;refreshStock()">${CAT_ICO[c]} ${c}</button>`).join('')}
+
+      <!-- หมวดหมู่ -->
+      <div style="display:flex;align-items:center;gap:6px;padding:4px 14px 4px 0;border-right:1px solid var(--border);margin-right:14px;flex-shrink:0">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        <div style="display:flex;gap:4px" id="st-cat-tabs">
+          <button class="btab ${stFilter.cat===''?'active':''}"
+            onclick="stFilter.cat='';stPage=0;refreshStock()">ทั้งหมด</button>
+          ${CATS_STOCK.map(c=>`<button class="btab ${stFilter.cat===c?'active':''}"
+            onclick="stFilter.cat='${c}';stPage=0;refreshStock()">${c}</button>`).join('')}
+        </div>
       </div>
-    </div>
-    <!-- row 3: สถานะ + ค้นหา -->
-    <div style="padding:10px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <div>
-        <div style="font-size:11px;color:var(--t3);font-family:'Kanit',sans-serif;margin-bottom:7px;text-transform:uppercase;letter-spacing:.08em">📊 สถานะสต็อก</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap" id="st-show-tabs">
-          ${[['all','ทั้งหมด'],['ok','✅ ปกติ'],['low','⚠️ ต่ำกว่าขั้นต่ำ'],['order','🛒 ต้องสั่ง']].map(([v,l])=>
+
+      <!-- สถานะ -->
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <div style="display:flex;gap:4px" id="st-show-tabs">
+          ${[['all','ทั้งหมด'],['ok','✅ ปกติ'],['low','⚠️ ต่ำ'],['order','🛒 ต้องสั่ง']].map(([v,l])=>
             `<button class="btab ${stFilter.showOnly===v?'active':''}"
               onclick="stFilter.showOnly='${v}';stPage=0;refreshStock()">${l}</button>`).join('')}
         </div>
       </div>
-      <div class="search-wrap" style="margin-left:auto">
-        <span>🔍</span>
-        <input id="sq" placeholder="ค้นหาชื่อสินค้า…" oninput="stFilter.q=this.value;stPage=0;refreshStock()" value="${stFilter.q}">
+
+      <!-- ค้นหา -->
+      <div class="search-wrap" style="margin-left:auto;flex-shrink:0">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="sq" placeholder="ค้นหาสินค้า…" oninput="stFilter.q=this.value;stPage=0;refreshStock()" value="${stFilter.q}" style="width:130px">
       </div>
     </div>
+
     <div class="tbl-wrap" id="st-body"></div>
     <div style="padding:10px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
       <span style="font-size:12px;color:var(--t2)" id="st-info"></span>
@@ -821,7 +2180,7 @@ function refreshStock(){
     el.classList.toggle('active', catVal===cat);
   });
   document.querySelectorAll('#st-show-tabs .btab').forEach(el=>{
-    const map = {'ทั้งหมด':'all','✅ ปกติ':'ok','⚠️ ต่ำกว่าขั้นต่ำ':'low','🛒 ต้องสั่ง':'order'};
+    const map = {'ทั้งหมด':'all','ปกติ':'ok','ต่ำ':'low','ต้องสั่ง':'order'};
     const v = map[el.textContent.trim()]||'all';
     el.classList.toggle('active', v===showOnly);
   });
@@ -837,10 +2196,42 @@ function refreshStock(){
     else cntOut++;
   });
   document.getElementById('st-cards').innerHTML=`
-    <div class="stat-card sc-blue"><div class="stat-icon si-blue">📦</div><div class="stat-val">${totalItems}</div><div class="stat-label">รายการทั้งหมด</div></div>
-    <div class="stat-card sc-green"><div class="stat-icon si-green">✅</div><div class="stat-val">${cntOk}</div><div class="stat-label">สต็อกปกติ</div></div>
-    <div class="stat-card sc-orange"><div class="stat-icon si-orange">⚠️</div><div class="stat-val">${cntLow}</div><div class="stat-label">ต่ำกว่าขั้นต่ำ</div></div>
-    <div class="stat-card sc-red"><div class="stat-icon si-red">🚫</div><div class="stat-val">${cntOut}</div><div class="stat-label">หมดสต็อก</div></div>`;
+    <div class="kpi-card" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);box-shadow:0 6px 24px rgba(99,102,241,.4)">
+      <div class="kpi-blob"></div><div class="kpi-blob2"></div>
+      <div class="kpi-toprow">
+        <div class="kpi-icon-wrap"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
+        <span class="kpi-badge">${bldg==='all'?'ทุกอาคาร':bldg}</span>
+      </div>
+      <div class="kpi-num">${totalItems}</div>
+      <div class="kpi-label">รายการทั้งหมด</div>
+    </div>
+    <div class="kpi-card" style="background:linear-gradient(135deg,#10b981,#14b8a6);box-shadow:0 6px 24px rgba(16,185,129,.38)">
+      <div class="kpi-blob"></div><div class="kpi-blob2"></div>
+      <div class="kpi-toprow">
+        <div class="kpi-icon-wrap"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <span class="kpi-badge">ปกติ</span>
+      </div>
+      <div class="kpi-num">${cntOk}</div>
+      <div class="kpi-label">สต็อกปกติ</div>
+    </div>
+    <div class="kpi-card" style="background:linear-gradient(135deg,#f59e0b,#f97316);box-shadow:0 6px 24px rgba(245,158,11,.38)">
+      <div class="kpi-blob"></div><div class="kpi-blob2"></div>
+      <div class="kpi-toprow">
+        <div class="kpi-icon-wrap"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <span class="kpi-badge">แจ้งเตือน</span>
+      </div>
+      <div class="kpi-num">${cntLow}</div>
+      <div class="kpi-label">ต่ำกว่าขั้นต่ำ</div>
+    </div>
+    <div class="kpi-card" style="background:linear-gradient(135deg,#f43f5e,#ec4899);box-shadow:0 6px 24px rgba(244,63,94,.38)">
+      <div class="kpi-blob"></div><div class="kpi-blob2"></div>
+      <div class="kpi-toprow">
+        <div class="kpi-icon-wrap"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
+        <span class="kpi-badge">วิกฤต</span>
+      </div>
+      <div class="kpi-num">${cntOut}</div>
+      <div class="kpi-label">หมดสต็อก</div>
+    </div>`;
 
   // filter items
   const allItems = getFilteredStockItems(q,cat,showOnly,bldg);
@@ -862,7 +2253,7 @@ function refreshStock(){
 
   if(pageItems.length===0){
     document.getElementById('st-body').innerHTML=
-      `<div class="tbl-empty"><div class="ei">🔍</div><p>ไม่พบรายการ</p></div>`;
+      `<div class="tbl-empty"><div class="ei" style="font-size:40px;opacity:.4">○</div><p>ไม่พบรายการ</p></div>`;
     return;
   }
 
@@ -923,64 +2314,103 @@ const MN_PAGE = 20;
 let mPage = 0;
 
 function renderMaintenance(){
-  document.getElementById('topbar-actions').innerHTML =
-    `<button class="btn btn-primary" onclick="navigate('import')">⬇️ นำเข้า</button>`;
+  document.getElementById('topbar-actions').innerHTML = '';
+  const bldg = mFilter.bldg;
 
   document.getElementById('content').innerHTML = `
-  <div class="stats-row fade-in" id="mn-cards"></div>
+  <div class="dash-grid-4 fade-in" id="mn-cards"></div>
 
-  <!-- subcat highlight cards -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" class="fade-in">
-    ${['ไฟฟ้า','ประปา'].map(sc=>{
-      const items = ITEMS.filter(x=>x.subcat===sc);
-      return `<div style="background:rgba(249,115,22,.07);border:1px solid rgba(249,115,22,.22);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:pointer"
-        onclick="mFilter.subcat='${sc}';mPage=0;refreshMaintenance()">
-        <div style="font-size:28px">${SUBCAT_ICO[sc]}</div>
-        <div>
-          <div style="font-family:'Kanit',sans-serif;font-size:14px;font-weight:600">ระบบ${sc==='ไฟฟ้า'?'ไฟฟ้า (Electrical)':'ประปา (Plumbing)'}</div>
-          <div style="font-size:12px;color:var(--t2);margin-top:2px">${items.length} รายการ</div>
+  <!-- subcat highlight cards — Image-2 style -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="fade-in" id="mn-subcat-cards">
+    ${[
+      {sc:'ไฟฟ้า', g:'linear-gradient(135deg,#f59e0b,#ef4444)',glow:'rgba(245,158,11,.4)',
+       svg:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+       subs:'หลอดไฟ T5/T8/LED · ไดรเวอร์ · สวิตช์ · เบรกเกอร์'},
+      {sc:'ประปา', g:'linear-gradient(135deg,#0ea5e9,#6366f1)',glow:'rgba(14,165,233,.4)',
+       svg:'<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>',
+       subs:'สายฉีดชำระ · ก๊อก · ท่อ PVC · ซิลิโคน'},
+    ].map(p=>{
+      const items = ITEMS.filter(x=>x.subcat===p.sc);
+      const lowCnt = items.filter(x=>{
+        const qty=bldg==='all'?getTotalStock(x.id):getStock(x.id,bldg);
+        return qty<getMin(x.id);
+      }).length;
+      const pct = items.length>0?Math.round((items.length-lowCnt)/items.length*100):100;
+      const isActive = mFilter.subcat===p.sc;
+      return `<div onclick="mFilter.subcat=mFilter.subcat==='${p.sc}'?'':'${p.sc}';mPage=0;refreshMaintenance()"
+        style="background:var(--bg-card);border:1px solid ${isActive?'rgba(99,102,241,.4)':' var(--border)'};border-radius:18px;
+               overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s;
+               display:flex;align-items:stretch;${isActive?'box-shadow:0 8px 28px '+p.glow:''}"
+        onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 30px ${p.glow}'"
+        onmouseout="this.style.transform='';this.style.boxShadow='${isActive?'0 8px 28px '+p.glow:''}'">
+        <div style="width:90px;background:${p.g};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <div style="width:52px;height:52px;border-radius:16px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p.svg}</svg>
+          </div>
         </div>
-        <span class="badge b-orange" style="margin-left:auto">${CAT_ICO['ซ่อมบำรุง']} ส่วนกลาง</span>
+        <div style="flex:1;padding:16px 18px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+            <div>
+              <div style="font-family:'Kanit',sans-serif;font-size:15px;font-weight:700;color:var(--t1)">ระบบ${p.sc==='ไฟฟ้า'?'ไฟฟ้า':'ประปา'}</div>
+              <div style="font-size:10px;color:var(--t3);font-family:'Kanit',sans-serif;margin-top:1px">${p.sc==='ไฟฟ้า'?'Electrical':'Plumbing'} · ${items.length} รายการ</div>
+            </div>
+            ${lowCnt>0
+              ?`<span style="background:rgba(244,63,94,.12);color:#fda4af;border:1px solid rgba(244,63,94,.2);padding:3px 9px;border-radius:8px;font-size:11px;font-family:'Kanit',sans-serif">⚠ ${lowCnt} ต่ำ</span>`
+              :`<span style="background:rgba(16,185,129,.1);color:#6ee7b7;border:1px solid rgba(16,185,129,.18);padding:3px 9px;border-radius:8px;font-size:11px;font-family:'Kanit',sans-serif">✓ ปกติ</span>`}
+          </div>
+          <div style="font-size:11px;color:var(--t2);margin-bottom:10px">${p.subs}</div>
+          <div style="height:5px;background:var(--border);border-radius:99px;overflow:hidden">
+            <div style="height:100%;width:${pct}%;background:${p.g};border-radius:99px;transition:width .7s"></div>
+          </div>
+          <div style="font-size:11px;color:var(--t3);margin-top:5px;font-family:'Kanit',sans-serif">${pct}% สต็อกปกติ · ${items.length-lowCnt}/${items.length}</div>
+        </div>
       </div>`;
     }).join('')}
   </div>
 
   <div class="sec fade-in">
-    <!-- row 1: อาคาร -->
-    <div style="padding:14px 18px 10px;border-bottom:1px solid var(--border)">
-      <div style="font-size:11px;color:var(--t3);font-family:'Kanit',sans-serif;margin-bottom:7px;text-transform:uppercase;letter-spacing:.08em">🏢 อาคาร</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap" id="mn-bldg-tabs">
-        ${['all',...BUILDINGS].map(b=>`<button class="btab ${mFilter.bldg===b?'active':''}"
-          onclick="mFilter.bldg='${b}';mPage=0;refreshMaintenance()">${b==='all'?'ทุกอาคาร':b}</button>`).join('')}
+    <!-- SINGLE FILTER ROW -->
+    <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;flex-wrap:wrap;overflow-x:auto">
+
+      <!-- อาคาร -->
+      <div style="display:flex;align-items:center;gap:6px;padding:4px 14px 4px 0;border-right:1px solid var(--border);margin-right:14px;flex-shrink:0">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <div style="display:flex;gap:4px" id="mn-bldg-tabs">
+          ${['all',...BUILDINGS].map(b=>`<button class="btab ${mFilter.bldg===b?'active':''}"
+            onclick="mFilter.bldg='${b}';mPage=0;refreshMaintenance()">${b==='all'?'ทั้งหมด':b}</button>`).join('')}
+        </div>
       </div>
-    </div>
-    <!-- row 2: ระบบงาน -->
-    <div style="padding:10px 18px;border-bottom:1px solid var(--border)">
-      <div style="font-size:11px;color:var(--t3);font-family:'Kanit',sans-serif;margin-bottom:7px;text-transform:uppercase;letter-spacing:.08em">🔧 ระบบงาน</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap" id="mn-sub-tabs">
-        <button class="btab ${mFilter.subcat===''?'active':''}"
-          onclick="mFilter.subcat='';mPage=0;refreshMaintenance()">ทั้งหมด</button>
-        <button class="btab ${mFilter.subcat==='ไฟฟ้า'?'active':''}"
-          onclick="mFilter.subcat='ไฟฟ้า';mPage=0;refreshMaintenance()">⚡ ระบบไฟฟ้า</button>
-        <button class="btab ${mFilter.subcat==='ประปา'?'active':''}"
-          onclick="mFilter.subcat='ประปา';mPage=0;refreshMaintenance()">🚿 ระบบประปา</button>
+
+      <!-- ระบบงาน -->
+      <div style="display:flex;align-items:center;gap:6px;padding:4px 14px 4px 0;border-right:1px solid var(--border);margin-right:14px;flex-shrink:0">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        <div style="display:flex;gap:4px" id="mn-sub-tabs">
+          <button class="btab ${mFilter.subcat===''?'active':''}"
+            onclick="mFilter.subcat='';mPage=0;refreshMaintenance()">ทั้งหมด</button>
+          <button class="btab ${mFilter.subcat==='ไฟฟ้า'?'active':''}"
+            onclick="mFilter.subcat='ไฟฟ้า';mPage=0;refreshMaintenance()">ไฟฟ้า</button>
+          <button class="btab ${mFilter.subcat==='ประปา'?'active':''}"
+            onclick="mFilter.subcat='ประปา';mPage=0;refreshMaintenance()">ประปา</button>
+        </div>
       </div>
-    </div>
-    <!-- row 3: สถานะ + ค้นหา -->
-    <div style="padding:10px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <div>
-        <div style="font-size:11px;color:var(--t3);font-family:'Kanit',sans-serif;margin-bottom:7px;text-transform:uppercase;letter-spacing:.08em">📊 สถานะสต็อก</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap" id="mn-show-tabs">
-          ${[['all','ทั้งหมด'],['ok','✅ ปกติ'],['low','⚠️ ต่ำกว่าขั้นต่ำ'],['order','🛒 ต้องสั่ง']].map(([v,l])=>
+
+      <!-- สถานะ -->
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <div style="display:flex;gap:4px" id="mn-show-tabs">
+          ${[['all','ทั้งหมด'],['ok','ปกติ'],['low','ต่ำ'],['order','ต้องสั่ง']].map(([v,l])=>
             `<button class="btab ${mFilter.showOnly===v?'active':''}"
               onclick="mFilter.showOnly='${v}';mPage=0;refreshMaintenance()">${l}</button>`).join('')}
         </div>
       </div>
-      <div class="search-wrap" style="margin-left:auto">
-        <span>🔍</span>
-        <input id="mq" placeholder="ค้นหาอุปกรณ์…" oninput="mFilter.q=this.value;mPage=0;refreshMaintenance()" value="${mFilter.q}">
+
+      <!-- ค้นหา -->
+      <div class="search-wrap" style="margin-left:auto;flex-shrink:0">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="mq" placeholder="ค้นหาอุปกรณ์…" oninput="mFilter.q=this.value;mPage=0;refreshMaintenance()" value="${mFilter.q}" style="width:130px">
       </div>
     </div>
+
     <div class="tbl-wrap" id="mn-body"></div>
     <div style="padding:10px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
       <span style="font-size:12px;color:var(--t2)" id="mn-info"></span>
@@ -1018,11 +2448,11 @@ function refreshMaintenance(){
     el.classList.toggle('active', v===bldg);
   });
   document.querySelectorAll('#mn-sub-tabs .btab').forEach(el=>{
-    const map={'ทั้งหมด':'','⚡ ระบบไฟฟ้า':'ไฟฟ้า','🚿 ระบบประปา':'ประปา'};
+    const map={'ทั้งหมด':'','⚡ ไฟฟ้า':'ไฟฟ้า','🚿 ประปา':'ประปา'};
     el.classList.toggle('active', (map[el.textContent.trim()]??'')=== subcat);
   });
   document.querySelectorAll('#mn-show-tabs .btab').forEach(el=>{
-    const map={'ทั้งหมด':'all','✅ ปกติ':'ok','⚠️ ต่ำกว่าขั้นต่ำ':'low','🛒 ต้องสั่ง':'order'};
+    const map={'ทั้งหมด':'all','ปกติ':'ok','ต่ำ':'low','ต้องสั่ง':'order'};
     el.classList.toggle('active', (map[el.textContent.trim()]||'all')===showOnly);
   });
 
@@ -1035,10 +2465,42 @@ function refreshMaintenance(){
     if(lv==='ok') cntOk++; else if(lv==='low') cntLow++; else cntOut++;
   });
   document.getElementById('mn-cards').innerHTML=`
-    <div class="stat-card sc-orange"><div class="stat-icon si-orange">🔧</div><div class="stat-val">${maintAll.length}</div><div class="stat-label">รายการส่วนกลาง</div></div>
-    <div class="stat-card sc-green"><div class="stat-icon si-green">✅</div><div class="stat-val">${cntOk}</div><div class="stat-label">สต็อกปกติ</div></div>
-    <div class="stat-card sc-orange"><div class="stat-icon si-orange">⚠️</div><div class="stat-val">${cntLow}</div><div class="stat-label">ต่ำกว่าขั้นต่ำ</div></div>
-    <div class="stat-card sc-red"><div class="stat-icon si-red">🚫</div><div class="stat-val">${cntOut}</div><div class="stat-label">หมดสต็อก</div></div>`;
+    <div class="kpi-card" style="background:linear-gradient(135deg,#f59e0b,#f97316);box-shadow:0 6px 24px rgba(245,158,11,.4)">
+      <div class="kpi-blob"></div><div class="kpi-blob2"></div>
+      <div class="kpi-toprow">
+        <div class="kpi-icon-wrap"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+        <span class="kpi-badge">ส่วนกลาง</span>
+      </div>
+      <div class="kpi-num">${maintAll.length}</div>
+      <div class="kpi-label">รายการส่วนกลาง</div>
+    </div>
+    <div class="kpi-card" style="background:linear-gradient(135deg,#10b981,#14b8a6);box-shadow:0 6px 24px rgba(16,185,129,.38)">
+      <div class="kpi-blob"></div><div class="kpi-blob2"></div>
+      <div class="kpi-toprow">
+        <div class="kpi-icon-wrap"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <span class="kpi-badge">ปกติ</span>
+      </div>
+      <div class="kpi-num">${cntOk}</div>
+      <div class="kpi-label">สต็อกปกติ</div>
+    </div>
+    <div class="kpi-card" style="background:linear-gradient(135deg,#f59e0b,#ef4444);box-shadow:0 6px 24px rgba(245,158,11,.35)">
+      <div class="kpi-blob"></div><div class="kpi-blob2"></div>
+      <div class="kpi-toprow">
+        <div class="kpi-icon-wrap"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <span class="kpi-badge">แจ้งเตือน</span>
+      </div>
+      <div class="kpi-num">${cntLow}</div>
+      <div class="kpi-label">ต่ำกว่าขั้นต่ำ</div>
+    </div>
+    <div class="kpi-card" style="background:linear-gradient(135deg,#f43f5e,#ec4899);box-shadow:0 6px 24px rgba(244,63,94,.38)">
+      <div class="kpi-blob"></div><div class="kpi-blob2"></div>
+      <div class="kpi-toprow">
+        <div class="kpi-icon-wrap"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
+        <span class="kpi-badge">วิกฤต</span>
+      </div>
+      <div class="kpi-num">${cntOut}</div>
+      <div class="kpi-label">หมดสต็อก</div>
+    </div>`;
 
   // filter + paginate
   const allItems = getFilteredMaintItems(q,subcat,showOnly,bldg);
@@ -1058,7 +2520,7 @@ function refreshMaintenance(){
 
   if(pageItems.length===0){
     document.getElementById('mn-body').innerHTML=
-      `<div class="tbl-empty"><div class="ei">🔍</div><p>ไม่พบรายการ</p></div>`;
+      `<div class="tbl-empty"><div class="ei" style="font-size:40px;opacity:.4">○</div><p>ไม่พบรายการ</p></div>`;
     return;
   }
 
@@ -1113,7 +2575,8 @@ function refreshMaintenance(){
    PAGE: IMPORT
 ================================================================ */
 function renderImport(){
-  document.getElementById('topbar-actions').innerHTML='';
+  document.getElementById('topbar-actions').innerHTML=
+    `<button class="btn btn-ghost" onclick="navigate('admin')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> กลับ Admin</button>`;
   const recent = [...transactions].filter(t=>t.type==='import'&&t.status==='approved')
     .sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,8);
 
@@ -1121,7 +2584,7 @@ function renderImport(){
   <div class="two-col fade-in">
     <div class="sec">
       <div class="modal-head" style="border-bottom:1px solid var(--border);padding:16px 18px">
-        <div class="modal-head-icon" style="background:rgba(34,197,94,.15)">⬇️</div>
+        <div class="modal-head-icon" style="background:rgba(16,185,129,.15)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="3" x2="12" y2="21"/></svg></div>
         <div><h3 style="font-family:'Kanit',sans-serif;font-size:15px;font-weight:600">นำเข้าสินค้า</h3><p style="font-size:12px;color:var(--t2)">บันทึกสินค้าเข้าคลัง</p></div>
       </div>
       <div class="form-grid">
@@ -1140,10 +2603,10 @@ function renderImport(){
         <div><label class="flabel">ผู้นำเข้า</label><input type="text" class="finput" id="fi-who" placeholder="ชื่อ-สกุล"></div>
         <div class="fg-full"><label class="flabel">หมายเหตุ</label><textarea class="ftextarea" id="fi-note" placeholder="แหล่งที่มา หรือข้อมูลเพิ่มเติม…"></textarea></div>
       </div>
-      <div class="form-foot"><button class="btn btn-ghost" onclick="clearImportForm()">ล้าง</button><button class="btn btn-green" onclick="submitImport()">💾 บันทึกนำเข้า</button></div>
+      <div class="form-foot"><button class="btn btn-ghost" onclick="clearImportForm()">ล้าง</button><button class="btn btn-green" onclick="submitImport()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึกนำเข้า</button></div>
     </div>
     <div class="sec">
-      <div class="sec-head"><span class="sec-title">📋 นำเข้าล่าสุด</span></div>
+      <div class="sec-head"><span class="sec-title">นำเข้าล่าสุด</span></div>
       <div class="tbl-wrap"><table>
         <thead><tr><th>สินค้า</th><th>อาคาร</th><th>จำนวน</th><th>วันที่</th></tr></thead>
         <tbody>${recent.map(t=>{
@@ -1156,7 +2619,7 @@ function renderImport(){
           </tr>`;
         }).join('')}</tbody>
       </table>
-      ${recent.length===0?`<div class="tbl-empty"><div class="ei">📥</div><p>ยังไม่มีการนำเข้า</p></div>`:''}
+      ${recent.length===0?`<div class="tbl-empty"><div class="ei" style="font-size:40px;opacity:.4">○</div><p>ยังไม่มีการนำเข้า</p></div>`:''}
       </div>
     </div>
   </div>`;
@@ -1232,7 +2695,7 @@ function renderCheckin(){
       <div class="form-foot"><button class="btn btn-ghost" onclick="clearCheckinForm()">ล้าง</button><button class="btn btn-primary" style="background:linear-gradient(135deg,var(--cyan),var(--blue))" onclick="submitCheckin()">↩️ บันทึกเช็คอิน</button></div>
     </div>
     <div class="sec">
-      <div class="sec-head"><span class="sec-title">📋 เช็คอินล่าสุด</span></div>
+      <div class="sec-head"><span class="sec-title">เช็คอินล่าสุด</span></div>
       <div class="tbl-wrap"><table>
         <thead><tr><th>สินค้า</th><th>อาคาร</th><th>จำนวน</th><th>วันที่</th></tr></thead>
         <tbody>${recent.map(t=>{
@@ -1245,7 +2708,7 @@ function renderCheckin(){
           </tr>`;
         }).join('')}</tbody>
       </table>
-      ${recent.length===0?`<div class="tbl-empty"><div class="ei">↩️</div><p>ยังไม่มีการเช็คอิน</p></div>`:''}
+      ${recent.length===0?`<div class="tbl-empty"><div class="ei" style="font-size:40px;opacity:.4">○</div><p>ยังไม่มีการเช็คอิน</p></div>`:''}
       </div>
     </div>
   </div>`;
@@ -1286,7 +2749,8 @@ function submitCheckin(){
    PAGE: WITHDRAW
 ================================================================ */
 function renderWithdraw(){
-  document.getElementById('topbar-actions').innerHTML='';
+  document.getElementById('topbar-actions').innerHTML=
+    `<button class="btn btn-ghost" onclick="navigate('admin')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> กลับ Admin</button>`;
   const my = [...transactions].filter(t=>t.type==='withdraw')
     .sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,8);
 
@@ -1320,7 +2784,7 @@ function renderWithdraw(){
       </div>
     </div>
     <div class="sec">
-      <div class="sec-head"><span class="sec-title">📋 ประวัติการเบิก</span></div>
+      <div class="sec-head"><span class="sec-title">ประวัติการเบิก</span></div>
       <div class="tbl-wrap"><table>
         <thead><tr><th>สินค้า</th><th>อาคาร</th><th>จำนวน</th><th>สถานะ</th><th>วันที่</th></tr></thead>
         <tbody>${my.map(t=>{
@@ -1334,7 +2798,7 @@ function renderWithdraw(){
           </tr>`;
         }).join('')}</tbody>
       </table>
-      ${my.length===0?`<div class="tbl-empty"><div class="ei">📤</div><p>ยังไม่มีคำขอ</p></div>`:''}
+      ${my.length===0?`<div class="tbl-empty"><div class="ei" style="font-size:40px;opacity:.4">○</div><p>ยังไม่มีคำขอ</p></div>`:''}
       </div>
     </div>
   </div>`;
@@ -1387,17 +2851,18 @@ function submitWithdraw(){
    PAGE: APPROVE
 ================================================================ */
 function renderApprove(){
-  document.getElementById('topbar-actions').innerHTML='';
+  document.getElementById('topbar-actions').innerHTML=
+    `<button class="btn btn-ghost" onclick="navigate('admin')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> กลับ Admin</button>`;
   const pending=transactions.filter(t=>t.type==='withdraw'&&t.status==='pending')
     .sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt));
 
   document.getElementById('content').innerHTML = `
   <div class="sec fade-in">
     <div class="sec-head">
-      <span class="sec-title">✅ รออนุมัติ</span>
+      <span class="sec-title">รออนุมัติ</span>
       <span style="font-size:12px;color:var(--t2)">${pending.length} รายการ</span>
     </div>
-    ${pending.length===0?`<div class="tbl-empty"><div class="ei">✅</div><p>ไม่มีคำขอที่รอพิจารณา</p></div>`:''}
+    ${pending.length===0?`<div class="tbl-empty"><div class="ei" style="font-size:40px">✓</div><p>ไม่มีคำขอที่รอพิจารณา</p></div>`:''}
     <div style="padding:${pending.length?'14px':'0'};display:flex;flex-direction:column;gap:10px">
       ${pending.map(t=>{
         const it=ITEMS.find(x=>x.id===t.itemId);
@@ -1429,7 +2894,7 @@ function renderApprove(){
     </div>
   </div>
   <div class="sec fade-in">
-    <div class="sec-head"><span class="sec-title">📋 ประวัติการอนุมัติ</span></div>
+    <div class="sec-head"><span class="sec-title">ประวัติการอนุมัติ</span></div>
     <div class="tbl-wrap"><table>
       <thead><tr><th>สินค้า</th><th>อาคาร</th><th>จำนวน</th><th>ผู้เบิก</th><th>ผู้อนุมัติ</th><th>สถานะ</th><th>วันที่</th></tr></thead>
       <tbody>${[...transactions].filter(t=>t.type==='withdraw'&&t.status!=='pending')
@@ -1483,31 +2948,60 @@ function confirmReject(){
 ================================================================ */
 let histFilter={bldg:'all',type:'',q:''};
 function renderHistory(){
-  document.getElementById('topbar-actions').innerHTML='';
+  document.getElementById('topbar-actions').innerHTML=
+    `<button class="btn btn-ghost" onclick="navigate('admin')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> กลับ Admin</button>`;
   document.getElementById('content').innerHTML=`
   <div class="sec fade-in">
-    <div class="sec-head">
-      <span class="sec-title">📋 ประวัติทั้งหมด</span>
-      <div class="sec-actions">
-        <div class="search-wrap"><span>🔍</span><input id="hq" placeholder="ค้นหา…" oninput="histFilter.q=this.value;refreshHistory()" value="${histFilter.q}"></div>
-        <select class="fselect" onchange="histFilter.type=this.value;refreshHistory()">
-          <option value="">ทุกประเภท</option>
-          <option value="import" ${histFilter.type==='import'?'selected':''}>⬇️ นำเข้า</option>
-          <option value="checkin" ${histFilter.type==='checkin'?'selected':''}>↩️ เช็คอิน</option>
-          <option value="withdraw" ${histFilter.type==='withdraw'?'selected':''}>⬆️ เบิก</option>
-        </select>
-        <select class="fselect" onchange="histFilter.bldg=this.value;refreshHistory()">
-          <option value="all">ทุกอาคาร</option>
-          ${BUILDINGS.map(b=>`<option value="${b}" ${histFilter.bldg===b?'selected':''}>${b}</option>`).join('')}
-        </select>
+    <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;flex-wrap:wrap;overflow-x:auto">
+      <!-- ประเภท -->
+      <div style="display:flex;align-items:center;gap:6px;padding:4px 14px 4px 0;border-right:1px solid var(--border);margin-right:14px;flex-shrink:0">
+        <span style="font-size:10px;color:var(--t3);font-family:'Kanit',sans-serif;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;margin-right:2px">📋</span>
+        <div style="display:flex;gap:4px" id="h-type-tabs">
+          <button class="btab ${histFilter.type===''?'active':''}"        onclick="histFilter.type='';refreshHistory()">ทั้งหมด</button>
+          <button class="btab ${histFilter.type==='import'?'active':''}"   onclick="histFilter.type='import';refreshHistory()">นำเข้า</button>
+          <button class="btab ${histFilter.type==='withdraw'?'active':''}" onclick="histFilter.type='withdraw';refreshHistory()">เบิก</button>
+        </div>
+      </div>
+      <!-- อาคาร -->
+      <div style="display:flex;align-items:center;gap:6px;padding:4px 14px 4px 0;border-right:1px solid var(--border);margin-right:14px;flex-shrink:0">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <div style="display:flex;gap:4px" id="h-bldg-tabs">
+          <button class="btab ${histFilter.bldg==='all'?'active':''}" onclick="histFilter.bldg='all';refreshHistory()">ทั้งหมด</button>
+          ${BUILDINGS.map(b=>`<button class="btab ${histFilter.bldg===b?'active':''}" onclick="histFilter.bldg='${b}';refreshHistory()">${b}</button>`).join('')}
+        </div>
+      </div>
+      <!-- ค้นหา -->
+      <div class="search-wrap" style="margin-left:auto;flex-shrink:0">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="hq" placeholder="ค้นหา…" oninput="histFilter.q=this.value;refreshHistory()" value="${histFilter.q}" style="width:130px">
       </div>
     </div>
     <div id="hist-table"></div>
   </div>`;
   refreshHistory();
 }
-function refreshHistory(){
+
+function refreshHistory(fromAdmin){
   const {bldg,type,q}=histFilter;
+
+  // sync pill buttons (both admin hub and history page)
+  const syncBtns = (parentId, getVal, onMatch) => {
+    document.querySelectorAll(`#${parentId} .btab`).forEach(onMatch);
+  };
+  ['h-type-tabs','ah-type-tabs'].forEach(id=>{
+    document.querySelectorAll(`#${id} .btab`).forEach(el=>{
+      const map={'ทั้งหมด':'','⬇️ นำเข้า':'import','⬆️ เบิก':'withdraw'};
+      const v=map[el.textContent.trim()]??'';
+      el.classList.toggle('active', v===type);
+    });
+  });
+  ['h-bldg-tabs','ah-bldg-tabs'].forEach(id=>{
+    document.querySelectorAll(`#${id} .btab`).forEach(el=>{
+      const v=el.textContent.trim()==='ทั้งหมด'?'all':el.textContent.trim();
+      el.classList.toggle('active', v===bldg);
+    });
+  });
+
   let txns=[...transactions].filter(t=>{
     const it=ITEMS.find(x=>x.id===t.itemId);
     const mq=!q||(it?.name||'').toLowerCase().includes(q.toLowerCase())||t.requester.toLowerCase().includes(q.toLowerCase());
@@ -1532,7 +3026,7 @@ function refreshHistory(){
       </tr>`;
     }).join('')}</tbody>
   </table>
-  ${txns.length===0?`<div class="tbl-empty"><div class="ei">🔍</div><p>ไม่พบรายการ</p></div>`:''}
+  ${txns.length===0?`<div class="tbl-empty"><div class="ei" style="font-size:40px;opacity:.4">○</div><p>ไม่พบรายการ</p></div>`:''}
   <div class="tbl-foot"><span>แสดง ${txns.length} รายการ</span></div>
   </div>`;
 }
@@ -1542,10 +3036,11 @@ function refreshHistory(){
 ================================================================ */
 function renderSettings(){
   document.getElementById('topbar-actions').innerHTML=
-    `<button class="btn btn-green" onclick="saveSettings()">💾 บันทึกทั้งหมด</button>`;
+    `<button class="btn btn-ghost" onclick="navigate('admin')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> กลับ Admin</button>
+     <button class="btn btn-green" onclick="saveSettings()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึกทั้งหมด</button>`;
   document.getElementById('content').innerHTML=`
   <div class="sec fade-in">
-    <div class="sec-head"><span class="sec-title">⚙️ สต็อกขั้นต่ำ (Safety Stock)</span>
+    <div class="sec-head"><span class="sec-title">สต็อกขั้นต่ำ (Safety Stock)</span>
       <span style="font-size:12px;color:var(--t2)">แก้ไขค่าขั้นต่ำที่ต้องมีในคลัง</span></div>
     <div class="tbl-wrap"><table>
       <thead><tr><th>#</th><th>ชื่อสินค้า</th><th>หมวด</th><th>หน่วย</th><th>ค่าขั้นต่ำ (ปัจจุบัน)</th></tr></thead>
@@ -1558,7 +3053,7 @@ function renderSettings(){
       </tr>`).join('')}</tbody>
     </table></div>
     <div style="padding:14px 18px;display:flex;justify-content:flex-end">
-      <button class="btn btn-green" onclick="saveSettings()">💾 บันทึกทั้งหมด</button>
+      <button class="btn btn-green" onclick="saveSettings()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึกทั้งหมด</button>
     </div>
   </div>`;
 }
@@ -1609,7 +3104,7 @@ function closeSB(){
 /* ================================================================
    INIT
 ================================================================ */
-document.querySelectorAll('.nb').forEach(el=>{
+document.querySelectorAll('.nb[data-page]').forEach(el=>{
   el.addEventListener('click',()=>navigate(el.dataset.page));
 });
 document.querySelectorAll('#bldg-sidebar .bldg-pill').forEach(el=>{
@@ -1621,9 +3116,61 @@ document.querySelectorAll('#bldg-sidebar .bldg-pill').forEach(el=>{
   });
 });
 
+// login modal: close overlay also clears pending page
+document.getElementById('ov-login').addEventListener('click', e=>{
+  if(e.target===document.getElementById('ov-login')){
+    closeOverlay('ov-login');
+    _pendingPage=null;
+  }
+});
+
+// Enter key on username field moves to password
+document.getElementById('login-user').addEventListener('keydown', e=>{
+  if(e.key==='Enter') document.getElementById('login-pass').focus();
+});
+
 loadState();
 updateBadge();
 navigate('dashboard');
+/* ================================================================
+   THEME
+================================================================ */
+function toggleTheme(){
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme')==='dark';
+  const newTheme = isDark?'light':'dark';
+  html.setAttribute('data-theme', newTheme);
+  localStorage.setItem('gnr3-theme', newTheme);
+  updateThemeUI(newTheme);
+}
+function updateThemeUI(theme){
+  const isDark = theme==='dark';
+  const elTop  = document.getElementById('theme-icon-top');
+  const labelSb = document.getElementById('theme-label-sb');
+  const iconSb  = document.querySelector('.toggle-thumb');
+  // swap SVG moon ↔ sun
+  if(elTop){
+    elTop.innerHTML = isDark
+      ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+      : '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+  }
+  if(labelSb) labelSb.textContent = isDark ? 'โหมดกลางคืน' : 'โหมดกลางวัน';
+  if(iconSb)  iconSb.textContent  = isDark ? '🌙' : '☀️';
+}
+// Load saved theme
+(()=>{
+  const saved = localStorage.getItem('gnr3-theme')||'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  updateThemeUI(saved);
+})();
+
+/* ── Mobile bottom nav sync ── */
+function syncBottomNav(page){
+  document.querySelectorAll('.bnav-item[data-page]').forEach(el=>{
+    el.classList.toggle('active', el.dataset.page===page);
+  });
+}
+
 setTimeout(()=>document.getElementById('loader').classList.add('hide'),700);
 </script>
 </body>
