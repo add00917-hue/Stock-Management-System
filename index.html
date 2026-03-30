@@ -2,7 +2,11 @@
 <html lang="th" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#070b18" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f0f4fc" media="(prefers-color-scheme: light)">
 <title>GNR3 Stock — Management System</title>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -89,13 +93,15 @@
    RESET & BASE
 ════════════════════════════════════════ */
 *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
-html,body { height:100%; overflow-x:hidden; }
+html { height:100%; }
+body { min-height:100%; }
 body {
   background: var(--bg);
   color: var(--t1);
   font-family: 'Sarabun', sans-serif;
   font-size: 14px;
   display: flex;
+  width: 100%;
   transition: background .3s, color .3s;
 }
 
@@ -317,8 +323,11 @@ body {
 #main {
   margin-left: var(--sw);
   flex: 1;
+  min-width: 0;
+  width: calc(100vw - var(--sw));
   display: flex; flex-direction: column;
   min-height: 100vh;
+  overflow-x: hidden;
   transition: margin-left .3s;
 }
 
@@ -492,6 +501,8 @@ body {
   overflow: hidden;
   transition: border-color .2s, background .3s;
 }
+/* Calendar section needs visible overflow */
+.sec.sec-calendar { overflow: visible !important; }
 .sec-head {
   padding: 14px 20px;
   border-bottom: 1px solid var(--border);
@@ -819,8 +830,9 @@ td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 90;
   background: var(--bg-panel);
   border-top: 1px solid var(--border);
-  padding: 8px 0 env(safe-area-inset-bottom);
+  padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
   backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 .bnav-items {
   display: flex; justify-content: space-around;
@@ -848,22 +860,176 @@ td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
   #sb-ov { display: block; }
   #main { margin-left: 0 !important; }
   .hamburger { display: flex !important; }
+  .dash-grid-4 { grid-template-columns: repeat(2,1fr) !important; }
   .stats-row { grid-template-columns: repeat(2,1fr); }
   .two-col { grid-template-columns: 1fr; }
   #content { padding: 16px; gap: 14px; }
 }
 
 @media (max-width: 640px) {
-  .stats-row { grid-template-columns: repeat(2,1fr); gap: 10px; }
-  #content { padding: 12px 12px 80px; gap: 12px; }
-  .form-grid { grid-template-columns: 1fr; }
-  .fg-full { grid-column: 1; }
+  /* layout */
+  #main { min-height: 100dvh; width: 100% !important; max-width: 100% !important; min-width: 0 !important; overflow-x: hidden; }
+  #content { padding: 10px 10px 90px; gap: 10px; width: 100%; max-width: 100%; }
+  .topbar { padding: 0 12px; height: 52px; }
+  .topbar-sub { display: none; }
+
+  /* grids */
+  .dash-grid-4 { grid-template-columns: repeat(2,1fr) !important; gap: 8px !important; }
+  .stats-row   { grid-template-columns: repeat(2,1fr); gap: 8px; }
+  .two-col     { grid-template-columns: 1fr; }
+  .form-grid   { grid-template-columns: 1fr; padding: 12px; }
+  .fg-full     { grid-column: 1; }
+  #mn-subcat-cards { grid-template-columns: 1fr; gap: 10px; }
+
+  /* KPI cards */
+  .kpi-card       { min-height: 108px; padding: 12px; border-radius: 14px; }
+  .kpi-num        { font-size: 28px; margin-top: 8px; }
+  .kpi-label      { font-size: 11px; }
+  .kpi-sub        { display: none; }
+  .kpi-badge      { font-size: 9px; padding: 2px 7px; }
+  .kpi-icon-wrap  { width: 38px; height: 38px; border-radius: 10px; }
+  .kpi-icon-wrap svg { width: 18px !important; height: 18px !important; }
+  .kpi-blob       { width: 70px; height: 70px; }
+  .kpi-blob2      { display: none; }
+
+  /* cat cards */
+  .cat-card           { min-height: 128px; }
+  .cat-card-inner     { padding: 12px; }
+  .cat-card-icon-bg   { width: 48px; height: 48px; }
+  .cat-card-icon-bg svg { width: 22px !important; height: 22px !important; }
+  .cat-card-title     { font-size: 12px; }
+  .cat-card-sub,.cat-card-bar-wrap,.cat-card-bar-label { display: none; }
+  .cat-card-footer    { padding: 8px 12px 10px; }
+  .cat-card-num-badge { width: 22px; height: 22px; font-size: 9px; }
+  .cat-card-count-badge { font-size: 9px; padding: 2px 7px; }
+
+  /* tables — horizontal scroll */
+  .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tbl-wrap { overflow-x: auto; }
+  .tbl-wrap table { min-width: 460px; }
+  .tbl-wrap td, .tbl-wrap th { padding: 7px 9px; font-size: 12px; }
+  .td-name { max-width: 140px; }
+
+  /* calendar grid smaller on mobile */
+  .cal-kpi-row { grid-template-columns: repeat(2,1fr); gap: 8px; }
+  .cal-cell    { min-height: 48px; padding: 5px 4px 4px; }
+  .cal-days { overflow: visible !important; }
+  .cal-tag     { display: none; }
+  .cal-nav     { flex-wrap: nowrap; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+  .cal-nav select { padding: 5px 8px; font-size: 12px; }
+  .cal-legend  { display: none; }
+
+  /* filter pills */
+  .btab { font-size: 11px; padding: 4px 10px; flex-shrink: 0; white-space: nowrap; }
+
+  /* forms */
+  .finput, .fselect, .ftextarea { font-size: 16px; }
+
+  /* sec head */
+  .sec-head { flex-wrap: wrap; padding: 10px 12px; gap: 8px; }
+  .sec-actions { width: 100%; margin-left: 0; }
+  .search-wrap { flex: 1; min-width: 0; }
+  .search-wrap input { width: 100%; min-width: 80px; }
+
+  /* alert */
+  .alert-row { padding: 10px 12px; }
+  .alert-name { font-size: 12px; }
+
+  /* modal */
+  .modal { border-radius: 14px; }
+
+  /* bottom nav */
   #bottom-nav { display: block; }
-  .topbar { padding: 0 14px; }
-  .toast-wrap { bottom: 80px; right: 12px; left: 12px; }
-  .toast { min-width: auto; }
+
+  /* toast */
+  .toast-wrap { bottom: 78px; right: 10px; left: 10px; }
+  .toast { min-width: auto; font-size: 12px; }
+
+  /* topbar btns */
+  .topbar-right .btn { padding: 5px 8px; font-size: 11px; gap: 4px; }
 }
 
+@media (max-width: 380px) {
+  .kpi-num  { font-size: 24px; }
+  .kpi-badge { display: none; }
+  .cat-card  { min-height: 110px; }
+}
+
+
+
+/* ════ STOCK CARD (mobile list layout) ════ */
+.scard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  transition: border-color .2s;
+}
+.scard:active { border-color: var(--border-hi); }
+.scard-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.scard-row:last-child { border-bottom: none; }
+.scard-key { color: var(--t2); font-size: 12px; }
+.scard-val { color: var(--t1); font-family: 'Kanit', sans-serif; }
+
+/* ════ CALENDAR STYLES ════ */
+.cal-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  .cal-kpi{border-radius:16px;padding:16px 18px;position:relative;overflow:hidden;cursor:default;transition:transform .18s,box-shadow .18s;}
+  .cal-kpi:hover{transform:translateY(-2px);}
+  .cal-kpi-num{font-family:'Kanit',sans-serif;font-size:32px;font-weight:800;line-height:1;margin-bottom:4px;}
+  .cal-kpi-label{font-size:12px;opacity:.85;}
+  .cal-kpi-badge{position:absolute;top:12px;right:12px;font-size:10px;font-family:'Kanit',sans-serif;font-weight:600;padding:2px 9px;border-radius:20px;background:rgba(255,255,255,.22);color:#fff;}
+
+  .cal-nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .cal-nav select{background:var(--bg-glass);border:1px solid var(--border);border-radius:10px;padding:7px 12px;color:var(--t1);font-family:'Kanit',sans-serif;font-size:13px;outline:none;cursor:pointer;}
+  .cal-nav select option{background:var(--bg-panel);}
+  .cal-nav-btn{width:34px;height:34px;border-radius:9px;background:var(--bg-glass);border:1px solid var(--border);color:var(--t1);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+  .cal-nav-btn:hover{border-color:var(--border-hi);}
+  .cal-today-btn{padding:6px 14px;border-radius:9px;background:var(--gr-primary);color:#fff;border:none;font-family:'Kanit',sans-serif;font-size:12px;font-weight:500;cursor:pointer;box-shadow:0 3px 10px rgba(99,102,241,.35);}
+
+  .cal-legend{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .cal-leg-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t2);}
+  .cal-leg-dot{width:9px;height:9px;border-radius:50%;}
+
+  .cal-grid-wrap{overflow:visible;}
+  .cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--border);}
+  .cal-wday{padding:8px 4px;text-align:center;font-family:'Kanit',sans-serif;font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.05em;}
+  .cal-wday:first-child{color:var(--rose);}
+  .cal-wday:last-child{color:var(--sky);}
+
+  .cal-days{display:grid;grid-template-columns:repeat(7,1fr);}
+  .cal-cell{
+    min-height:76px;padding:8px 10px 6px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);
+    cursor:pointer;transition:background .15s;display:flex;flex-direction:column;
+    position:relative;
+  }
+  .cal-cell:nth-child(7n){border-right:none;}
+  .cal-cell:hover{background:var(--bg-hover);}
+  .cal-cell.cal-empty{background:var(--bg-glass);cursor:default;}
+  .cal-cell.cal-today{background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.3);}
+  .cal-cell.cal-today .cal-day-num{
+    background:var(--gr-primary);color:#fff;border-radius:50%;
+    width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+    font-weight:700;box-shadow:0 2px 8px rgba(99,102,241,.4);
+  }
+  .cal-cell.cal-has-txn:not(.cal-empty){background:rgba(99,102,241,.04);}
+  .cal-day-num{font-family:'Kanit',sans-serif;font-size:13px;font-weight:600;color:var(--t1);min-width:26px;line-height:26px;}
+
+  .cal-tag{font-size:10px;font-family:'Kanit',sans-serif;font-weight:500;padding:1px 6px;border-radius:5px;line-height:1.5;white-space:nowrap;}
+  .cal-tag-import  {background:rgba(16,185,129,.15);color:#6ee7b7;}
+  .cal-tag-withdraw{background:rgba(244,63,94,.12);color:#fda4af;}
+  .cal-tag-pending {background:rgba(245,158,11,.12);color:#fcd34d;}
+  .cal-dot{width:6px;height:6px;border-radius:50%;}
+
+  .cal-detail{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+  .cal-detail-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+  /* cal mobile merged above */
 /* scrollbar */
 * { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
 *::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -926,8 +1092,7 @@ td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
 .cat-card-bar{height:100%;border-radius:99px;background:rgba(255,255,255,.8);transition:width .8s;}
 .cat-card-bar-label{font-size:10px;color:rgba(255,255,255,.55);margin-top:4px;}
 
-@media(max-width:960px){.dash-grid-4{grid-template-columns:repeat(2,1fr);}.cat-card{min-height:170px;}}
-@media(max-width:640px){.dash-grid-4{grid-template-columns:repeat(2,1fr);gap:10px;}.kpi-num{font-size:34px;}.cat-card-icon-bg{width:60px;height:60px;}.cat-card-icon-bg svg{width:30px!important;height:30px!important;}}
+/* responsive handled in main @media block */
 </style>
 </head>
 <body>
@@ -1579,64 +1744,6 @@ function refreshCalendar(){
 
   const ct = document.getElementById('content');
   ct.innerHTML = `
-  <style>
-  .cal-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
-  .cal-kpi{border-radius:16px;padding:16px 18px;position:relative;overflow:hidden;cursor:default;transition:transform .18s,box-shadow .18s;}
-  .cal-kpi:hover{transform:translateY(-2px);}
-  .cal-kpi-num{font-family:'Kanit',sans-serif;font-size:32px;font-weight:800;line-height:1;margin-bottom:4px;}
-  .cal-kpi-label{font-size:12px;opacity:.85;}
-  .cal-kpi-badge{position:absolute;top:12px;right:12px;font-size:10px;font-family:'Kanit',sans-serif;font-weight:600;padding:2px 9px;border-radius:20px;background:rgba(255,255,255,.22);color:#fff;}
-
-  .cal-nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-  .cal-nav select{background:var(--bg-glass);border:1px solid var(--border);border-radius:10px;padding:7px 12px;color:var(--t1);font-family:'Kanit',sans-serif;font-size:13px;outline:none;cursor:pointer;}
-  .cal-nav select option{background:var(--bg-panel);}
-  .cal-nav-btn{width:34px;height:34px;border-radius:9px;background:var(--bg-glass);border:1px solid var(--border);color:var(--t1);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
-  .cal-nav-btn:hover{border-color:var(--border-hi);}
-  .cal-today-btn{padding:6px 14px;border-radius:9px;background:var(--gr-primary);color:#fff;border:none;font-family:'Kanit',sans-serif;font-size:12px;font-weight:500;cursor:pointer;box-shadow:0 3px 10px rgba(99,102,241,.35);}
-
-  .cal-legend{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
-  .cal-leg-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t2);}
-  .cal-leg-dot{width:9px;height:9px;border-radius:50%;}
-
-  .cal-grid-wrap{overflow:hidden;}
-  .cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--border);}
-  .cal-wday{padding:8px 4px;text-align:center;font-family:'Kanit',sans-serif;font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.05em;}
-  .cal-wday:first-child{color:var(--rose);}
-  .cal-wday:last-child{color:var(--sky);}
-
-  .cal-days{display:grid;grid-template-columns:repeat(7,1fr);}
-  .cal-cell{
-    min-height:76px;padding:8px 10px 6px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);
-    cursor:pointer;transition:background .15s;display:flex;flex-direction:column;
-    position:relative;
-  }
-  .cal-cell:nth-child(7n){border-right:none;}
-  .cal-cell:hover{background:var(--bg-hover);}
-  .cal-cell.cal-empty{background:var(--bg-glass);cursor:default;}
-  .cal-cell.cal-today{background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.3);}
-  .cal-cell.cal-today .cal-day-num{
-    background:var(--gr-primary);color:#fff;border-radius:50%;
-    width:26px;height:26px;display:flex;align-items:center;justify-content:center;
-    font-weight:700;box-shadow:0 2px 8px rgba(99,102,241,.4);
-  }
-  .cal-cell.cal-has-txn:not(.cal-empty){background:rgba(99,102,241,.04);}
-  .cal-day-num{font-family:'Kanit',sans-serif;font-size:13px;font-weight:600;color:var(--t1);min-width:26px;line-height:26px;}
-
-  .cal-tag{font-size:10px;font-family:'Kanit',sans-serif;font-weight:500;padding:1px 6px;border-radius:5px;line-height:1.5;white-space:nowrap;}
-  .cal-tag-import  {background:rgba(16,185,129,.15);color:#6ee7b7;}
-  .cal-tag-withdraw{background:rgba(244,63,94,.12);color:#fda4af;}
-  .cal-tag-pending {background:rgba(245,158,11,.12);color:#fcd34d;}
-  .cal-dot{width:6px;height:6px;border-radius:50%;}
-
-  .cal-detail{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
-  .cal-detail-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-  @media(max-width:640px){
-    .cal-kpi-row{grid-template-columns:repeat(2,1fr);}
-    .cal-cell{min-height:54px;padding:5px 6px 4px;}
-    .cal-tag{display:none;}
-  }
-  </style>
-
   <!-- KPI row -->
   <div class="cal-kpi-row fade-in">
     <div class="cal-kpi" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 4px 20px rgba(99,102,241,.4)">
@@ -1666,7 +1773,7 @@ function refreshCalendar(){
   </div>
 
   <!-- Calendar card -->
-  <div class="sec fade-in">
+  <div class="sec sec-calendar fade-in">
     <!-- nav bar -->
     <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
       <div class="cal-nav">
@@ -1794,7 +1901,7 @@ function renderAdmin(){
 
   <!-- History table with single filter row -->
   <div class="sec fade-in">
-    <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;flex-wrap:wrap;overflow-x:auto">
+    <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none">
       <div style="display:flex;align-items:center;gap:6px;padding:4px 14px 4px 0;border-right:1px solid var(--border);margin-right:14px;flex-shrink:0">
         <span style="font-size:10px;color:var(--t3);font-family:'Kanit',sans-serif;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;margin-right:2px">📋</span>
         <div style="display:flex;gap:4px" id="ah-type-tabs">
@@ -2083,7 +2190,7 @@ function renderStock(){
 
   <div class="sec fade-in">
     <!-- SINGLE FILTER ROW -->
-    <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;flex-wrap:wrap;overflow-x:auto">
+    <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none">
 
       <!-- อาคาร -->
       <div style="display:flex;align-items:center;gap:6px;padding:4px 14px 4px 0;border-right:1px solid var(--border);margin-right:14px;flex-shrink:0">
@@ -2257,53 +2364,86 @@ function refreshStock(){
     return;
   }
 
-  /* columns:
-     ทุกอาคาร → ชื่อ | หมวด | Ari Hills | KSL | ESV | รวม | ขั้นต่ำ | ต้องสั่ง
-     อาคารเดียว → ชื่อ | หมวด | [mini-bar] คงเหลือ | ขั้นต่ำ | ต้องสั่ง
-  */
+  // Build HTML — cards on mobile, table on desktop
+  const isMobile = window.innerWidth < 640;
   const isSingle = bldg !== 'all';
 
-  const thead = isSingle
-    ? `<tr><th>#</th><th>ชื่อสินค้า / หน่วย</th><th>หมวด</th><th style="min-width:170px">คงเหลือ (${bldg})</th><th>ขั้นต่ำ</th><th>ต้องสั่งเพิ่ม</th></tr>`
-    : `<tr><th>#</th><th>ชื่อสินค้า / หน่วย</th><th>หมวด</th>
-        ${BUILDINGS.map(b=>`<th style="min-width:120px">${b}</th>`).join('')}
-        <th>รวม</th><th>ขั้นต่ำ</th><th>ต้องสั่ง</th></tr>`;
-
-  const tbody = pageItems.map(it=>{
-    const min = getMin(it.id);
-    const bStocks = BUILDINGS.map(b=>getStock(it.id,b));
-    const total = bStocks.reduce((s,v)=>s+v,0);
-    const singleQty = getStock(it.id,bldg);
-    const refQty = isSingle ? singleQty : total;
-    const order = Math.max(0, min - refQty);
-    const lv = stockLevel(refQty, min);
-    const orderColor = order>0 ? '#fca5a5' : '#4a5a7a';
-    const totalColor = lv==='ok'?'#86efac':lv==='low'?'#fdba74':'#fca5a5';
-
-    if(isSingle){
-      return `<tr>
-        <td class="td-no">${it.no}</td>
-        <td class="td-name">${it.name}<small>${it.unit}${it.subcat?` · ${SUBCAT_ICO[it.subcat]} ${it.subcat}`:''}</small></td>
-        <td><span class="badge ${CAT_CLR[it.cat]}">${CAT_ICO[it.cat]} ${it.cat}</span></td>
-        <td>${miniBar(singleQty, min)}</td>
-        <td style="color:var(--t3);font-family:'Kanit',sans-serif;text-align:center">${min}</td>
-        <td style="text-align:center"><span style="font-family:'Kanit',sans-serif;font-weight:600;color:${orderColor}">${order>0?'+ '+order:'—'}</span></td>
-      </tr>`;
-    } else {
-      return `<tr>
-        <td class="td-no">${it.no}</td>
-        <td class="td-name">${it.name}<small>${it.unit}${it.subcat?` · ${SUBCAT_ICO[it.subcat]} ${it.subcat}`:''}</small></td>
-        <td><span class="badge ${CAT_CLR[it.cat]}">${CAT_ICO[it.cat]} ${it.cat}</span></td>
-        ${bStocks.map(q=>{ const l=stockLevel(q,min); const c=l==='ok'?'#86efac':l==='low'?'#fdba74':'#fca5a5'; return `<td><span style="font-family:'Kanit',sans-serif;font-weight:600;font-size:14px;color:${c}">${q}</span></td>`; }).join('')}
-        <td style="text-align:center"><span style="font-family:'Kanit',sans-serif;font-weight:700;color:${totalColor}">${total}</span></td>
-        <td style="text-align:center;color:var(--t3);font-family:'Kanit',sans-serif">${min}</td>
-        <td style="text-align:center"><span style="font-family:'Kanit',sans-serif;font-weight:600;color:${orderColor}">${order>0?'+ '+order:'—'}</span></td>
-      </tr>`;
-    }
-  }).join('');
-
-  document.getElementById('st-body').innerHTML=
-    `<table><thead>${thead}</thead><tbody>${tbody}</tbody></table>`;
+  if(isMobile){
+    // ── CARD LAYOUT for mobile ──
+    const cards = pageItems.map(it=>{
+      const min = getMin(it.id);
+      const singleQty = getStock(it.id, bldg==='all'?'Ari Hills':bldg);
+      const bStocks = BUILDINGS.map(b=>getStock(it.id,b));
+      const total = bStocks.reduce((s,v)=>s+v,0);
+      const refQty = isSingle ? getStock(it.id,bldg) : total;
+      const order = Math.max(0, min - refQty);
+      const lv = stockLevel(refQty, min);
+      const lvColor = lv==='ok'?'#6ee7b7':lv==='low'?'#fcd34d':'#fca5a5';
+      const lvBg    = lv==='ok'?'rgba(16,185,129,.12)':lv==='low'?'rgba(245,158,11,.12)':'rgba(244,63,94,.12)';
+      const lvLabel = lv==='ok'?'ปกติ':lv==='low'?'ต่ำ':'หมด';
+      const bldgRows = isSingle
+        ? `<div class="scard-row"><span class="scard-key">คงเหลือ</span><div style="display:flex;align-items:center;gap:8px">${miniBar(getStock(it.id,bldg),min)}<span style="font-family:'Kanit',sans-serif;font-size:12px;color:var(--t2)">${it.unit}</span></div></div>`
+        : BUILDINGS.map((b,bi)=>{
+            const q = bStocks[bi];
+            const lc = stockLevel(q,min);
+            const cc = lc==='ok'?'#6ee7b7':lc==='low'?'#fcd34d':'#fca5a5';
+            return `<div class="scard-row"><span class="scard-key">${b}</span><span class="scard-val" style="color:${cc};font-weight:700;font-family:'Kanit',sans-serif">${q}</span></div>`;
+          }).join('')+`<div class="scard-row" style="border-top:1px solid var(--border-hi)"><span class="scard-key" style="font-weight:600">รวม</span><span class="scard-val" style="color:${lvColor};font-weight:700;font-family:'Kanit',sans-serif">${total}</span></div>`;
+      return `<div class="scard">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div>
+            <div style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:600;color:var(--t1)">${it.name}</div>
+            <div style="font-size:11px;color:var(--t2);margin-top:1px">${it.unit} · <span class="badge ${CAT_CLR[it.cat]}">${it.cat}</span></div>
+          </div>
+          <span style="background:${lvBg};color:${lvColor};border-radius:8px;padding:3px 10px;font-size:11px;font-family:'Kanit',sans-serif;font-weight:600;flex-shrink:0">${lvLabel}</span>
+        </div>
+        ${bldgRows}
+        <div class="scard-row"><span class="scard-key">ขั้นต่ำ</span><span class="scard-val" style="color:var(--t3)">${min}</span></div>
+        ${order>0?`<div class="scard-row"><span class="scard-key">ต้องสั่งเพิ่ม</span><span class="scard-val" style="color:#fca5a5;font-weight:600">+ ${order} ${it.unit}</span></div>`:''}
+      </div>`;
+    }).join('');
+    document.getElementById('st-body').innerHTML = `<div style="display:flex;flex-direction:column;gap:8px;padding:10px">${cards}</div>`;
+  } else {
+    // ── TABLE LAYOUT for desktop ──
+    const isSingleD = bldg !== 'all';
+    const thead = isSingleD
+      ? `<tr><th>#</th><th>ชื่อสินค้า / หน่วย</th><th>หมวด</th><th style="min-width:170px">คงเหลือ (${bldg})</th><th>ขั้นต่ำ</th><th>ต้องสั่งเพิ่ม</th></tr>`
+      : `<tr><th>#</th><th>ชื่อสินค้า / หน่วย</th><th>หมวด</th>
+          ${BUILDINGS.map(b=>`<th style="min-width:120px">${b}</th>`).join('')}
+          <th>รวม</th><th>ขั้นต่ำ</th><th>ต้องสั่ง</th></tr>`;
+    const tbody = pageItems.map(it=>{
+      const min = getMin(it.id);
+      const bStocks = BUILDINGS.map(b=>getStock(it.id,b));
+      const total = bStocks.reduce((s,v)=>s+v,0);
+      const singleQty = getStock(it.id,bldg);
+      const refQty = isSingleD ? singleQty : total;
+      const order = Math.max(0, min - refQty);
+      const lv = stockLevel(refQty, min);
+      const orderColor = order>0 ? '#fca5a5' : '#4a5a7a';
+      const totalColor = lv==='ok'?'#86efac':lv==='low'?'#fdba74':'#fca5a5';
+      if(isSingleD){
+        return `<tr>
+          <td class="td-no">${it.no}</td>
+          <td class="td-name">${it.name}<small>${it.unit}</small></td>
+          <td><span class="badge ${CAT_CLR[it.cat]}">${it.cat}</span></td>
+          <td>${miniBar(singleQty, min)}</td>
+          <td style="color:var(--t3);font-family:'Kanit',sans-serif;text-align:center">${min}</td>
+          <td style="text-align:center"><span style="font-family:'Kanit',sans-serif;font-weight:600;color:${orderColor}">${order>0?'+ '+order:'—'}</span></td>
+        </tr>`;
+      } else {
+        return `<tr>
+          <td class="td-no">${it.no}</td>
+          <td class="td-name">${it.name}<small>${it.unit}</small></td>
+          <td><span class="badge ${CAT_CLR[it.cat]}">${it.cat}</span></td>
+          ${bStocks.map(q=>{ const l=stockLevel(q,min); const c=l==='ok'?'#86efac':l==='low'?'#fdba74':'#fca5a5'; return `<td><span style="font-family:'Kanit',sans-serif;font-weight:600;color:${c}">${q}</span></td>`; }).join('')}
+          <td style="text-align:center"><span style="font-family:'Kanit',sans-serif;font-weight:700;color:${totalColor}">${total}</span></td>
+          <td style="text-align:center;color:var(--t3);font-family:'Kanit',sans-serif">${min}</td>
+          <td style="text-align:center"><span style="font-family:'Kanit',sans-serif;font-weight:600;color:${orderColor}">${order>0?'+ '+order:'—'}</span></td>
+        </tr>`;
+      }
+    }).join('');
+    document.getElementById('st-body').innerHTML = `<table><thead>${thead}</thead><tbody>${tbody}</tbody></table>`;
+  }
 }
 
 /* ================================================================
@@ -2370,7 +2510,7 @@ function renderMaintenance(){
 
   <div class="sec fade-in">
     <!-- SINGLE FILTER ROW -->
-    <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;flex-wrap:wrap;overflow-x:auto">
+    <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none">
 
       <!-- อาคาร -->
       <div style="display:flex;align-items:center;gap:6px;padding:4px 14px 4px 0;border-right:1px solid var(--border);margin-right:14px;flex-shrink:0">
@@ -2524,51 +2664,85 @@ function refreshMaintenance(){
     return;
   }
 
+  const isMobile = window.innerWidth < 640;
   const isSingle = bldg !== 'all';
-  const thead = isSingle
-    ? `<tr><th>#</th><th>ชื่ออุปกรณ์ / หน่วย</th><th>ระบบ</th><th style="min-width:170px">คงเหลือ (${bldg})</th><th>ขั้นต่ำ</th><th>ต้องสั่งเพิ่ม</th></tr>`
-    : `<tr><th>#</th><th>ชื่ออุปกรณ์ / หน่วย</th><th>ระบบ</th>
-        ${BUILDINGS.map(b=>`<th style="min-width:110px">${b}</th>`).join('')}
-        <th>รวม</th><th>ขั้นต่ำ</th><th>ต้องสั่ง</th></tr>`;
 
-  const tbody = pageItems.map(it=>{
-    const min = getMin(it.id);
-    const bStocks = BUILDINGS.map(b=>getStock(it.id,b));
-    const total = bStocks.reduce((s,v)=>s+v,0);
-    const singleQty = getStock(it.id,bldg);
-    const refQty = isSingle?singleQty:total;
-    const order = Math.max(0,min-refQty);
-    const lv = stockLevel(refQty,min);
-    const orderColor = order>0?'#fca5a5':'#4a5a7a';
-    const totalColor = lv==='ok'?'#86efac':lv==='low'?'#fdba74':'#fca5a5';
-    const subcatBadge = it.subcat
-      ? `<span class="badge ${it.subcat==='ไฟฟ้า'?'b-yellow':'b-cyan'}">${SUBCAT_ICO[it.subcat]} ${it.subcat}</span>`
-      : '';
-
-    if(isSingle){
-      return `<tr>
-        <td class="td-no">${it.no}</td>
-        <td class="td-name">${it.name}<small>${it.unit}</small></td>
-        <td>${subcatBadge}</td>
-        <td>${miniBar(singleQty,min)}</td>
-        <td style="color:var(--t3);font-family:'Kanit',sans-serif;text-align:center">${min}</td>
-        <td style="text-align:center"><span style="font-family:'Kanit',sans-serif;font-weight:600;color:${orderColor}">${order>0?'+ '+order:'—'}</span></td>
-      </tr>`;
-    } else {
-      return `<tr>
-        <td class="td-no">${it.no}</td>
-        <td class="td-name">${it.name}<small>${it.unit}</small></td>
-        <td>${subcatBadge}</td>
-        ${bStocks.map(q=>{ const l=stockLevel(q,min); const c=l==='ok'?'#86efac':l==='low'?'#fdba74':'#fca5a5'; return `<td><span style="font-family:'Kanit',sans-serif;font-weight:600;color:${c}">${q}</span></td>`; }).join('')}
-        <td style="text-align:center"><span style="font-family:'Kanit',sans-serif;font-weight:700;color:${totalColor}">${total}</span></td>
-        <td style="text-align:center;color:var(--t3);font-family:'Kanit',sans-serif">${min}</td>
-        <td style="text-align:center"><span style="font-family:'Kanit',sans-serif;font-weight:600;color:${orderColor}">${order>0?'+ '+order:'—'}</span></td>
-      </tr>`;
-    }
-  }).join('');
-
-  document.getElementById('mn-body').innerHTML=
-    `<table><thead>${thead}</thead><tbody>${tbody}</tbody></table>`;
+  if(isMobile){
+    const cards = pageItems.map(it=>{
+      const min = getMin(it.id);
+      const bStocks = BUILDINGS.map(b=>getStock(it.id,b));
+      const total = bStocks.reduce((s,v)=>s+v,0);
+      const refQty = isSingle ? getStock(it.id,bldg) : total;
+      const order = Math.max(0, min - refQty);
+      const lv = stockLevel(refQty, min);
+      const lvColor = lv==='ok'?'#6ee7b7':lv==='low'?'#fcd34d':'#fca5a5';
+      const lvBg    = lv==='ok'?'rgba(16,185,129,.12)':lv==='low'?'rgba(245,158,11,.12)':'rgba(244,63,94,.12)';
+      const lvLabel = lv==='ok'?'ปกติ':lv==='low'?'ต่ำ':'หมด';
+      const subcatBadge = it.subcat
+        ? `<span class="badge ${it.subcat==='ไฟฟ้า'?'b-yellow':'b-cyan'}">${it.subcat}</span>` : '';
+      const bldgRows = isSingle
+        ? `<div class="scard-row"><span class="scard-key">คงเหลือ</span><div style="display:flex;align-items:center;gap:8px">${miniBar(getStock(it.id,bldg),min)}<span style="font-family:'Kanit',sans-serif;font-size:12px;color:var(--t2)">${it.unit}</span></div></div>`
+        : BUILDINGS.map((b,bi)=>{
+            const q = bStocks[bi];
+            const lc = stockLevel(q,min);
+            const cc = lc==='ok'?'#6ee7b7':lc==='low'?'#fcd34d':'#fca5a5';
+            return `<div class="scard-row"><span class="scard-key">${b}</span><span class="scard-val" style="color:${cc};font-weight:700;font-family:'Kanit',sans-serif">${q}</span></div>`;
+          }).join('')+`<div class="scard-row" style="border-top:1px solid var(--border-hi)"><span class="scard-key" style="font-weight:600">รวม</span><span class="scard-val" style="color:${lvColor};font-weight:700;font-family:'Kanit',sans-serif">${total}</span></div>`;
+      return `<div class="scard">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div>
+            <div style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:600;color:var(--t1)">${it.name}</div>
+            <div style="font-size:11px;color:var(--t2);margin-top:2px">${it.unit} · ${subcatBadge}</div>
+          </div>
+          <span style="background:${lvBg};color:${lvColor};border-radius:8px;padding:3px 10px;font-size:11px;font-family:'Kanit',sans-serif;font-weight:600;flex-shrink:0">${lvLabel}</span>
+        </div>
+        ${bldgRows}
+        <div class="scard-row"><span class="scard-key">ขั้นต่ำ</span><span class="scard-val" style="color:var(--t3)">${min}</span></div>
+        ${order>0?`<div class="scard-row"><span class="scard-key">ต้องสั่งเพิ่ม</span><span class="scard-val" style="color:#fca5a5;font-weight:600">+ ${order} ${it.unit}</span></div>`:''}
+      </div>`;
+    }).join('');
+    document.getElementById('mn-body').innerHTML = `<div style="display:flex;flex-direction:column;gap:8px;padding:10px">${cards}</div>`;
+  } else {
+    const thead = isSingle
+      ? `<tr><th>#</th><th>ชื่ออุปกรณ์ / หน่วย</th><th>ระบบ</th><th style="min-width:170px">คงเหลือ (${bldg})</th><th>ขั้นต่ำ</th><th>ต้องสั่งเพิ่ม</th></tr>`
+      : `<tr><th>#</th><th>ชื่ออุปกรณ์ / หน่วย</th><th>ระบบ</th>
+          ${BUILDINGS.map(b=>`<th style="min-width:110px">${b}</th>`).join('')}
+          <th>รวม</th><th>ขั้นต่ำ</th><th>ต้องสั่ง</th></tr>`;
+    const tbody = pageItems.map(it=>{
+      const min = getMin(it.id);
+      const bStocks = BUILDINGS.map(b=>getStock(it.id,b));
+      const total = bStocks.reduce((s,v)=>s+v,0);
+      const singleQty = getStock(it.id,bldg);
+      const refQty = isSingle?singleQty:total;
+      const order = Math.max(0,min-refQty);
+      const lv = stockLevel(refQty,min);
+      const orderColor = order>0?'#fca5a5':'#4a5a7a';
+      const totalColor = lv==='ok'?'#86efac':lv==='low'?'#fdba74':'#fca5a5';
+      const subcatBadge = it.subcat
+        ? `<span class="badge ${it.subcat==='ไฟฟ้า'?'b-yellow':'b-cyan'}">${SUBCAT_ICO[it.subcat]} ${it.subcat}</span>` : '';
+      if(isSingle){
+        return `<tr>
+          <td class="td-no">${it.no}</td>
+          <td class="td-name">${it.name}<small>${it.unit}</small></td>
+          <td>${subcatBadge}</td>
+          <td>${miniBar(singleQty,min)}</td>
+          <td style="color:var(--t3);font-family:'Kanit',sans-serif;text-align:center">${min}</td>
+          <td style="text-align:center"><span style="font-family:'Kanit',sans-serif;font-weight:600;color:${orderColor}">${order>0?'+ '+order:'—'}</span></td>
+        </tr>`;
+      } else {
+        return `<tr>
+          <td class="td-no">${it.no}</td>
+          <td class="td-name">${it.name}<small>${it.unit}</small></td>
+          <td>${subcatBadge}</td>
+          ${bStocks.map(q=>{ const l=stockLevel(q,min); const c=l==='ok'?'#86efac':l==='low'?'#fdba74':'#fca5a5'; return `<td><span style="font-family:'Kanit',sans-serif;font-weight:600;color:${c}">${q}</span></td>`; }).join('')}
+          <td style="text-align:center"><span style="font-family:'Kanit',sans-serif;font-weight:700;color:${totalColor}">${total}</span></td>
+          <td style="text-align:center;color:var(--t3);font-family:'Kanit',sans-serif">${min}</td>
+          <td style="text-align:center"><span style="font-family:'Kanit',sans-serif;font-weight:600;color:${orderColor}">${order>0?'+ '+order:'—'}</span></td>
+        </tr>`;
+      }
+    }).join('');
+    document.getElementById('mn-body').innerHTML = `<table><thead>${thead}</thead><tbody>${tbody}</tbody></table>`;
+  }
 }
 
 /* ================================================================
@@ -2952,7 +3126,7 @@ function renderHistory(){
     `<button class="btn btn-ghost" onclick="navigate('admin')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> กลับ Admin</button>`;
   document.getElementById('content').innerHTML=`
   <div class="sec fade-in">
-    <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;flex-wrap:wrap;overflow-x:auto">
+    <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none">
       <!-- ประเภท -->
       <div style="display:flex;align-items:center;gap:6px;padding:4px 14px 4px 0;border-right:1px solid var(--border);margin-right:14px;flex-shrink:0">
         <span style="font-size:10px;color:var(--t3);font-family:'Kanit',sans-serif;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;margin-right:2px">📋</span>
@@ -3010,25 +3184,66 @@ function refreshHistory(fromAdmin){
     return mq&&mb&&mt;
   }).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
 
-  document.getElementById('hist-table').innerHTML=`<div class="tbl-wrap"><table>
-    <thead><tr><th>ID</th><th>สินค้า</th><th>ประเภท</th><th>อาคาร</th><th>จำนวน</th><th>ผู้ดำเนินการ</th><th>สถานะ</th><th>วันที่</th></tr></thead>
-    <tbody>${txns.map(t=>{
-      const it=ITEMS.find(x=>x.id===t.itemId);
-      return `<tr>
-        <td class="td-no">${t.id}</td>
-        <td class="td-name" style="max-width:180px">${it?.name||t.itemId}</td>
-        <td><span class="badge ${TYPE_CLR[t.type]}">${TYPE_LBL[t.type]}</span></td>
-        <td><span class="tag-bldg ${BLDG_CLR[t.building]}">${t.building}</span></td>
-        <td style="font-family:'Kanit',sans-serif">${t.type==='withdraw'?'–':'+'}${t.qty} ${it?.unit||''}</td>
-        <td style="color:var(--t2)">${t.requester}</td>
-        <td><span class="badge ${STATUS_CLR[t.status]}">${STATUS_LBL[t.status]}</span></td>
-        <td style="color:var(--t3);font-size:12px">${fmtDate(t.createdAt)}</td>
-      </tr>`;
-    }).join('')}</tbody>
-  </table>
-  ${txns.length===0?`<div class="tbl-empty"><div class="ei" style="font-size:40px;opacity:.4">○</div><p>ไม่พบรายการ</p></div>`:''}
-  <div class="tbl-foot"><span>แสดง ${txns.length} รายการ</span></div>
-  </div>`;
+  const isMobileH = window.innerWidth < 640;
+  if(isMobileH && txns.length > 0){
+    document.getElementById('hist-table').innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:8px;padding:10px">
+        ${txns.map(t=>{
+          const it=ITEMS.find(x=>x.id===t.itemId);
+          const tc = t.type==='import'?'#6ee7b7':t.type==='withdraw'?'#fda4af':'#7dd3fc';
+          return `<div class="scard">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+              <div style="flex:1;min-width:0;margin-right:10px">
+                <div style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:600;color:var(--t1)">${it?.name||t.itemId}</div>
+                <div style="font-size:11px;color:var(--t3);margin-top:1px">${t.id}</div>
+              </div>
+              <span class="badge ${STATUS_CLR[t.status]}" style="flex-shrink:0">${STATUS_LBL[t.status]}</span>
+            </div>
+            <div class="scard-row">
+              <span class="scard-key">ประเภท</span>
+              <span class="badge ${TYPE_CLR[t.type]}">${TYPE_LBL[t.type]}</span>
+            </div>
+            <div class="scard-row">
+              <span class="scard-key">อาคาร</span>
+              <span class="tag-bldg ${BLDG_CLR[t.building]}">${t.building}</span>
+            </div>
+            <div class="scard-row">
+              <span class="scard-key">จำนวน</span>
+              <span style="font-family:'Kanit',sans-serif;font-weight:700;color:${tc}">${t.type==='withdraw'?'–':'+'}${t.qty} ${it?.unit||''}</span>
+            </div>
+            <div class="scard-row">
+              <span class="scard-key">ผู้ดำเนินการ</span>
+              <span class="scard-val">${t.requester}</span>
+            </div>
+            <div class="scard-row">
+              <span class="scard-key">วันที่</span>
+              <span style="font-size:11px;color:var(--t3)">${fmtDate(t.createdAt)}</span>
+            </div>
+          </div>`;
+        }).join('')}
+        <div style="padding:6px 0;text-align:center;font-size:12px;color:var(--t2)">${txns.length} รายการ</div>
+      </div>`;
+  } else {
+    document.getElementById('hist-table').innerHTML=`<div class="tbl-wrap"><table>
+      <thead><tr><th>ID</th><th>สินค้า</th><th>ประเภท</th><th>อาคาร</th><th>จำนวน</th><th>ผู้ดำเนินการ</th><th>สถานะ</th><th>วันที่</th></tr></thead>
+      <tbody>${txns.map(t=>{
+        const it=ITEMS.find(x=>x.id===t.itemId);
+        return `<tr>
+          <td class="td-no">${t.id}</td>
+          <td class="td-name" style="max-width:180px">${it?.name||t.itemId}</td>
+          <td><span class="badge ${TYPE_CLR[t.type]}">${TYPE_LBL[t.type]}</span></td>
+          <td><span class="tag-bldg ${BLDG_CLR[t.building]}">${t.building}</span></td>
+          <td style="font-family:'Kanit',sans-serif">${t.type==='withdraw'?'–':'+'}${t.qty} ${it?.unit||''}</td>
+          <td style="color:var(--t2)">${t.requester}</td>
+          <td><span class="badge ${STATUS_CLR[t.status]}">${STATUS_LBL[t.status]}</span></td>
+          <td style="color:var(--t3);font-size:12px">${fmtDate(t.createdAt)}</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>
+    ${txns.length===0?`<div class="tbl-empty"><div class="ei" style="font-size:40px;opacity:.4">○</div><p>ไม่พบรายการ</p></div>`:''}
+    <div class="tbl-foot"><span>แสดง ${txns.length} รายการ</span></div>
+    </div>`;
+  }
 }
 
 /* ================================================================
