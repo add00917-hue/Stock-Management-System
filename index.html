@@ -1672,11 +1672,16 @@ async function pushToGAS(txn, itemGroup) {
   try {
     await gasPost({
       action: 'addTransaction',
+      txnId: txn.id,           // ← ส่ง local ID ให้ GAS ใช้ (ไม่ generate ใหม่)
       type: txn.type, itemGroup,
       itemId: txn.itemId, building: txn.building,
       qty: txn.qty, requester: txn.requester, note: txn.note,
+      status: txn.status,      // ← ส่ง status ด้วย (import=approved, withdraw=pending)
+      createdAt: txn.createdAt,
+      approvedAt: txn.approvedAt || '',
+      approvedBy: txn.approvedBy || '',
     });
-  } catch(e) { console.warn('GAS push failed'); }
+  } catch(e) { console.warn('GAS push failed:', e); }
 }
 
 /* ── Push approve/reject to GAS ── */
@@ -2879,92 +2884,223 @@ function refreshMaintenance(){
 /* ================================================================
    PAGE: IMPORT
 ================================================================ */
+/* ── Import state ── */
+let importGroup = 'consumer'; // 'consumer' | 'maintenance'
+
 function renderImport(){
   document.getElementById('topbar-actions').innerHTML=
     `<button class="btn btn-ghost" onclick="navigate('admin')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> กลับ Admin</button>`;
-  const recent = [...transactions].filter(t=>t.type==='import'&&t.status==='approved')
-    .sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,8);
-
   document.getElementById('content').innerHTML = `
-  <div class="two-col fade-in">
-    <div class="sec">
-      <div class="modal-head" style="border-bottom:1px solid var(--border);padding:16px 18px">
-        <div class="modal-head-icon" style="background:rgba(16,185,129,.15)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="3" x2="12" y2="21"/></svg></div>
-        <div><h3 style="font-family:'Kanit',sans-serif;font-size:15px;font-weight:600">นำเข้าสินค้า</h3><p style="font-size:12px;color:var(--t2)">บันทึกสินค้าเข้าคลัง</p></div>
+  <div class="sec fade-in">
+    <!-- header + controls -->
+    <div class="sec-head" style="flex-wrap:wrap;gap:10px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:34px;height:34px;border-radius:10px;background:rgba(16,185,129,.15);display:flex;align-items:center;justify-content:center">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+        </div>
+        <div>
+          <div style="font-family:'Kanit',sans-serif;font-size:15px;font-weight:600">นำเข้าสินค้า</div>
+          <div style="font-size:11px;color:var(--t2)">เลือกหมวดและติ๊กรายการที่ต้องการนำเข้า</div>
+        </div>
       </div>
-      <div class="form-grid">
-        <div><label class="flabel">อาคาร *</label>
-          <select class="fselect" id="fi-bldg" style="width:100%" onchange="updateImportUnit()">
-            ${BUILDINGS.map(b=>`<option value="${b}">${b}</option>`).join('')}
-          </select></div>
-        <div><label class="flabel">สินค้า *</label>
-          <select class="fselect" id="fi-item" style="width:100%" onchange="updateImportUnit()">
-            <option value="">-- เลือกสินค้า --</option>
-            ${ITEMS.map(it=>`<option value="${it.id}">[${it.no}] ${it.name} (${it.unit})</option>`).join('')}
-          </select></div>
-        <div class="fg-full"><label class="flabel">จำนวน *</label>
-          <div class="input-row"><input type="number" class="finput" id="fi-qty" placeholder="0" min="1"><div class="unit-badge" id="fi-unit">หน่วย</div></div></div>
-        <div><label class="flabel">วันที่นำเข้า</label><input type="date" class="finput" id="fi-date"></div>
-        <div><label class="flabel">ผู้นำเข้า</label><input type="text" class="finput" id="fi-who" placeholder="ชื่อ-สกุล"></div>
-        <div class="fg-full"><label class="flabel">หมายเหตุ</label><textarea class="ftextarea" id="fi-note" placeholder="แหล่งที่มา หรือข้อมูลเพิ่มเติม…"></textarea></div>
+      <!-- Group toggle -->
+      <div style="display:flex;gap:6px;margin-left:auto">
+        <button id="ig-btn-consumer" onclick="setImportGroup('consumer')"
+          class="btn ${importGroup==='consumer'?'btn-primary':'btn-ghost'}" style="font-size:12px;padding:6px 14px">
+          🛒 อุปโภค บริโภค
+        </button>
+        <button id="ig-btn-maintenance" onclick="setImportGroup('maintenance')"
+          class="btn ${importGroup==='maintenance'?'btn-primary':'btn-ghost'}" style="font-size:12px;padding:6px 14px">
+          🔧 ส่วนกลาง
+        </button>
       </div>
-      <div class="form-foot"><button class="btn btn-ghost" onclick="clearImportForm()">ล้าง</button><button class="btn btn-green" onclick="submitImport()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึกนำเข้า</button></div>
     </div>
-    <div class="sec">
-      <div class="sec-head"><span class="sec-title">นำเข้าล่าสุด</span></div>
-      <div class="tbl-wrap"><table>
-        <thead><tr><th>สินค้า</th><th>อาคาร</th><th>จำนวน</th><th>วันที่</th></tr></thead>
-        <tbody>${recent.map(t=>{
-          const it=ITEMS.find(x=>x.id===t.itemId);
-          return `<tr>
-            <td class="td-name" style="max-width:160px">${it?.name}</td>
-            <td><span class="tag-bldg ${BLDG_CLR[t.building]}">${t.building}</span></td>
-            <td style="font-family:'Kanit',sans-serif;color:#86efac">+${t.qty} ${it?.unit}</td>
-            <td style="color:var(--t3);font-size:12px">${fmtDate(t.createdAt)}</td>
-          </tr>`;
-        }).join('')}</tbody>
-      </table>
-      ${recent.length===0?`<div class="tbl-empty"><div class="ei" style="font-size:40px;opacity:.4">○</div><p>ยังไม่มีการนำเข้า</p></div>`:''}
+
+    <!-- Common fields -->
+    <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end">
+      <div style="min-width:140px">
+        <label class="flabel">อาคาร *</label>
+        <select class="fselect" id="fi-bldg" style="width:100%">
+          ${BUILDINGS.map(b=>`<option value="${b}">${b}</option>`).join('')}
+        </select>
+      </div>
+      <div style="min-width:140px">
+        <label class="flabel">วันที่นำเข้า</label>
+        <input type="date" class="finput" id="fi-date">
+      </div>
+      <div style="flex:1;min-width:160px">
+        <label class="flabel">ผู้นำเข้า</label>
+        <input type="text" class="finput" id="fi-who" placeholder="ชื่อ-สกุล">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
+        <input type="text" class="finput" id="fi-search" placeholder="🔍 ค้นหารายการ..." 
+          oninput="filterImportList(this.value)" style="min-width:180px">
+      </div>
+    </div>
+
+    <!-- Item checklist -->
+    <div id="fi-item-list" style="padding:10px 14px;display:flex;flex-direction:column;gap:4px;max-height:55vh;overflow-y:auto">
+      <!-- rendered by renderImportList() -->
+    </div>
+
+    <!-- Footer -->
+    <div style="padding:14px 18px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <span id="fi-count" style="font-size:13px;color:var(--t2)">เลือก 0 รายการ</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost" onclick="clearImportForm()">ล้าง</button>
+        <button class="btn btn-green" onclick="submitImport()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          บันทึกนำเข้าทั้งหมด
+        </button>
       </div>
     </div>
   </div>`;
+
   document.getElementById('fi-date').valueAsDate = new Date();
+  renderImportList('');
 }
 
-function updateImportUnit(){
-  const sel = document.getElementById('fi-item');
-  const it = ITEMS.find(x=>x.id===sel.value);
-  document.getElementById('fi-unit').textContent = it?.unit||'หน่วย';
+function setImportGroup(grp){
+  importGroup = grp;
+  document.getElementById('ig-btn-consumer').className = `btn ${grp==='consumer'?'btn-primary':'btn-ghost'}`;
+  document.getElementById('ig-btn-consumer').style.cssText='font-size:12px;padding:6px 14px';
+  document.getElementById('ig-btn-maintenance').className = `btn ${grp==='maintenance'?'btn-primary':'btn-ghost'}`;
+  document.getElementById('ig-btn-maintenance').style.cssText='font-size:12px;padding:6px 14px';
+  document.getElementById('fi-search').value='';
+  renderImportList('');
+}
+
+function filterImportList(q){ renderImportList(q); }
+
+function renderImportList(q){
+  const items = ITEMS.filter(it=>{
+    const inGroup = importGroup==='maintenance' ? it.cat==='ซ่อมบำรุง' : it.cat!=='ซ่อมบำรุง';
+    return inGroup && (!q || it.name.includes(q) || it.cat.includes(q) || (it.subcat||'').includes(q));
+  });
+
+  const list = document.getElementById('fi-item-list');
+  if(!list) return;
+
+  // group by category
+  const grouped = {};
+  items.forEach(it=>{ (grouped[it.subcat||it.cat] = grouped[it.subcat||it.cat]||[]).push(it); });
+
+  list.innerHTML = Object.entries(grouped).map(([grpName, grpItems])=>`
+    <div style="margin-bottom:4px">
+      <div style="font-size:11px;font-family:'Kanit',sans-serif;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;padding:8px 6px 4px">${grpName}</div>
+      ${grpItems.map(it=>{
+        const cur = getStock(it.id, document.getElementById('fi-bldg')?.value||BUILDINGS[0]);
+        const min = getMin(it.id);
+        const lv = stockLevel(cur,min);
+        const lvClr = lv==='ok'?'#6ee7b7':lv==='low'?'#fcd34d':'#fca5a5';
+        return `<div class="fi-row" id="fi-row-${it.id}" onclick="toggleImportItem('${it.id}')"
+          style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:pointer;border:1px solid transparent;transition:all .15s;background:var(--bg-glass)">
+          <div id="fi-chk-${it.id}" style="width:18px;height:18px;border-radius:5px;border:2px solid var(--border-hi);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s"></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:500;color:var(--t1);font-family:'Kanit',sans-serif">${it.name}</div>
+            <div style="font-size:11px;color:var(--t2);margin-top:1px">
+              ${it.unit}
+              <span style="margin-left:8px;color:${lvClr};font-weight:600">${cur} คงเหลือ</span>
+              <span style="color:var(--t3)"> / ขั้นต่ำ ${min}</span>
+            </div>
+          </div>
+          <div id="fi-qty-wrap-${it.id}" style="display:none;align-items:center;gap:6px" onclick="event.stopPropagation()">
+            <input type="number" id="fi-qty-${it.id}" class="finput" placeholder="0" min="1"
+              style="width:80px;padding:5px 10px;font-size:14px;font-family:'Kanit',sans-serif;text-align:center"
+              oninput="updateImportCount()">
+            <span style="font-size:12px;color:var(--t2);flex-shrink:0">${it.unit}</span>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+
+  updateImportCount();
+}
+
+function toggleImportItem(itemId){
+  const row  = document.getElementById(`fi-row-${itemId}`);
+  const chk  = document.getElementById(`fi-chk-${itemId}`);
+  const wrap = document.getElementById(`fi-qty-wrap-${itemId}`);
+  const inp  = document.getElementById(`fi-qty-${itemId}`);
+  const isOn = wrap.style.display==='flex';
+
+  if(isOn){
+    // uncheck
+    wrap.style.display='none';
+    row.style.background='var(--bg-glass)';
+    row.style.borderColor='transparent';
+    chk.style.background='transparent';
+    chk.style.borderColor='var(--border-hi)';
+    chk.innerHTML='';
+  } else {
+    // check
+    wrap.style.display='flex';
+    row.style.background='rgba(16,185,129,.07)';
+    row.style.borderColor='rgba(16,185,129,.25)';
+    chk.style.background='#10b981';
+    chk.style.borderColor='#10b981';
+    chk.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    inp.focus();
+  }
+  updateImportCount();
+}
+
+function updateImportCount(){
+  const selected = ITEMS.filter(it=>{
+    const w = document.getElementById(`fi-qty-wrap-${it.id}`);
+    return w && w.style.display==='flex';
+  });
+  const cnt = document.getElementById('fi-count');
+  if(cnt) cnt.textContent = `เลือก ${selected.length} รายการ`;
 }
 
 function clearImportForm(){
-  ['fi-item','fi-bldg','fi-qty','fi-who','fi-note'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.value='';
+  ITEMS.forEach(it=>{
+    const row  = document.getElementById(`fi-row-${it.id}`);
+    const chk  = document.getElementById(`fi-chk-${it.id}`);
+    const wrap = document.getElementById(`fi-qty-wrap-${it.id}`);
+    const inp  = document.getElementById(`fi-qty-${it.id}`);
+    if(!wrap) return;
+    wrap.style.display='none';
+    if(row){ row.style.background='var(--bg-glass)'; row.style.borderColor='transparent'; }
+    if(chk){ chk.style.background='transparent'; chk.style.borderColor='var(--border-hi)'; chk.innerHTML=''; }
+    if(inp) inp.value='';
   });
-  document.getElementById('fi-date').valueAsDate=new Date();
-  document.getElementById('fi-unit').textContent='หน่วย';
+  updateImportCount();
 }
 
 function submitImport(){
-  const bldg=document.getElementById('fi-bldg').value;
-  const itemId=document.getElementById('fi-item').value;
-  const qty=parseInt(document.getElementById('fi-qty').value)||0;
-  const who=document.getElementById('fi-who').value.trim();
-  const note=document.getElementById('fi-note').value.trim();
-  const date=document.getElementById('fi-date').value;
-  if(!itemId){showToast('⚠️','กรุณาเลือกสินค้า');return;}
-  if(qty<=0){showToast('⚠️','กรุณาระบุจำนวนที่ถูกต้อง');return;}
-  const t={id:genId(),type:'import',itemId,building:bldg,qty,
-    requester:who||'ไม่ระบุ',note,status:'approved',
-    createdAt:date?new Date(date).toISOString():new Date().toISOString(),
-    approvedAt:new Date().toISOString(),approvedBy:'ระบบ'};
-  transactions.unshift(t);
+  const bldg = document.getElementById('fi-bldg').value;
+  const who  = document.getElementById('fi-who').value.trim() || 'ไม่ระบุ';
+  const date = document.getElementById('fi-date').value;
+  const now  = date ? new Date(date).toISOString() : new Date().toISOString();
+
+  // collect all checked items
+  const selected = ITEMS.filter(it=>{
+    const w = document.getElementById(`fi-qty-wrap-${it.id}`);
+    return w && w.style.display==='flex';
+  }).map(it=>({
+    it,
+    qty: parseInt(document.getElementById(`fi-qty-${it.id}`)?.value)||0
+  })).filter(({qty})=>qty>0);
+
+  if(selected.length===0){ showToast('⚠️','กรุณาเลือกและระบุจำนวนสินค้าอย่างน้อย 1 รายการ'); return; }
+
+  selected.forEach(({it, qty})=>{
+    const t={id:genId(),type:'import',itemId:it.id,building:bldg,qty,
+      requester:who,note:'',status:'approved',
+      createdAt:now,approvedAt:now,approvedBy:'ระบบ'};
+    transactions.unshift(t);
+    const group=it.cat==='ซ่อมบำรุง'?'maintenance':'consumer';
+    pushToGAS(t,group);
+  });
+
   saveState();
-  const it=ITEMS.find(x=>x.id===itemId);
-  showToast('✅',`นำเข้า ${it?.name} ${qty} ${it?.unit} → ${bldg}`);
+  showToast('✅',`นำเข้า ${selected.length} รายการ → ${bldg} สำเร็จ`);
   clearImportForm();
-  navigate('import');
 }
+
+function updateImportUnit(){}  // legacy stub
 
 /* ================================================================
    PAGE: CHECK-IN / RETURN
@@ -3053,104 +3189,223 @@ function submitCheckin(){
 /* ================================================================
    PAGE: WITHDRAW
 ================================================================ */
+/* ── Withdraw state ── */
+let withdrawGroup = 'consumer';
+
 function renderWithdraw(){
   document.getElementById('topbar-actions').innerHTML=
     `<button class="btn btn-ghost" onclick="navigate('admin')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> กลับ Admin</button>`;
-  const my = [...transactions].filter(t=>t.type==='withdraw')
-    .sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,8);
 
   document.getElementById('content').innerHTML = `
-  <div class="two-col fade-in">
-    <div class="sec">
-      <div class="modal-head" style="border-bottom:1px solid var(--border);padding:16px 18px">
-        <div class="modal-head-icon" style="background:rgba(249,115,22,.15)">⬆️</div>
-        <div><h3 style="font-family:'Kanit',sans-serif;font-size:15px;font-weight:600">ยื่นคำขอเบิก</h3><p style="font-size:12px;color:var(--t2)">รายการที่เบิกต้องรอการอนุมัติ</p></div>
+  <div class="sec fade-in">
+    <div class="sec-head" style="flex-wrap:wrap;gap:10px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:34px;height:34px;border-radius:10px;background:rgba(249,115,22,.15);display:flex;align-items:center;justify-content:center">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 7 12 3 16 7"/><line x1="12" y1="21" x2="12" y2="3"/></svg>
+        </div>
+        <div>
+          <div style="font-family:'Kanit',sans-serif;font-size:15px;font-weight:600">ยื่นคำขอเบิก</div>
+          <div style="font-size:11px;color:var(--t2)">เลือกหมวดและติ๊กรายการที่ต้องการเบิก</div>
+        </div>
       </div>
-      <div class="form-grid">
-        <div><label class="flabel">อาคาร *</label>
-          <select class="fselect" id="fw-bldg" style="width:100%" onchange="updateWithdrawInfo()">
-            ${BUILDINGS.map(b=>`<option value="${b}">${b}</option>`).join('')}
-          </select></div>
-        <div><label class="flabel">สินค้า *</label>
-          <select class="fselect" id="fw-item" style="width:100%" onchange="updateWithdrawInfo()">
-            <option value="">-- เลือกสินค้า --</option>
-            ${ITEMS.map(it=>`<option value="${it.id}">[${it.no}] ${it.name} (${it.unit})</option>`).join('')}
-          </select></div>
-        <div id="fw-stock-info" class="fg-full" style="background:var(--bg-glass);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--t2)">เลือกสินค้าและอาคารเพื่อดูสต็อก</div>
-        <div class="fg-full"><label class="flabel">จำนวนที่เบิก *</label>
-          <div class="input-row"><input type="number" class="finput" id="fw-qty" placeholder="0" min="1"><div class="unit-badge" id="fw-unit">หน่วย</div></div></div>
-        <div class="fg-full"><label class="flabel">ผู้เบิก *</label><input type="text" class="finput" id="fw-who" placeholder="ชื่อ-สกุล"></div>
-        <div class="fg-full"><label class="flabel">เหตุผล / วัตถุประสงค์</label><textarea class="ftextarea" id="fw-reason" placeholder="ระบุเหตุผลการเบิก…"></textarea></div>
-      </div>
-      <div class="form-foot">
-        <div style="font-size:11px;color:var(--t3)">⏳ คำขอจะต้องรอการอนุมัติก่อนหักสต็อก</div>
-        <button class="btn btn-ghost" onclick="clearWithdrawForm()">ล้าง</button>
-        <button class="btn btn-orange" onclick="submitWithdraw()">⬆️ ส่งคำขอ</button>
+      <div style="display:flex;gap:6px;margin-left:auto">
+        <button id="wg-btn-consumer" onclick="setWithdrawGroup('consumer')"
+          class="btn ${withdrawGroup==='consumer'?'btn-primary':'btn-ghost'}" style="font-size:12px;padding:6px 14px">
+          🛒 อุปโภค บริโภค
+        </button>
+        <button id="wg-btn-maintenance" onclick="setWithdrawGroup('maintenance')"
+          class="btn ${withdrawGroup==='maintenance'?'btn-primary':'btn-ghost'}" style="font-size:12px;padding:6px 14px">
+          🔧 ส่วนกลาง
+        </button>
       </div>
     </div>
-    <div class="sec">
-      <div class="sec-head"><span class="sec-title">ประวัติการเบิก</span></div>
-      <div class="tbl-wrap"><table>
-        <thead><tr><th>สินค้า</th><th>อาคาร</th><th>จำนวน</th><th>สถานะ</th><th>วันที่</th></tr></thead>
-        <tbody>${my.map(t=>{
-          const it=ITEMS.find(x=>x.id===t.itemId);
-          return `<tr>
-            <td class="td-name" style="max-width:150px">${it?.name}</td>
-            <td><span class="tag-bldg ${BLDG_CLR[t.building]}">${t.building}</span></td>
-            <td style="font-family:'Kanit',sans-serif">${t.qty} ${it?.unit}</td>
-            <td><span class="badge ${STATUS_CLR[t.status]}">${STATUS_LBL[t.status]}</span></td>
-            <td style="color:var(--t3);font-size:12px">${fmtDate(t.createdAt)}</td>
-          </tr>`;
-        }).join('')}</tbody>
-      </table>
-      ${my.length===0?`<div class="tbl-empty"><div class="ei" style="font-size:40px;opacity:.4">○</div><p>ยังไม่มีคำขอ</p></div>`:''}
+
+    <!-- Common fields -->
+    <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end">
+      <div style="min-width:140px">
+        <label class="flabel">อาคาร *</label>
+        <select class="fselect" id="fw-bldg" style="width:100%" onchange="renderWithdrawList('')">
+          ${BUILDINGS.map(b=>`<option value="${b}">${b}</option>`).join('')}
+        </select>
+      </div>
+      <div style="flex:1;min-width:160px">
+        <label class="flabel">ผู้เบิก *</label>
+        <input type="text" class="finput" id="fw-who" placeholder="ชื่อ-สกุล">
+      </div>
+      <div style="flex:1;min-width:180px">
+        <label class="flabel">เหตุผล / วัตถุประสงค์</label>
+        <input type="text" class="finput" id="fw-reason" placeholder="ระบุเหตุผล…">
+      </div>
+      <div>
+        <label class="flabel">&nbsp;</label>
+        <input type="text" class="finput" id="fw-search" placeholder="🔍 ค้นหา..." 
+          oninput="renderWithdrawList(this.value)" style="min-width:160px">
+      </div>
+    </div>
+
+    <!-- Item checklist -->
+    <div id="fw-item-list" style="padding:10px 14px;display:flex;flex-direction:column;gap:4px;max-height:52vh;overflow-y:auto"></div>
+
+    <!-- Footer -->
+    <div style="padding:14px 18px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <span id="fw-count" style="font-size:13px;color:var(--t2)">เลือก 0 รายการ</span>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:11px;color:var(--t3)">⏳ รอการอนุมัติก่อนหักสต็อก</span>
+        <button class="btn btn-ghost" onclick="clearWithdrawForm()">ล้าง</button>
+        <button class="btn btn-orange" onclick="submitWithdraw()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 7 12 3 16 7"/><line x1="12" y1="21" x2="12" y2="3"/></svg>
+          ส่งคำขอเบิก
+        </button>
       </div>
     </div>
   </div>`;
+
+  renderWithdrawList('');
 }
 
-function updateWithdrawInfo(){
-  const bldg=document.getElementById('fw-bldg').value;
-  const itemId=document.getElementById('fw-item').value;
-  const it=ITEMS.find(x=>x.id===itemId);
-  document.getElementById('fw-unit').textContent=it?.unit||'หน่วย';
-  if(itemId&&bldg){
-    const qty=getStock(itemId,bldg);
-    const min=getMin(itemId);
-    const lv=stockLevel(qty,min);
-    const color={ok:'#86efac',low:'#fdba74',out:'#fca5a5'}[lv];
-    document.getElementById('fw-stock-info').innerHTML=
-      `<span style="color:var(--t2)">สต็อกใน ${bldg}:</span> <span style="font-family:'Kanit',sans-serif;font-weight:600;color:${color}">${qty} ${it?.unit}</span> <span style="color:var(--t3)">(ขั้นต่ำ ${min})</span>`;
+function setWithdrawGroup(grp){
+  withdrawGroup = grp;
+  document.getElementById('wg-btn-consumer').className=`btn ${grp==='consumer'?'btn-primary':'btn-ghost'}`;
+  document.getElementById('wg-btn-consumer').style.cssText='font-size:12px;padding:6px 14px';
+  document.getElementById('wg-btn-maintenance').className=`btn ${grp==='maintenance'?'btn-primary':'btn-ghost'}`;
+  document.getElementById('wg-btn-maintenance').style.cssText='font-size:12px;padding:6px 14px';
+  if(document.getElementById('fw-search')) document.getElementById('fw-search').value='';
+  renderWithdrawList('');
+}
+
+function renderWithdrawList(q){
+  const bldg = document.getElementById('fw-bldg')?.value || BUILDINGS[0];
+  const items = ITEMS.filter(it=>{
+    const inGroup = withdrawGroup==='maintenance' ? it.cat==='ซ่อมบำรุง' : it.cat!=='ซ่อมบำรุง';
+    return inGroup && (!q || it.name.includes(q) || it.cat.includes(q) || (it.subcat||'').includes(q));
+  });
+
+  const list = document.getElementById('fw-item-list');
+  if(!list) return;
+
+  const grouped = {};
+  items.forEach(it=>{ (grouped[it.subcat||it.cat] = grouped[it.subcat||it.cat]||[]).push(it); });
+
+  list.innerHTML = Object.entries(grouped).map(([grpName, grpItems])=>`
+    <div style="margin-bottom:4px">
+      <div style="font-size:11px;font-family:'Kanit',sans-serif;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;padding:8px 6px 4px">${grpName}</div>
+      ${grpItems.map(it=>{
+        const cur = getStock(it.id, bldg);
+        const min = getMin(it.id);
+        const lv  = stockLevel(cur,min);
+        const lvClr = lv==='ok'?'#6ee7b7':lv==='low'?'#fcd34d':'#fca5a5';
+        const noStock = cur <= 0;
+        return `<div class="fi-row" id="fw-row-${it.id}" onclick="${noStock?'showToast(\'❌\',\'สต็อกหมด\')':'toggleWithdrawItem(\''+it.id+'\')'}"
+          style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:${noStock?'not-allowed':'pointer'};border:1px solid transparent;transition:all .15s;background:${noStock?'rgba(244,63,94,.04)':'var(--bg-glass)'};opacity:${noStock?'.5':'1'}">
+          <div id="fw-chk-${it.id}" style="width:18px;height:18px;border-radius:5px;border:2px solid var(--border-hi);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s"></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:500;color:var(--t1);font-family:'Kanit',sans-serif">${it.name}</div>
+            <div style="font-size:11px;color:var(--t2);margin-top:1px">
+              ${it.unit}
+              <span style="margin-left:8px;color:${lvClr};font-weight:600">${cur} คงเหลือ</span>
+              <span style="color:var(--t3)"> / ขั้นต่ำ ${min}</span>
+              ${noStock?'<span style="margin-left:8px;color:#fca5a5;font-size:10px;background:rgba(244,63,94,.12);padding:1px 6px;border-radius:4px">หมดสต็อก</span>':''}
+            </div>
+          </div>
+          <div id="fw-qty-wrap-${it.id}" style="display:none;align-items:center;gap:6px" onclick="event.stopPropagation()">
+            <input type="number" id="fw-qty-${it.id}" class="finput" placeholder="0" min="1" max="${cur}"
+              style="width:80px;padding:5px 10px;font-size:14px;font-family:'Kanit',sans-serif;text-align:center"
+              oninput="updateWithdrawCount()">
+            <span style="font-size:12px;color:var(--t2);flex-shrink:0">${it.unit}</span>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+
+  updateWithdrawCount();
+}
+
+function toggleWithdrawItem(itemId){
+  const row  = document.getElementById(`fw-row-${itemId}`);
+  const chk  = document.getElementById(`fw-chk-${itemId}`);
+  const wrap = document.getElementById(`fw-qty-wrap-${itemId}`);
+  const inp  = document.getElementById(`fw-qty-${itemId}`);
+  const isOn = wrap.style.display==='flex';
+
+  if(isOn){
+    wrap.style.display='none';
+    row.style.background='var(--bg-glass)';
+    row.style.borderColor='transparent';
+    chk.style.background='transparent'; chk.style.borderColor='var(--border-hi)'; chk.innerHTML='';
+  } else {
+    wrap.style.display='flex';
+    row.style.background='rgba(249,115,22,.07)';
+    row.style.borderColor='rgba(249,115,22,.25)';
+    chk.style.background='#f97316'; chk.style.borderColor='#f97316';
+    chk.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    inp.focus();
   }
+  updateWithdrawCount();
 }
+
+function updateWithdrawCount(){
+  const selected = ITEMS.filter(it=>{
+    const w = document.getElementById(`fw-qty-wrap-${it.id}`);
+    return w && w.style.display==='flex';
+  });
+  const cnt = document.getElementById('fw-count');
+  if(cnt) cnt.textContent = `เลือก ${selected.length} รายการ`;
+}
+
 function clearWithdrawForm(){
-  ['fw-item','fw-qty','fw-who','fw-reason'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('fw-unit').textContent='หน่วย';
-  document.getElementById('fw-stock-info').textContent='เลือกสินค้าและอาคารเพื่อดูสต็อก';
-  document.getElementById('fw-stock-info').style.color='var(--t2)';
+  ITEMS.forEach(it=>{
+    const row  = document.getElementById(`fw-row-${it.id}`);
+    const chk  = document.getElementById(`fw-chk-${it.id}`);
+    const wrap = document.getElementById(`fw-qty-wrap-${it.id}`);
+    const inp  = document.getElementById(`fw-qty-${it.id}`);
+    if(!wrap) return;
+    wrap.style.display='none';
+    if(row){ row.style.background='var(--bg-glass)'; row.style.borderColor='transparent'; }
+    if(chk){ chk.style.background='transparent'; chk.style.borderColor='var(--border-hi)'; chk.innerHTML=''; }
+    if(inp) inp.value='';
+  });
+  updateWithdrawCount();
 }
+
 function submitWithdraw(){
-  const bldg=document.getElementById('fw-bldg').value;
-  const itemId=document.getElementById('fw-item').value;
-  const qty=parseInt(document.getElementById('fw-qty').value)||0;
-  const who=document.getElementById('fw-who').value.trim();
-  const reason=document.getElementById('fw-reason').value.trim();
-  if(!itemId){showToast('⚠️','กรุณาเลือกสินค้า');return;}
-  if(qty<=0){showToast('⚠️','กรุณาระบุจำนวน');return;}
-  if(!who){showToast('⚠️','กรุณาระบุชื่อผู้เบิก');return;}
-  const curStock=getStock(itemId,bldg);
-  if(qty>curStock){showToast('❌',`สต็อกไม่เพียงพอ (มี ${curStock} ${ITEMS.find(x=>x.id===itemId)?.unit})`);return;}
-  const t={id:genId(),type:'withdraw',itemId,building:bldg,qty,
-    requester:who,note:reason,status:'pending',
-    createdAt:new Date().toISOString()};
-  transactions.unshift(t);
+  const bldg   = document.getElementById('fw-bldg').value;
+  const who    = document.getElementById('fw-who').value.trim();
+  const reason = document.getElementById('fw-reason').value.trim();
+
+  if(!who){ showToast('⚠️','กรุณาระบุชื่อผู้เบิก'); return; }
+
+  const selected = ITEMS.filter(it=>{
+    const w = document.getElementById(`fw-qty-wrap-${it.id}`);
+    return w && w.style.display==='flex';
+  }).map(it=>({
+    it,
+    qty: parseInt(document.getElementById(`fw-qty-${it.id}`)?.value)||0
+  })).filter(({qty})=>qty>0);
+
+  if(selected.length===0){ showToast('⚠️','กรุณาเลือกและระบุจำนวนสินค้าอย่างน้อย 1 รายการ'); return; }
+
+  // validate stock
+  for(const {it,qty} of selected){
+    const cur = getStock(it.id, bldg);
+    if(qty > cur){ showToast('❌',`${it.name}: สต็อกไม่เพียงพอ (มี ${cur} ${it.unit})`); return; }
+  }
+
+  selected.forEach(({it, qty})=>{
+    const t={id:genId(),type:'withdraw',itemId:it.id,building:bldg,qty,
+      requester:who,note:reason,status:'pending',
+      createdAt:new Date().toISOString()};
+    transactions.unshift(t);
+    const group=it.cat==='ซ่อมบำรุง'?'maintenance':'consumer';
+    pushToGAS(t,group);
+  });
+
   saveState();
-  const it=ITEMS.find(x=>x.id===itemId);
-  showToast('📤',`ส่งคำขอเบิก ${it?.name} ${qty} ${it?.unit} แล้ว — รอการอนุมัติ`);
+  showToast('📤',`ส่งคำขอเบิก ${selected.length} รายการ — รอการอนุมัติ`);
   updateBadge();
   clearWithdrawForm();
-  navigate('withdraw');
 }
+
+function updateWithdrawInfo(){}  // legacy stub
 
 /* ================================================================
    PAGE: APPROVE
@@ -3226,6 +3481,7 @@ function approveReq(id){
   const approver=(document.getElementById(`approver-${id}`)?.value||'').trim()||'ผู้อนุมัติ';
   t.status='approved';t.approvedAt=new Date().toISOString();t.approvedBy=approver;
   saveState();
+  pushApproveToGAS(id, approver);
   const it=ITEMS.find(x=>x.id===t.itemId);
   showToast('✅',`อนุมัติแล้ว: ${it?.name} ${t.qty} ${it?.unit} → ${t.building}`);
   updateBadge();navigate('approve');
@@ -3243,6 +3499,7 @@ function confirmReject(){
   if(!t)return;
   t.status='rejected';t.rejectReason=reason;t.approvedAt=new Date().toISOString();
   saveState();
+  pushRejectToGAS(rejectTargetId, reason);
   showToast('🚫','ปฏิเสธคำขอแล้ว');
   closeOverlay('ov-reject');
   updateBadge();navigate('approve');
