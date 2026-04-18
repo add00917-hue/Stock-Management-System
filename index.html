@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#070b18" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#f0f4fc" media="(prefers-color-scheme: light)">
-<title>GNR3 Stock — Management System</title>
+<title>ระบบจัดการสต๊อก · Stock Management System</title>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -90,8 +90,288 @@
 }
 
 /* ════════════════════════════════════════
-   RESET & BASE
+   ALL ITEMS — Storage Card Grid
 ════════════════════════════════════════ */
+.ai-layout {
+  display: flex;
+  gap: 0;
+  min-height: calc(100vh - var(--topbar-h));
+}
+.ai-sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--bg-panel);
+}
+.ai-sb-title {
+  font-size: 10px;
+  font-family: 'Kanit', sans-serif;
+  font-weight: 700;
+  color: var(--t3);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  padding: 6px 8px 4px;
+  margin-top: 6px;
+}
+.ai-sb-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: 'Kanit', sans-serif;
+  font-size: 13px;
+  color: var(--t2);
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  transition: all .18s;
+}
+.ai-sb-btn:hover { background: var(--bg-hover); color: var(--t1); }
+.ai-sb-btn.active {
+  background: rgba(99,102,241,.13);
+  color: #a5b4fc;
+  font-weight: 600;
+}
+.ai-sb-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.ai-sb-count {
+  margin-left: auto;
+  font-size: 11px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1px 7px;
+  font-family: 'Kanit', sans-serif;
+  font-weight: 600;
+}
+
+.ai-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+.ai-toolbar {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: var(--bg-panel);
+  position: sticky;
+  top: var(--topbar-h);
+  z-index: 10;
+}
+.ai-total {
+  font-size: 13px;
+  color: var(--t2);
+  font-family: 'Kanit', sans-serif;
+}
+.ai-total strong { color: var(--t1); font-weight: 700; }
+
+.ai-view-btns { display: flex; gap: 4px; margin-left: auto; }
+.ai-view-btn {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  color: var(--t2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .15s;
+}
+.ai-view-btn:hover { border-color: var(--border-hi); color: var(--t1); }
+.ai-view-btn.active { background: var(--indigo); border-color: var(--indigo); color: #fff; }
+.ai-view-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+.ai-sort-btn {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  color: var(--t2);
+  font-size: 12px;
+  font-family: 'Kanit', sans-serif;
+  cursor: pointer;
+  transition: all .15s;
+}
+.ai-sort-btn:hover { border-color: var(--border-hi); color: var(--t1); }
+.ai-sort-btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+.ai-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+  padding: 20px;
+}
+.ai-list { display: flex; flex-direction: column; gap: 0; padding: 0; }
+
+/* CARD */
+.ai-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 14px 13px;
+  cursor: pointer;
+  position: relative;
+  transition: transform .2s, box-shadow .2s, border-color .2s;
+  overflow: hidden;
+}
+.ai-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(0,0,0,.22);
+  border-color: var(--border-hi);
+}
+.ai-card-menu {
+  position: absolute; top: 10px; right: 10px;
+  color: var(--t3);
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: 1px;
+  transition: color .15s, background .15s;
+}
+.ai-card-menu:hover { color: var(--t1); background: var(--bg-glass); }
+
+.ai-card-icon {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+.ai-card-size {
+  font-family: 'Kanit', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--t2);
+  margin-bottom: 6px;
+}
+.ai-card-name {
+  font-family: 'Kanit', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--t1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 3px;
+}
+.ai-card-date {
+  font-size: 10px;
+  color: var(--t3);
+}
+
+/* Stock bar inside card */
+.ai-card-stock {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.ai-card-stock-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.ai-card-stock-label {
+  font-size: 10px;
+  font-family: 'Kanit', sans-serif;
+  color: var(--t3);
+}
+.ai-card-stock-val {
+  font-size: 11px;
+  font-family: 'Kanit', sans-serif;
+  font-weight: 700;
+}
+.ai-card-bar-wrap {
+  height: 4px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+.ai-card-bar { height: 100%; border-radius: 99px; transition: width .5s; }
+
+/* Status pill on card */
+.ai-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-family: 'Kanit', sans-serif;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 20px;
+  margin-top: 6px;
+}
+
+/* LIST ROW */
+.ai-list-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background .12s;
+}
+.ai-list-row:hover { background: var(--bg-hover); }
+.ai-list-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.ai-list-info { flex: 1; min-width: 0; }
+.ai-list-name {
+  font-family: 'Kanit', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--t1);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ai-list-meta { font-size: 11px; color: var(--t3); margin-top: 2px; }
+.ai-list-stock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  min-width: 100px;
+}
+.ai-list-stock-num {
+  font-family: 'Kanit', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+}
+.ai-list-stock-sub { font-size: 10px; color: var(--t3); font-family: 'Kanit', sans-serif; }
+.ai-list-bar-wrap { width: 80px; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.ai-list-bar { height: 100%; border-radius: 99px; transition: width .4s; }
+
+/* bldg badges in allitems */
+.ai-bldg-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.ai-bldg-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-family: 'Kanit', sans-serif;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 8px;
+}
+
+@media (max-width: 767px) {
+  .ai-sidebar { display: none; }
+  .ai-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; padding: 12px; }
+}
+
 *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
 html { height:100%; }
 body { min-height:100%; }
@@ -770,9 +1050,11 @@ td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
 .t-ari { background: rgba(99,102,241,.15); color: #a5b4fc; }
 .t-ksl { background: rgba(139,92,246,.15); color: #c4b5fd; }
 .t-esv { background: rgba(16,185,129,.15); color: #6ee7b7; }
+.t-bts { background: rgba(14,165,233,.15); color: #7dd3fc; }
 [data-theme="light"] .t-ari { color: #4f46e5; }
 [data-theme="light"] .t-ksl { color: #7c3aed; }
 [data-theme="light"] .t-esv { color: #059669; }
+[data-theme="light"] .t-bts { color: #0284c7; }
 
 /* ════════════════════════════════════════
    PAGINATION
@@ -1030,6 +1312,20 @@ td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
   .cal-detail{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
   .cal-detail-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
   /* cal mobile merged above */
+
+/* ════ GLOBAL SEARCH ════ */
+#global-search-wrap { display: flex; }
+#global-search-input:focus { border-color: var(--border-hi); background: var(--bg-glass); box-shadow: 0 0 0 3px rgba(99,102,241,.12); }
+#global-search-results::-webkit-scrollbar { width: 5px; }
+#global-search-results::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+/* ════ CONFIRM MODAL ════ */
+#confirm-body table thead th { font-family: 'Kanit', sans-serif; }
+
+@media (max-width: 640px) {
+  #global-search-wrap { display: none; } /* hide on mobile — use in-page search */
+}
+
 /* scrollbar */
 * { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
 *::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -1103,7 +1399,7 @@ td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
     <div style="position:relative;width:52px;height:52px;margin:0 auto">
       <div class="loader-ring"></div>
     </div>
-    <div style="margin-top:16px;font-size:13px;color:var(--t2);font-family:'Kanit',sans-serif;font-weight:500">GNR3 Stock กำลังโหลด…</div>
+    <div style="margin-top:16px;font-size:13px;color:var(--t2);font-family:'Kanit',sans-serif;font-weight:500">ระบบจัดการสต๊อก กำลังโหลด…</div>
   </div>
 </div>
 
@@ -1116,7 +1412,7 @@ td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
     <div class="sb-logo-icon">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
     </div>
-    <div class="sb-logo-text">GNR3 Stock<small>Management System</small></div>
+    <div class="sb-logo-text">ระบบจัดการสต๊อก<small>Stock Management System</small></div>
   </div>
 
   <div class="sb-nav">
@@ -1132,21 +1428,17 @@ td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
         position: relative; overflow: hidden;
       " onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 22px rgba(99,102,241,.5)'"
          onmouseout="this.style.transform='';this.style.boxShadow='0 4px 16px rgba(99,102,241,.35)'">
-        <!-- glow blob -->
         <div style="position:absolute;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.1);top:-15px;right:-10px;pointer-events:none"></div>
-        <!-- icon -->
         <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
             <polyline points="9 22 9 12 15 12 15 22"/>
           </svg>
         </div>
-        <!-- text -->
         <div style="flex:1;min-width:0">
           <div style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;color:#fff;line-height:1.2">หน้าหลัก OMS GNR3</div>
           <div style="font-size:10px;color:rgba(255,255,255,.65);margin-top:1px">Office Management System</div>
         </div>
-        <!-- arrow -->
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0">
           <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
         </svg>
@@ -1160,6 +1452,13 @@ td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
       </div>
       <span class="nb-label">Dashboard</span>
+    </div>
+
+    <div class="nb" data-page="allitems">
+      <div class="nb-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      </div>
+      <span class="nb-label">รายการสินค้าทั้งหมด</span>
     </div>
 
     <div class="nb" data-page="stock">
@@ -1176,11 +1475,40 @@ td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
       <span class="nb-label">สต็อก ส่วนกลาง</span>
     </div>
 
+    <div class="nb" data-page="import">
+      <div class="nb-icon">
+        <svg viewBox="0 0 24 24"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+      </div>
+      <span class="nb-label">นำเข้าสินค้า</span>
+    </div>
+
+    <div class="nb" data-page="withdraw">
+      <div class="nb-icon">
+        <svg viewBox="0 0 24 24"><polyline points="8 7 12 3 16 7"/><line x1="12" y1="21" x2="12" y2="3"/></svg>
+      </div>
+      <span class="nb-label">เบิกสินค้า</span>
+    </div>
+
+    <div class="nb" data-page="approve">
+      <div class="nb-icon">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <span class="nb-label">อนุมัติ</span>
+      <span class="nb-badge" id="badge-ap" style="display:none">0</span>
+    </div>
+
     <div class="nb" data-page="calendar">
       <div class="nb-icon">
         <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       </div>
       <span class="nb-label">ปฏิทินสต็อก</span>
+    </div>
+
+    <div class="nb" data-page="monthly">
+      <div class="nb-icon">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      </div>
+      <span class="nb-label">สรุปรายเดือน</span>
     </div>
 
     <div class="sb-section">Admin</div>
@@ -1190,14 +1518,13 @@ td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
         <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       </div>
       <span class="nb-label">Admin Panel</span>
-      <span class="nb-badge" id="badge-ap" style="display:none">0</span>
     </div>
 
-    <div class="nb" data-page="monthly">
+    <div class="nb" data-page="settings">
       <div class="nb-icon">
-        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </div>
-      <span class="nb-label">สรุปรายเดือน</span>
+      <span class="nb-label">ตั้งค่าสต็อกขั้นต่ำ</span>
     </div>
   </div>
 
@@ -1219,7 +1546,7 @@ td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
       <div id="gs-status-card" style="background:var(--bg-glass);border:1px solid var(--border);border-radius:12px;padding:10px 12px;cursor:pointer;transition:all .2s" onclick="checkGSConnection()" title="คลิกเพื่อตรวจสอบใหม่">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          <span style="font-family:'Kanit',sans-serif;font-size:12px;font-weight:600;color:var(--t1)">GNR3 Stock DB</span>
+          <span style="font-family:'Kanit',sans-serif;font-size:12px;font-weight:600;color:var(--t1)">Stock DB · GNR3</span>
           <div id="gs-dot" style="width:8px;height:8px;border-radius:50%;background:var(--t3);margin-left:auto;flex-shrink:0;box-shadow:0 0 0 2px transparent;transition:all .3s"></div>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between">
@@ -1253,6 +1580,18 @@ td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
       </div>
       <div class="topbar-sub" id="pg-sub">ภาพรวมสต็อก GNR3</div>
     </div>
+    <!-- GLOBAL SEARCH -->
+    <div id="global-search-wrap" style="position:relative;flex:1;max-width:280px;min-width:0">
+      <div style="position:relative;display:flex;align-items:center">
+        <svg style="position:absolute;left:10px;pointer-events:none" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="global-search-input" type="text" placeholder="ค้นหาสินค้า..." autocomplete="off"
+          style="width:100%;background:var(--bg-glass);border:1px solid var(--border);border-radius:10px;padding:7px 10px 7px 32px;color:var(--t1);font-family:'Sarabun',sans-serif;font-size:13px;outline:none;transition:all .2s"
+          oninput="globalSearch(this.value)" onfocus="showGlobalResults()" onblur="setTimeout(hideGlobalResults,200)">
+        <kbd id="global-search-clear" onclick="clearGlobalSearch()" style="display:none;position:absolute;right:8px;cursor:pointer;background:var(--border);border-radius:4px;padding:1px 5px;font-size:10px;color:var(--t2)">✕</kbd>
+      </div>
+      <div id="global-search-results" style="display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.3);z-index:200;max-height:340px;overflow-y:auto"></div>
+    </div>
+
     <div class="topbar-right">
       <!-- dark/light toggle (topbar, visible on mobile) -->
       <button class="topbar-theme-btn" onclick="toggleTheme()" title="เปลี่ยนธีม" id="theme-icon-top-btn">
@@ -1277,20 +1616,47 @@ td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
       <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
       สต็อก
     </button>
-    <button class="bnav-item" data-page="maintenance" onclick="navigate('maintenance')">
-      <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-      ส่วนกลาง
+    <button class="bnav-item" data-page="withdraw" onclick="navigate('withdraw')">
+      <svg viewBox="0 0 24 24"><polyline points="8 7 12 3 16 7"/><line x1="12" y1="21" x2="12" y2="3"/></svg>
+      เบิก
     </button>
-    <button class="bnav-item" data-page="calendar" onclick="navigate('calendar')">
-      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      ปฏิทิน
+    <button class="bnav-item" data-page="approve" onclick="navigate('approve')" id="bnav-admin">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      อนุมัติ
     </button>
-    <button class="bnav-item" data-page="admin" onclick="navigate('admin')" id="bnav-admin">
+    <button class="bnav-item" data-page="admin" onclick="navigate('admin')">
       <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       Admin
     </button>
   </div>
 </nav>
+
+<!-- CONFIRM MODAL -->
+<div class="overlay" id="ov-confirm" onclick="closeOverlay('ov-confirm',event)">
+  <div class="modal" style="width:420px;max-width:95vw">
+    <div class="modal-head" style="padding:22px 22px 16px;border-bottom:none">
+      <div id="confirm-icon" class="modal-head-icon" style="background:rgba(16,185,129,.15)">
+        <svg id="confirm-icon-svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div>
+        <h3 id="confirm-title" style="font-family:'Kanit',sans-serif;font-size:16px;font-weight:700">ยืนยันการดำเนินการ</h3>
+        <p id="confirm-subtitle" style="font-size:12px;color:var(--t2);margin-top:2px">โปรดตรวจสอบรายการก่อนยืนยัน</p>
+      </div>
+      <div class="modal-close" onclick="closeOverlay('ov-confirm')">✕</div>
+    </div>
+    <!-- Summary table -->
+    <div id="confirm-body" style="padding:0 22px 16px;max-height:280px;overflow-y:auto"></div>
+    <!-- Info bar -->
+    <div id="confirm-info" style="margin:0 22px 16px;padding:10px 14px;background:var(--bg-glass);border:1px solid var(--border);border-radius:10px;font-size:12px;color:var(--t2)"></div>
+    <div class="form-foot" style="padding:14px 22px 20px;border-top:1px solid var(--border)">
+      <button class="btn btn-ghost" onclick="closeOverlay('ov-confirm')">ยกเลิก</button>
+      <button id="confirm-ok-btn" class="btn btn-green" onclick="_confirmCallback && _confirmCallback()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        ยืนยัน
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- REJECT MODAL -->
 <div class="overlay" id="ov-reject" onclick="closeOverlay('ov-reject',event)">
@@ -1340,14 +1706,51 @@ td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
   </div>
 </div>
 
+<!-- PRICE EDIT MODAL -->
+<div class="overlay" id="ov-price" onclick="closeOverlay('ov-price',event)">
+  <div class="modal" style="width:720px;max-width:calc(100vw - 24px)">
+    <div class="modal-head">
+      <div class="modal-head-icon" style="background:linear-gradient(135deg,#f59e0b,#f97316)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+      <div>
+        <h3>แก้ไขราคาสินค้า</h3>
+        <p id="price-modal-sub">ตั้งราคาต่อหน่วยแยกตามเดือน · เดือนที่ไม่ได้ตั้งจะสืบทอดจากเดือนก่อน</p>
+      </div>
+      <div class="modal-close" onclick="closeOverlay('ov-price')">✕</div>
+    </div>
+    <!-- Month selector -->
+    <div style="padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span style="font-size:12px;font-family:'Kanit',sans-serif;color:var(--t2)">เดือน:</span>
+      <select class="fselect" id="price-month-sel" onchange="refreshPriceModal()" style="min-width:110px">
+        ${['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'].map((m,i)=>`<option value="${i+1}" ${i+1===new Date().getMonth()+1?'selected':''}>${m}</option>`).join('')}
+      </select>
+      <select class="fselect" id="price-year-sel" onchange="refreshPriceModal()" style="min-width:80px">
+        ${Array.from({length:5},(_,i)=>new Date().getFullYear()-2+i).map(y=>`<option value="${y}" ${y===new Date().getFullYear()?'selected':''}>${y+543}</option>`).join('')}
+      </select>
+      <span style="font-size:11px;color:var(--t3);margin-left:8px">💡 ราคาที่แก้ไขเดือนนี้จะมีผลตั้งแต่เดือนถัดไปเป็นต้นไปโดยอัตโนมัติ</span>
+    </div>
+    <div id="price-modal-body" style="max-height:55vh;overflow-y:auto">
+      <div style="padding:20px;text-align:center;color:var(--t3)">กำลังโหลด…</div>
+    </div>
+    <div class="form-foot">
+      <button class="btn btn-ghost" onclick="closeOverlay('ov-price')">ยกเลิก</button>
+      <button class="btn btn-green" onclick="savePriceModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        บันทึกราคา
+      </button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-wrap" id="toasts"></div>
 
 <script>
 /* ================================================================
    CONSTANTS
 ================================================================ */
-const BUILDINGS = ['Ari Hills','KSL','ESV'];
-const BLDG_CLR  = {'Ari Hills':'t-ari','KSL':'t-ksl','ESV':'t-esv'};
+const BUILDINGS = ['Ari Hills','KSL','ESV','BTS'];
+const BLDG_CLR  = {'Ari Hills':'t-ari','KSL':'t-ksl','ESV':'t-esv','BTS':'t-bts'};
 const CATS = ['สำนักงาน','อุปโภค','บริโภค','ซ่อมบำรุง'];
 const CAT_CLR = {'สำนักงาน':'b-blue','อุปโภค':'b-purple','บริโภค':'b-cyan','ซ่อมบำรุง':'b-orange'};
 const CAT_ICO = {'สำนักงาน':'🖥️','อุปโภค':'🧴','บริโภค':'☕','ซ่อมบำรุง':'🔧'};
@@ -1433,23 +1836,62 @@ let currentPage = 'dashboard';
 let globalBldg   = 'all';
 let rejectTargetId = null;
 
+// Price system: {itemId: {year_month: price}} e.g. {'I01': {'2025_3': 120}}
+// If month not set, inherits from most recent previous month
+let itemPrices = {};
+
 const LS_TXN = 'gnr3_txn_v1';
 const LS_MIN = 'gnr3_min_v1';
+const LS_PRICE = 'gnr3_price_v1';
 
 function loadState(){
   try{ transactions = JSON.parse(localStorage.getItem(LS_TXN)||'null')||seedTransactions(); }
   catch(e){ transactions = seedTransactions(); }
   try{ minStockOverrides = JSON.parse(localStorage.getItem(LS_MIN)||'{}'); }
   catch(e){ minStockOverrides = {}; }
+  try{ itemPrices = JSON.parse(localStorage.getItem(LS_PRICE)||'{}'); }
+  catch(e){ itemPrices = {}; }
 }
 function saveState(){
   localStorage.setItem(LS_TXN, JSON.stringify(transactions));
   localStorage.setItem(LS_MIN, JSON.stringify(minStockOverrides));
+  localStorage.setItem(LS_PRICE, JSON.stringify(itemPrices));
 }
 
 function getMin(itemId){
   const it = ITEMS.find(x=>x.id===itemId);
   return minStockOverrides[itemId] ?? it?.min ?? 0;
+}
+
+/* ── Price helpers ── */
+// Get price for itemId at given year/month (inherits forward from last set month)
+function getPrice(itemId, year, month){
+  const key = `${itemId}`;
+  const prices = itemPrices[key] || {};
+  // look backwards from given month to find latest set price
+  for(let m = month; m >= 1; m--){
+    const k = `${year}_${m}`;
+    if(prices[k] !== undefined) return prices[k];
+  }
+  // try previous years
+  for(let y = year-1; y >= 2020; y--){
+    for(let m = 12; m >= 1; m--){
+      const k = `${y}_${m}`;
+      if(prices[k] !== undefined) return prices[k];
+    }
+  }
+  return 0;
+}
+
+function setPrice(itemId, year, month, price){
+  if(!itemPrices[itemId]) itemPrices[itemId] = {};
+  itemPrices[itemId][`${year}_${month}`] = price;
+  saveState();
+}
+
+function getCurrentPrice(itemId){
+  const now = new Date();
+  return getPrice(itemId, now.getFullYear(), now.getMonth()+1);
 }
 
 function seedTransactions(){
@@ -1459,6 +1901,7 @@ function seedTransactions(){
     'Ari Hills': m => Math.max(1, Math.round(m*3)),
     'KSL':       m => Math.max(1, Math.round(m*2)),
     'ESV':       m => Math.max(1, Math.round(m*1.5)),
+    'BTS':       m => Math.max(1, Math.round(m*1.2)),
   };
   ITEMS.forEach(item=>{
     BUILDINGS.forEach(b=>{
@@ -1699,9 +2142,121 @@ async function pushMonthlyOrderToGAS(month, year, items) {
   if (!USE_GAS) return;
   try { await gasPost({ action: 'saveMonthlyOrder', month, year, items, createdBy: 'Admin' }); } catch(e) {}
 }
+/* ── Push monthly order to GAS ── */
+async function pushMonthlyOrderToGAS(month, year, items) {
+  if (!USE_GAS) return;
+  try { await gasPost({ action: 'saveMonthlyOrder', month, year, items, createdBy: 'Admin' }); } catch(e) {}
+}
+
+/* ================================================================
+   PHASE 1A: GLOBAL SEARCH
+================================================================ */
+function globalSearch(q) {
+  const clear = document.getElementById('global-search-clear');
+  if (clear) clear.style.display = q ? 'block' : 'none';
+  if (!q.trim()) { hideGlobalResults(); return; }
+  const ql = q.toLowerCase();
+  const results = ITEMS.filter(it =>
+    it.name.toLowerCase().includes(ql) ||
+    it.cat.toLowerCase().includes(ql) ||
+    (it.subcat||'').toLowerCase().includes(ql) ||
+    it.unit.toLowerCase().includes(ql) ||
+    String(it.no).includes(q)
+  ).slice(0, 10);
+
+  const box = document.getElementById('global-search-results');
+  if (!box) return;
+  if (results.length === 0) {
+    box.innerHTML = `<div style="padding:20px;text-align:center;color:var(--t3);font-size:13px">ไม่พบสินค้า "${q}"</div>`;
+    box.style.display = 'block'; return;
+  }
+  box.innerHTML = `
+    <div style="padding:8px 12px 4px;font-size:10px;font-family:'Kanit',sans-serif;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.08em">พบ ${results.length} รายการ</div>
+    ${results.map(it=>{
+      const total = BUILDINGS.reduce((s,b)=>s+getStock(it.id,b),0);
+      const min = getMin(it.id);
+      const lv = stockLevel(total, min);
+      const lvClr = lv==='ok'?'#6ee7b7':lv==='low'?'#fcd34d':'#fca5a5';
+      const page = it.cat==='ซ่อมบำรุง'?'maintenance':'stock';
+      return `<div onclick="closeGlobalSearch();navigate('${page}')"
+        style="display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;transition:background .15s;border-radius:8px;margin:2px 6px"
+        onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''">
+        <div style="width:34px;height:34px;border-radius:9px;background:var(--bg-glass);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <span style="font-size:11px;font-family:'Kanit',sans-serif;font-weight:700;color:var(--indigo)">${it.no}</span>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:500;color:var(--t1);font-family:'Kanit',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${it.name}</div>
+          <div style="font-size:11px;color:var(--t2);margin-top:1px">${it.unit} · <span class="badge ${CAT_CLR[it.cat]}" style="font-size:9px;padding:1px 6px">${it.cat}</span></div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:'Kanit',sans-serif;font-size:14px;font-weight:700;color:${lvClr}">${total}</div>
+          <div style="font-size:10px;color:var(--t3)">รวมทุกอาคาร</div>
+        </div>
+      </div>`;
+    }).join('')}
+    <div style="padding:7px 12px;border-top:1px solid var(--border);margin-top:4px;font-size:11px;color:var(--t3);text-align:center">คลิกเพื่อไปหน้าสินค้า · กด Esc ปิด</div>`;
+  box.style.display = 'block';
+}
+function showGlobalResults(){ const q=document.getElementById('global-search-input')?.value; if(q&&q.trim()) globalSearch(q); }
+function hideGlobalResults(){ const b=document.getElementById('global-search-results'); if(b) b.style.display='none'; }
+function clearGlobalSearch(){ const i=document.getElementById('global-search-input'); if(i) i.value=''; document.getElementById('global-search-clear')?.style && (document.getElementById('global-search-clear').style.display='none'); hideGlobalResults(); }
+function closeGlobalSearch(){ clearGlobalSearch(); hideGlobalResults(); }
+document.addEventListener('keydown',e=>{
+  if(e.key==='/'&&e.target.tagName!=='INPUT'&&e.target.tagName!=='TEXTAREA'){ e.preventDefault(); document.getElementById('global-search-input')?.focus(); }
+  if(e.key==='Escape') closeGlobalSearch();
+});
+
+/* ================================================================
+   PHASE 1B: CONFIRMATION DIALOG
+================================================================ */
+let _confirmCallback = null;
+
+function showConfirm({ title, subtitle, iconBg, iconColor, iconSvg, items, info, okLabel, okClass, onConfirm }) {
+  _confirmCallback = ()=>{ closeOverlay('ov-confirm'); onConfirm(); };
+  document.getElementById('confirm-title').textContent = title||'ยืนยัน';
+  document.getElementById('confirm-subtitle').textContent = subtitle||'';
+  document.getElementById('confirm-icon').style.background = iconBg||'rgba(16,185,129,.15)';
+  const svg = document.getElementById('confirm-icon-svg');
+  if(iconSvg) svg.innerHTML = iconSvg;
+  svg.setAttribute('stroke', iconColor||'#34d399');
+  const okBtn = document.getElementById('confirm-ok-btn');
+  okBtn.className = `btn ${okClass||'btn-green'}`;
+  okBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ${okLabel||'ยืนยัน'}`;
+  // Summary table
+  document.getElementById('confirm-body').innerHTML = items?.length ? `
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr style="border-bottom:1px solid var(--border)">
+        <th style="padding:6px 8px;text-align:left;color:var(--t3);font-weight:500">รายการ</th>
+        <th style="padding:6px 8px;text-align:center;color:var(--t3);font-weight:500">จำนวน</th>
+        <th style="padding:6px 8px;text-align:right;color:var(--t3);font-weight:500">หน่วย</th>
+      </tr></thead>
+      <tbody>${items.map((r,i)=>`
+        <tr style="border-bottom:1px solid var(--border);${i%2?'background:var(--bg-glass)':''}">
+          <td style="padding:7px 8px;color:var(--t1);font-family:'Kanit',sans-serif;font-weight:500">${r.name}</td>
+          <td style="padding:7px 8px;text-align:center;font-family:'Kanit',sans-serif;font-weight:700;color:var(--indigo)">${r.qty}</td>
+          <td style="padding:7px 8px;text-align:right;color:var(--t2)">${r.unit}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>` : '';
+  document.getElementById('confirm-info').innerHTML = info||'';
+  document.getElementById('ov-confirm').classList.add('open');
+}
+
+/* ================================================================
+   PHASE 1C: EMPTY STATE HELPER
+================================================================ */
+function emptyState(icon, title, subtitle, actionHtml=''){
+  return `<div style="padding:44px 24px;text-align:center">
+    <div style="font-size:54px;margin-bottom:14px;opacity:.45;line-height:1">${icon}</div>
+    <div style="font-family:'Kanit',sans-serif;font-size:15px;font-weight:600;color:var(--t1);margin-bottom:6px">${title}</div>
+    <div style="font-size:13px;color:var(--t2);max-width:260px;margin:0 auto${actionHtml?';margin-bottom:16px':''}">${subtitle}</div>
+    ${actionHtml}
+  </div>`;
+}
+
 function navigate(page){
-  // Only action pages (edit/add) require login — admin hub is public
-  const loginRequired = ['import','withdraw','approve','settings','monthly'];
+  // Only settings requires login — import/withdraw/approve/monthly are public
+  const loginRequired = ['settings'];
   if(loginRequired.includes(page) && !adminLoggedIn){
     document.getElementById('ov-login').classList.add('open');
     document.getElementById('login-user').focus();
@@ -1718,6 +2273,7 @@ function navigate(page){
   });
   const titles = {
     dashboard:'Dashboard',
+    allitems:'รายการสินค้าทั้งหมด',
     stock:'สต็อก อุปโภค บริโภค',
     maintenance:'สต็อก ส่วนกลาง',
     calendar:'ปฏิทินสต็อก',
@@ -1729,6 +2285,7 @@ function navigate(page){
   };
   const subs = {
     dashboard:'ภาพรวมสต็อกทุกอาคาร GNR3',
+    allitems:'สินค้าทุกรายการ · คงเหลือ · ขั้นต่ำ',
     stock:'สำนักงาน · อุปโภค · บริโภค (38 รายการ)',
     maintenance:'งานซ่อมบำรุง · ระบบไฟฟ้า · ระบบประปา (21 รายการ)',
     admin:'จัดการระบบ · เฉพาะผู้ดูแล',
@@ -1737,11 +2294,12 @@ function navigate(page){
     withdraw:'ยื่นคำขอเบิกสินค้า',
     approve:'พิจารณาคำขอเบิกที่รอดำเนินการ',
     history:'บันทึกธุรกรรมทั้งหมด',
-    settings:'กำหนดจำนวนสต็อกขั้นต่ำแต่ละรายการ',
+    settings:'กำหนดจำนวนสต็อกขั้นต่ำแต่ละรายการ · เฉพาะ Admin',
     monthly:'สรุปรายการสั่งซื้อ อุปโภค บริโภค รายเดือน',
   };
   const PAGE_ICONS = {
     dashboard: {svg:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',  grad:'linear-gradient(135deg,#6366f1,#8b5cf6)'},
+    allitems:  {svg:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>',  grad:'linear-gradient(135deg,#0ea5e9,#6366f1)'},
     stock:     {svg:'<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>',                               grad:'linear-gradient(135deg,#8b5cf6,#ec4899)'},
     maintenance:{svg:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',  grad:'linear-gradient(135deg,#f59e0b,#f97316)'},
     calendar:  {svg:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',  grad:'linear-gradient(135deg,#0ea5e9,#6366f1)'},
@@ -1779,7 +2337,8 @@ function updateBadge(){
 function render(page){
   const ct = document.getElementById('content');
   ct.innerHTML = '';
-  const fns = {dashboard:renderDashboard,stock:renderStock,maintenance:renderMaintenance,
+  ct.style.padding = '24px';
+  const fns = {dashboard:renderDashboard,allitems:renderAllItems,stock:renderStock,maintenance:renderMaintenance,
                 calendar:renderCalendar,
                 admin:renderAdmin,import:renderImport,withdraw:renderWithdraw,
                 approve:renderApprove,history:renderHistory,settings:renderSettings,
@@ -2004,14 +2563,7 @@ function renderAdmin(){
   const pending = pendingCount();
 
   document.getElementById('topbar-actions').innerHTML = adminLoggedIn ? `
-    <button class="btn btn-green btn-sm" onclick="navigate('import')" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="3" x2="12" y2="21"/></svg> นำเข้า</button>
-    <button class="btn btn-orange btn-sm" onclick="navigate('withdraw')" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 7 12 3 16 7"/><line x1="12" y1="21" x2="12" y2="3"/></svg> เบิก</button>
-    <button class="btn btn-primary btn-sm" style="position:relative" onclick="navigate('approve')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> อนุมัติ
-      ${pending?`<span style="position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;font-size:10px;font-family:'Kanit',sans-serif;padding:1px 5px;border-radius:8px;min-width:16px;text-align:center">${pending}</span>`:''}
-    </button>
-    <button class="btn btn-ghost btn-sm" onclick="navigate('settings')" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> ตั้งค่า</button>
-    <button class="btn btn-green btn-sm" onclick="navigate('monthly')" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg> สรุปเดือน</button>
+    <button class="btn btn-ghost btn-sm" onclick="navigate('settings')" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> ตั้งค่าขั้นต่ำ</button>
     <div style="width:1px;height:24px;background:var(--border);margin:0 4px"></div>
     <button class="btn btn-ghost btn-sm" onclick="doLogout()" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> ออกจากระบบ</button>
   ` : `
@@ -2024,14 +2576,14 @@ function renderAdmin(){
   <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:12px" class="fade-in">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
     <div style="flex:1">
-      <div style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:600;margin-bottom:2px">ดูประวัติได้เลย — เข้าสู่ระบบเพื่อแก้ไขข้อมูล</div>
-      <div style="font-size:12px;color:var(--t2)">นำเข้าสินค้า · เบิก · อนุมัติ · ตั้งค่า ต้องเข้าสู่ระบบก่อน</div>
+      <div style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:600;margin-bottom:2px">ดูประวัติได้เลย — เข้าสู่ระบบเพื่อใช้ฟีเจอร์ Admin</div>
+      <div style="font-size:12px;color:var(--t2)">ตั้งค่าสต็อกขั้นต่ำ ต้องเข้าสู่ระบบก่อน</div>
     </div>
     <button class="btn btn-primary btn-sm" onclick="showLoginModal()" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Login</button>
   </div>` : `
   <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:10px" class="fade-in">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-    <div style="font-size:13px;color:#86efac;font-family:'Kanit',sans-serif;font-weight:500">เข้าสู่ระบบแล้ว · สามารถแก้ไขข้อมูลได้</div>
+    <div style="font-size:13px;color:#86efac;font-family:'Kanit',sans-serif;font-weight:500">เข้าสู่ระบบแล้ว · สามารถตั้งค่าสต็อกขั้นต่ำได้</div>
     <button class="btn btn-ghost btn-sm" style="margin-left:auto;display:flex;align-items:center;gap:6px" onclick="doLogout()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> ออกจากระบบ</button>
   </div>`}
 
@@ -2067,6 +2619,256 @@ function renderAdmin(){
 function showLoginModal(){
   document.getElementById('ov-login').classList.add('open');
   document.getElementById('login-user').focus();
+}
+
+/* ================================================================
+   PAGE: ALL ITEMS — Storage Card Grid Style
+================================================================ */
+let aiState = { cat: 'all', showOnly: 'all', q: '', view: 'grid', sort: 'name' };
+
+/* Category icon+color config */
+const AI_CAT_CFG = {
+  'สำนักงาน': { emoji:'🖥️', bg:'rgba(99,102,241,.15)',  color:'#a5b4fc', dark:'#6366f1' },
+  'อุปโภค':   { emoji:'🧴', bg:'rgba(139,92,246,.15)', color:'#c4b5fd', dark:'#8b5cf6' },
+  'บริโภค':   { emoji:'☕', bg:'rgba(14,165,233,.15)',  color:'#7dd3fc', dark:'#0ea5e9' },
+  'ซ่อมบำรุง':{ emoji:'🔧', bg:'rgba(245,158,11,.15)', color:'#fcd34d', dark:'#f59e0b' },
+};
+const AI_SUBCAT_CFG = {
+  'ไฟฟ้า':  { emoji:'⚡', bg:'rgba(234,179,8,.15)',   color:'#fde047', dark:'#ca8a04' },
+  'ประปา':  { emoji:'🚿', bg:'rgba(14,165,233,.15)',  color:'#7dd3fc', dark:'#0284c7' },
+};
+
+function renderAllItems() {
+  document.getElementById('topbar-actions').innerHTML = '';
+  const ct = document.getElementById('content');
+  ct.style.padding = '0';
+  ct.innerHTML = `<div class="ai-layout fade-in" id="ai-layout"></div>`;
+  buildAllItemsUI();
+}
+
+function buildAllItemsUI() {
+  const wrap = document.getElementById('ai-layout');
+  if (!wrap) return;
+
+  const bldg = globalBldg;
+  const allCats = ['all','สำนักงาน','อุปโภค','บริโภค','ซ่อมบำรุง'];
+  const catCounts = {};
+  allCats.forEach(c => {
+    catCounts[c] = c === 'all' ? ITEMS.length : ITEMS.filter(it => it.cat === c).length;
+  });
+
+  // Filter items
+  let items = ITEMS.filter(it => {
+    if (aiState.cat !== 'all' && it.cat !== aiState.cat) return false;
+    if (aiState.q && !it.name.toLowerCase().includes(aiState.q.toLowerCase())) return false;
+    const total = bldg === 'all' ? getTotalStock(it.id) : getStock(it.id, bldg);
+    const min = getMin(it.id);
+    if (aiState.showOnly === 'ok')    return total >= min && total > 0;
+    if (aiState.showOnly === 'low')   return total < min && total > 0;
+    if (aiState.showOnly === 'out')   return total <= 0;
+    return true;
+  });
+
+  // Sort
+  items = [...items].sort((a, b) => {
+    if (aiState.sort === 'name') return a.name.localeCompare(b.name, 'th');
+    if (aiState.sort === 'stock') {
+      const qa = bldg === 'all' ? getTotalStock(a.id) : getStock(a.id, bldg);
+      const qb = bldg === 'all' ? getTotalStock(b.id) : getStock(b.id, bldg);
+      return qb - qa;
+    }
+    if (aiState.sort === 'low') {
+      const qa = bldg === 'all' ? getTotalStock(a.id) : getStock(a.id, bldg);
+      const qb = bldg === 'all' ? getTotalStock(b.id) : getStock(b.id, bldg);
+      return qa - qb; // ascending (lowest first)
+    }
+    return 0;
+  });
+
+  const totalItems = items.length;
+  const totalStock = items.reduce((s, it) => {
+    return s + (bldg === 'all' ? getTotalStock(it.id) : getStock(it.id, bldg));
+  }, 0);
+
+  wrap.innerHTML = `
+  <!-- LEFT SIDEBAR -->
+  <div class="ai-sidebar">
+    <div style="margin-bottom:8px">
+      <div class="search-wrap" style="padding:7px 10px">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input placeholder="ค้นหาสินค้า…" oninput="aiState.q=this.value;buildAllItemsUI()" value="${aiState.q}" style="width:100%;font-size:12px">
+      </div>
+    </div>
+
+    <div class="ai-sb-title">หมวดหมู่</div>
+
+    <button class="ai-sb-btn ${aiState.cat==='all'?'active':''}" onclick="aiState.cat='all';buildAllItemsUI()">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      ทั้งหมด
+      <span class="ai-sb-count">${catCounts['all']}</span>
+    </button>
+
+    ${['สำนักงาน','อุปโภค','บริโภค','ซ่อมบำรุง'].map(c => {
+      const cfg = AI_CAT_CFG[c];
+      return `<button class="ai-sb-btn ${aiState.cat===c?'active':''}" onclick="aiState.cat='${c}';buildAllItemsUI()">
+        <span style="font-size:15px">${cfg.emoji}</span>
+        ${c}
+        <span class="ai-sb-count">${catCounts[c]}</span>
+      </button>`;
+    }).join('')}
+
+    <div class="ai-sb-title" style="margin-top:8px">สถานะ</div>
+    ${[['all','ทั้งหมด','○'],['ok','ปกติ','✓'],['low','ต่ำ','⚠'],['out','หมด','✕']].map(([v,l,ic])=>`
+      <button class="ai-sb-btn ${aiState.showOnly===v?'active':''}" onclick="aiState.showOnly='${v}';buildAllItemsUI()">
+        <span style="font-size:14px">${ic}</span>${l}
+      </button>`).join('')}
+  </div>
+
+  <!-- MAIN AREA -->
+  <div class="ai-main">
+    <!-- Toolbar -->
+    <div class="ai-toolbar">
+      <div class="ai-total">
+        รายการทั้งหมด <strong>${totalItems}</strong> รายการ
+        <span style="margin-left:10px;color:var(--t3)">·</span>
+        <span style="margin-left:10px">สต็อกรวม <strong style="color:var(--indigo)">${totalStock}</strong> ชิ้น</span>
+      </div>
+
+      <!-- Sort -->
+      <button class="ai-sort-btn" onclick="
+        const opts=['name','stock','low'];
+        aiState.sort=opts[(opts.indexOf(aiState.sort)+1)%opts.length];
+        buildAllItemsUI()">
+        <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="9" y2="18"/></svg>
+        ${aiState.sort==='name'?'ชื่อ ↑':aiState.sort==='stock'?'สต็อก ↓':'ต่ำสุด ↑'}
+      </button>
+
+      <!-- View toggle -->
+      <div class="ai-view-btns">
+        <button class="ai-view-btn ${aiState.view==='grid'?'active':''}" onclick="aiState.view='grid';buildAllItemsUI()" title="Grid">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        </button>
+        <button class="ai-view-btn ${aiState.view==='list'?'active':''}" onclick="aiState.view='list';buildAllItemsUI()" title="List">
+          <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Items -->
+    ${items.length === 0 ? `
+      <div class="tbl-empty" style="padding:60px 20px">
+        <div class="ei" style="font-size:48px;opacity:.3">○</div>
+        <p>ไม่พบสินค้าที่ค้นหา</p>
+      </div>
+    ` : aiState.view === 'grid' ? `
+      <div class="ai-grid">
+        ${items.map(it => aiCard(it, bldg)).join('')}
+      </div>
+    ` : `
+      <div class="ai-list">
+        ${items.map(it => aiListRow(it, bldg)).join('')}
+      </div>
+    `}
+  </div>`;
+}
+
+function aiCard(it, bldg) {
+  const min = getMin(it.id);
+  const total = bldg === 'all' ? getTotalStock(it.id) : getStock(it.id, bldg);
+  const lv = stockLevel(total, min);
+  const pct = min > 0 ? Math.min(100, Math.round(total / min * 100)) : (total > 0 ? 100 : 0);
+  const barClr = lv === 'ok' ? '#10b981' : lv === 'low' ? '#f59e0b' : '#f43f5e';
+  const numClr = lv === 'ok' ? '#6ee7b7' : lv === 'low' ? '#fcd34d' : '#fda4af';
+  const lvLabel = lv === 'ok' ? 'ปกติ' : lv === 'low' ? 'ต่ำ' : 'หมด';
+  const lvBg = lv === 'ok' ? 'rgba(16,185,129,.12)' : lv === 'low' ? 'rgba(245,158,11,.12)' : 'rgba(244,63,94,.12)';
+
+  const cfg = AI_SUBCAT_CFG[it.subcat] || AI_CAT_CFG[it.cat] || { emoji:'📦', bg:'var(--bg-glass)', color:'var(--t2)' };
+
+  // Per-building breakdown
+  const bldgRows = bldg === 'all' ? BUILDINGS.map(b => {
+    const q = getStock(it.id, b);
+    const bl = stockLevel(q, min);
+    const bc = bl === 'ok' ? '#6ee7b7' : bl === 'low' ? '#fcd34d' : '#fda4af';
+    return `<span class="ai-bldg-badge" style="background:rgba(255,255,255,.05);border:1px solid var(--border)">
+      <span class="bldg-dot" style="background:${bc}"></span>
+      <span style="color:var(--t3)">${b.split(' ')[0]}</span>
+      <span style="color:${bc};font-weight:700">${q}</span>
+    </span>`;
+  }).join('') : '';
+
+  const price = getCurrentPrice(it.id);
+  const priceHtml = price > 0 ? `<span style="font-size:10px;color:var(--amber);font-family:'Kanit',sans-serif;font-weight:600">฿${price.toLocaleString()}</span>` : '';
+
+  return `<div class="ai-card" onclick="navigate('${it.cat==='ซ่อมบำรุง'?'maintenance':'stock'}')">
+    <span class="ai-card-menu" title="เมนู">⋮</span>
+    <div class="ai-card-icon" style="background:${cfg.bg}">${cfg.emoji}</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+      <div class="ai-card-size" style="color:${numClr}">${total} ${it.unit}</div>
+      ${priceHtml}
+    </div>
+    <div class="ai-card-name" title="${it.name}">${it.name}</div>
+    <div class="ai-card-date">
+      <span class="badge ${CAT_CLR[it.cat]}" style="font-size:9px;padding:1px 6px">${it.cat}</span>
+    </div>
+
+    <div class="ai-card-stock">
+      <div class="ai-card-stock-row">
+        <span class="ai-card-stock-label">คงเหลือ / ขั้นต่ำ</span>
+        <span class="ai-status-pill" style="background:${lvBg};color:${numClr};border:1px solid ${barClr}30">${lvLabel}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span class="ai-card-stock-val" style="color:${numClr}">${total}</span>
+        <span style="font-size:10px;color:var(--t3);font-family:'Kanit',sans-serif">/ min ${min}</span>
+      </div>
+      <div class="ai-card-bar-wrap">
+        <div class="ai-card-bar" style="width:${pct}%;background:${barClr}"></div>
+      </div>
+      ${bldg === 'all' && bldgRows ? `<div class="ai-bldg-row">${bldgRows}</div>` : ''}
+    </div>
+  </div>`;
+}
+
+function aiListRow(it, bldg) {
+  const min = getMin(it.id);
+  const total = bldg === 'all' ? getTotalStock(it.id) : getStock(it.id, bldg);
+  const lv = stockLevel(total, min);
+  const pct = min > 0 ? Math.min(100, Math.round(total / min * 100)) : (total > 0 ? 100 : 0);
+  const barClr = lv === 'ok' ? '#10b981' : lv === 'low' ? '#f59e0b' : '#f43f5e';
+  const numClr = lv === 'ok' ? '#6ee7b7' : lv === 'low' ? '#fcd34d' : '#fda4af';
+  const lvLabel = lv === 'ok' ? '✓ ปกติ' : lv === 'low' ? '⚠ ต่ำ' : '✕ หมด';
+  const lvBg = lv === 'ok' ? 'rgba(16,185,129,.1)' : lv === 'low' ? 'rgba(245,158,11,.1)' : 'rgba(244,63,94,.1)';
+  const cfg = AI_SUBCAT_CFG[it.subcat] || AI_CAT_CFG[it.cat] || { emoji:'📦', bg:'var(--bg-glass)', color:'var(--t2)' };
+  const price = getCurrentPrice(it.id);
+
+  const bldgChips = bldg === 'all' ? `<span style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">${BUILDINGS.map(b => {
+    const q = getStock(it.id, b);
+    const bl = stockLevel(q, min);
+    const bc = bl === 'ok' ? '#6ee7b7' : bl === 'low' ? '#fcd34d' : '#fda4af';
+    return `<span style="font-size:10px;font-family:'Kanit',sans-serif;color:var(--t3)">${b.split(' ')[0]}: <b style="color:${bc}">${q}</b></span>`;
+  }).join(' · ')}</span>` : '';
+
+  return `<div class="ai-list-row" onclick="navigate('${it.cat==='ซ่อมบำรุง'?'maintenance':'stock'}')">
+    <div class="ai-list-icon" style="background:${cfg.bg}">${cfg.emoji}</div>
+    <div class="ai-list-info">
+      <div class="ai-list-name">${it.name}</div>
+      <div class="ai-list-meta">
+        <span class="badge ${CAT_CLR[it.cat]}" style="font-size:9px;padding:1px 6px">${it.cat}</span>
+        <span style="margin-left:6px">${it.unit}</span>
+        ${price > 0 ? `<span style="margin-left:8px;color:var(--amber);font-weight:600">฿${price.toLocaleString()}</span>` : ''}
+      </div>
+      ${bldgChips}
+    </div>
+    <div class="ai-list-stock">
+      <div class="ai-list-stock-num" style="color:${numClr}">${total}</div>
+      <div class="ai-list-stock-sub">min ${min} ${it.unit}</div>
+      <div class="ai-list-bar-wrap">
+        <div class="ai-list-bar" style="width:${pct}%;background:${barClr}"></div>
+      </div>
+    </div>
+    <div style="margin-left:12px;min-width:56px;text-align:right">
+      <span style="font-size:11px;font-family:'Kanit',sans-serif;font-weight:600;padding:2px 8px;border-radius:8px;background:${lvBg};color:${numClr}">${lvLabel}</span>
+    </div>
+  </div>`;
 }
 
 /* ================================================================
@@ -2319,7 +3121,11 @@ const ST_PAGE = 20;
 let stPage = 0;
 
 function renderStock(){
-  document.getElementById('topbar-actions').innerHTML = '';
+  document.getElementById('topbar-actions').innerHTML = `
+    <button class="btn btn-ghost btn-sm" onclick="openPriceModal('consumer')" style="display:flex;align-items:center;gap:6px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      แก้ไขราคา
+    </button>`;
 
   document.getElementById('content').innerHTML = `
   <div class="dash-grid-4 fade-in" id="st-cards"></div>
@@ -2496,7 +3302,7 @@ function refreshStock(){
 
   if(pageItems.length===0){
     document.getElementById('st-body').innerHTML=
-      `<div class="tbl-empty"><div class="ei" style="font-size:40px;opacity:.4">○</div><p>ไม่พบรายการ</p></div>`;
+      emptyState("🔍","ไม่พบรายการ","ลองเปลี่ยนตัวกรองหรือค้นหาด้วยคำอื่น");
     return;
   }
 
@@ -2542,11 +3348,12 @@ function refreshStock(){
   } else {
     // ── TABLE LAYOUT for desktop ──
     const isSingleD = bldg !== 'all';
+    const now = new Date();
     const thead = isSingleD
-      ? `<tr><th>#</th><th>ชื่อสินค้า / หน่วย</th><th>หมวด</th><th style="min-width:170px">คงเหลือ (${bldg})</th><th>ขั้นต่ำ</th><th>ต้องสั่งเพิ่ม</th></tr>`
+      ? `<tr><th>#</th><th>ชื่อสินค้า / หน่วย</th><th>หมวด</th><th style="min-width:170px">คงเหลือ (${bldg})</th><th>ขั้นต่ำ</th><th>ราคา/หน่วย</th><th>ต้องสั่งเพิ่ม</th></tr>`
       : `<tr><th>#</th><th>ชื่อสินค้า / หน่วย</th><th>หมวด</th>
           ${BUILDINGS.map(b=>`<th style="min-width:120px">${b}</th>`).join('')}
-          <th>รวม</th><th>ขั้นต่ำ</th><th>ต้องสั่ง</th></tr>`;
+          <th>รวม</th><th>ขั้นต่ำ</th><th>ราคา/หน่วย</th><th>ต้องสั่ง</th></tr>`;
     const tbody = pageItems.map(it=>{
       const min = getMin(it.id);
       const bStocks = BUILDINGS.map(b=>getStock(it.id,b));
@@ -2557,6 +3364,10 @@ function refreshStock(){
       const lv = stockLevel(refQty, min);
       const orderColor = order>0 ? '#fca5a5' : '#4a5a7a';
       const totalColor = lv==='ok'?'#86efac':lv==='low'?'#fdba74':'#fca5a5';
+      const price = getPrice(it.id, now.getFullYear(), now.getMonth()+1);
+      const priceHtml = price>0
+        ? `<span style="font-family:'Kanit',sans-serif;font-size:12px;color:#fcd34d">฿${price.toLocaleString()}</span>`
+        : `<span style="color:var(--t3);font-size:11px">—</span>`;
       if(isSingleD){
         return `<tr>
           <td class="td-no">${it.no}</td>
@@ -2564,6 +3375,7 @@ function refreshStock(){
           <td><span class="badge ${CAT_CLR[it.cat]}">${it.cat}</span></td>
           <td>${miniBar(singleQty, min)}</td>
           <td style="color:var(--t3);font-family:'Kanit',sans-serif;text-align:center">${min}</td>
+          <td style="text-align:center">${priceHtml}</td>
           <td style="text-align:center"><span style="font-family:'Kanit',sans-serif;font-weight:600;color:${orderColor}">${order>0?'+ '+order:'—'}</span></td>
         </tr>`;
       } else {
@@ -2574,6 +3386,7 @@ function refreshStock(){
           ${bStocks.map(q=>{ const l=stockLevel(q,min); const c=l==='ok'?'#86efac':l==='low'?'#fdba74':'#fca5a5'; return `<td><span style="font-family:'Kanit',sans-serif;font-weight:600;color:${c}">${q}</span></td>`; }).join('')}
           <td style="text-align:center"><span style="font-family:'Kanit',sans-serif;font-weight:700;color:${totalColor}">${total}</span></td>
           <td style="text-align:center;color:var(--t3);font-family:'Kanit',sans-serif">${min}</td>
+          <td style="text-align:center">${priceHtml}</td>
           <td style="text-align:center"><span style="font-family:'Kanit',sans-serif;font-weight:600;color:${orderColor}">${order>0?'+ '+order:'—'}</span></td>
         </tr>`;
       }
@@ -2590,7 +3403,11 @@ const MN_PAGE = 20;
 let mPage = 0;
 
 function renderMaintenance(){
-  document.getElementById('topbar-actions').innerHTML = '';
+  document.getElementById('topbar-actions').innerHTML = `
+    <button class="btn btn-ghost btn-sm" onclick="openPriceModal('maintenance')" style="display:flex;align-items:center;gap:6px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      แก้ไขราคา
+    </button>`;
   const bldg = mFilter.bldg;
 
   document.getElementById('content').innerHTML = `
@@ -2796,7 +3613,7 @@ function refreshMaintenance(){
 
   if(pageItems.length===0){
     document.getElementById('mn-body').innerHTML=
-      `<div class="tbl-empty"><div class="ei" style="font-size:40px;opacity:.4">○</div><p>ไม่พบรายการ</p></div>`;
+      emptyState("🔍","ไม่พบรายการ","ลองเปลี่ยนตัวกรองหรือค้นหาด้วยคำอื่น");
     return;
   }
 
@@ -2840,10 +3657,10 @@ function refreshMaintenance(){
     document.getElementById('mn-body').innerHTML = `<div style="display:flex;flex-direction:column;gap:8px;padding:10px">${cards}</div>`;
   } else {
     const thead = isSingle
-      ? `<tr><th>#</th><th>ชื่ออุปกรณ์ / หน่วย</th><th>ระบบ</th><th style="min-width:170px">คงเหลือ (${bldg})</th><th>ขั้นต่ำ</th><th>ต้องสั่งเพิ่ม</th></tr>`
+      ? `<tr><th>#</th><th>ชื่ออุปกรณ์ / หน่วย</th><th>ระบบ</th><th style="min-width:170px">คงเหลือ (${bldg})</th><th>ขั้นต่ำ</th><th>ราคา/หน่วย</th><th>ต้องสั่งเพิ่ม</th></tr>`
       : `<tr><th>#</th><th>ชื่ออุปกรณ์ / หน่วย</th><th>ระบบ</th>
           ${BUILDINGS.map(b=>`<th style="min-width:110px">${b}</th>`).join('')}
-          <th>รวม</th><th>ขั้นต่ำ</th><th>ต้องสั่ง</th></tr>`;
+          <th>รวม</th><th>ขั้นต่ำ</th><th>ราคา/หน่วย</th><th>ต้องสั่ง</th></tr>`;
     const tbody = pageItems.map(it=>{
       const min = getMin(it.id);
       const bStocks = BUILDINGS.map(b=>getStock(it.id,b));
@@ -2856,6 +3673,11 @@ function refreshMaintenance(){
       const totalColor = lv==='ok'?'#86efac':lv==='low'?'#fdba74':'#fca5a5';
       const subcatBadge = it.subcat
         ? `<span class="badge ${it.subcat==='ไฟฟ้า'?'b-yellow':'b-cyan'}">${SUBCAT_ICO[it.subcat]} ${it.subcat}</span>` : '';
+      const mnow = new Date();
+      const mprice = getPrice(it.id, mnow.getFullYear(), mnow.getMonth()+1);
+      const mpriceHtml = mprice>0
+        ? `<span style="font-family:'Kanit',sans-serif;font-size:12px;color:#fcd34d">฿${mprice.toLocaleString()}</span>`
+        : `<span style="color:var(--t3);font-size:11px">—</span>`;
       if(isSingle){
         return `<tr>
           <td class="td-no">${it.no}</td>
@@ -2863,6 +3685,7 @@ function refreshMaintenance(){
           <td>${subcatBadge}</td>
           <td>${miniBar(singleQty,min)}</td>
           <td style="color:var(--t3);font-family:'Kanit',sans-serif;text-align:center">${min}</td>
+          <td style="text-align:center">${mpriceHtml}</td>
           <td style="text-align:center"><span style="font-family:'Kanit',sans-serif;font-weight:600;color:${orderColor}">${order>0?'+ '+order:'—'}</span></td>
         </tr>`;
       } else {
@@ -2873,6 +3696,7 @@ function refreshMaintenance(){
           ${bStocks.map(q=>{ const l=stockLevel(q,min); const c=l==='ok'?'#86efac':l==='low'?'#fdba74':'#fca5a5'; return `<td><span style="font-family:'Kanit',sans-serif;font-weight:600;color:${c}">${q}</span></td>`; }).join('')}
           <td style="text-align:center"><span style="font-family:'Kanit',sans-serif;font-weight:700;color:${totalColor}">${total}</span></td>
           <td style="text-align:center;color:var(--t3);font-family:'Kanit',sans-serif">${min}</td>
+          <td style="text-align:center">${mpriceHtml}</td>
           <td style="text-align:center"><span style="font-family:'Kanit',sans-serif;font-weight:600;color:${orderColor}">${order>0?'+ '+order:'—'}</span></td>
         </tr>`;
       }
@@ -2885,11 +3709,38 @@ function refreshMaintenance(){
    PAGE: IMPORT
 ================================================================ */
 /* ── Import state ── */
+/* ================================================================
+   VIEW MODE SYSTEM (shared: import, withdraw, stock pages)
+================================================================ */
+// view: 'small' | 'list' | 'details' | 'tiles'
+let importView   = 'list';
+let withdrawView = 'list';
+
+// SVG icons for view buttons
+const VIEW_ICONS = {
+  small:   '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  list:    '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
+  details: '<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>',
+  tiles:   '<rect x="3" y="3" width="8" height="10" rx="1"/><rect x="13" y="3" width="8" height="10" rx="1"/><rect x="3" y="15" width="8" height="6" rx="1"/><rect x="13" y="15" width="8" height="6" rx="1"/>',
+};
+const VIEW_LABELS = { small:'Small', list:'List', details:'Details', tiles:'Tiles' };
+
+function viewModeBar(currentView, onChangeFn) {
+  return `<div style="display:flex;gap:2px;background:var(--bg-glass);border:1px solid var(--border);border-radius:9px;padding:3px">
+    ${['small','list','details','tiles'].map(v=>`
+      <button title="${VIEW_LABELS[v]}" onclick="${onChangeFn}('${v}')"
+        style="width:30px;height:28px;border-radius:6px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;
+               background:${v===currentView?'var(--indigo)':'transparent'};
+               color:${v===currentView?'#fff':'var(--t2)'}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="${['small','tiles'].includes(v)?'currentColor':'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round">${VIEW_ICONS[v]}</svg>
+      </button>`).join('')}
+  </div>`;
+}
+
 let importGroup = 'consumer'; // 'consumer' | 'maintenance'
 
 function renderImport(){
-  document.getElementById('topbar-actions').innerHTML=
-    `<button class="btn btn-ghost" onclick="navigate('admin')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> กลับ Admin</button>`;
+  document.getElementById('topbar-actions').innerHTML='';
   document.getElementById('content').innerHTML = `
   <div class="sec fade-in">
     <!-- header + controls -->
@@ -2934,7 +3785,8 @@ function renderImport(){
       </div>
       <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
         <input type="text" class="finput" id="fi-search" placeholder="🔍 ค้นหารายการ..." 
-          oninput="filterImportList(this.value)" style="min-width:180px">
+          oninput="filterImportList(this.value)" style="min-width:160px">
+        ${viewModeBar(importView, 'setImportView')}
       </div>
     </div>
 
@@ -2970,49 +3822,143 @@ function setImportGroup(grp){
   renderImportList('');
 }
 
+function setImportView(v){
+  importView = v;
+  renderImportList(document.getElementById('fi-search')?.value||'');
+  // update bar UI
+  document.querySelectorAll('[data-import-view]').forEach(el=>{
+    const isActive = el.dataset.importView === v;
+    el.style.background = isActive ? 'var(--indigo)' : 'transparent';
+    el.style.color = isActive ? '#fff' : 'var(--t2)';
+  });
+}
+
 function filterImportList(q){ renderImportList(q); }
 
 function renderImportList(q){
+  const bldg  = document.getElementById('fi-bldg')?.value || BUILDINGS[0];
   const items = ITEMS.filter(it=>{
     const inGroup = importGroup==='maintenance' ? it.cat==='ซ่อมบำรุง' : it.cat!=='ซ่อมบำรุง';
-    return inGroup && (!q || it.name.includes(q) || it.cat.includes(q) || (it.subcat||'').includes(q));
+    return inGroup && (!q || it.name.toLowerCase().includes(q.toLowerCase()) || it.cat.includes(q) || (it.subcat||'').includes(q));
   });
 
   const list = document.getElementById('fi-item-list');
   if(!list) return;
 
-  // group by category
+  // group by subcat or cat
   const grouped = {};
   items.forEach(it=>{ (grouped[it.subcat||it.cat] = grouped[it.subcat||it.cat]||[]).push(it); });
 
-  list.innerHTML = Object.entries(grouped).map(([grpName, grpItems])=>`
-    <div style="margin-bottom:4px">
-      <div style="font-size:11px;font-family:'Kanit',sans-serif;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;padding:8px 6px 4px">${grpName}</div>
-      ${grpItems.map(it=>{
-        const cur = getStock(it.id, document.getElementById('fi-bldg')?.value||BUILDINGS[0]);
-        const min = getMin(it.id);
-        const lv = stockLevel(cur,min);
-        const lvClr = lv==='ok'?'#6ee7b7':lv==='low'?'#fcd34d':'#fca5a5';
-        return `<div class="fi-row" id="fi-row-${it.id}" onclick="toggleImportItem('${it.id}')"
-          style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:pointer;border:1px solid transparent;transition:all .15s;background:var(--bg-glass)">
-          <div id="fi-chk-${it.id}" style="width:18px;height:18px;border-radius:5px;border:2px solid var(--border-hi);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s"></div>
+  const CHK_ON  = `background:#10b981;border-color:#10b981;`;
+  const CHK_OFF = `border:2px solid var(--border-hi);`;
+
+  const renderItem = (it) => {
+    const cur   = getStock(it.id, bldg);
+    const min   = getMin(it.id);
+    const lv    = stockLevel(cur, min);
+    const lvClr = lv==='ok'?'#6ee7b7':lv==='low'?'#fcd34d':'#fca5a5';
+    const checked = document.getElementById(`fi-qty-wrap-${it.id}`)?.style.display === 'flex';
+    const chkStyle = checked
+      ? `background:#10b981;border-color:#10b981;`
+      : `border:2px solid var(--border-hi);`;
+    const rowBg = checked ? 'rgba(16,185,129,.07)' : 'var(--bg-glass)';
+    const rowBorder = checked ? '1px solid rgba(16,185,129,.25)' : '1px solid transparent';
+    const qty = document.getElementById(`fi-qty-${it.id}`)?.value || '';
+    const chkSVG = checked ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : '';
+
+    if(importView === 'small'){
+      return `<div id="fi-row-${it.id}" onclick="toggleImportItem('${it.id}')"
+        style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 6px;border-radius:10px;cursor:pointer;background:${rowBg};border:${rowBorder};transition:all .15s;position:relative;text-align:center">
+        <div id="fi-chk-${it.id}" style="position:absolute;top:6px;right:6px;width:16px;height:16px;border-radius:4px;${chkStyle}display:flex;align-items:center;justify-content:center;transition:all .15s">${chkSVG}</div>
+        <div style="width:40px;height:40px;border-radius:10px;background:var(--bg-card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <span style="font-size:11px;font-family:'Kanit',sans-serif;font-weight:700;color:${lvClr}">${cur}</span>
+        </div>
+        <div style="font-size:10px;color:var(--t1);font-family:'Kanit',sans-serif;line-height:1.3;max-width:80px;word-break:break-word">${it.name.length>20?it.name.substring(0,18)+'…':it.name}</div>
+        <div id="fi-qty-wrap-${it.id}" style="display:${checked?'flex':'none'};align-items:center;gap:3px" onclick="event.stopPropagation()">
+          <input type="number" id="fi-qty-${it.id}" class="finput" value="${qty}" placeholder="0" min="1"
+            style="width:54px;padding:3px 6px;font-size:12px;font-family:'Kanit',sans-serif;text-align:center" oninput="updateImportCount()">
+        </div>
+      </div>`;
+
+    } else if(importView === 'list'){
+      return `<div class="fi-row" id="fi-row-${it.id}" onclick="toggleImportItem('${it.id}')"
+        style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;cursor:pointer;border:${rowBorder};transition:all .15s;background:${rowBg}">
+        <div id="fi-chk-${it.id}" style="width:17px;height:17px;border-radius:4px;${chkStyle}flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s">${chkSVG}</div>
+        <div style="flex:1;min-width:0;font-size:13px;font-weight:500;color:var(--t1);font-family:'Kanit',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${it.name}</div>
+        <span style="font-size:11px;color:${lvClr};font-family:'Kanit',sans-serif;font-weight:600;flex-shrink:0">${cur} ${it.unit}</span>
+        <div id="fi-qty-wrap-${it.id}" style="display:${checked?'flex':'none'};align-items:center;gap:5px;flex-shrink:0" onclick="event.stopPropagation()">
+          <input type="number" id="fi-qty-${it.id}" class="finput" value="${qty}" placeholder="0" min="1"
+            style="width:70px;padding:4px 8px;font-size:13px;font-family:'Kanit',sans-serif;text-align:center" oninput="updateImportCount()">
+          <span style="font-size:11px;color:var(--t2)">${it.unit}</span>
+        </div>
+      </div>`;
+
+    } else if(importView === 'details'){
+      const allStocks = BUILDINGS.map(b=>({ b, q:getStock(it.id,b) }));
+      return `<div class="fi-row" id="fi-row-${it.id}" onclick="toggleImportItem('${it.id}')"
+        style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;border:${rowBorder};transition:all .15s;background:${rowBg}">
+        <div id="fi-chk-${it.id}" style="width:18px;height:18px;border-radius:5px;${chkStyle}flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s">${chkSVG}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--t1);font-family:'Kanit',sans-serif">${it.name}</div>
+          <div style="display:flex;gap:10px;margin-top:4px;flex-wrap:wrap">
+            ${allStocks.map(({b,q})=>{
+              const lc=stockLevel(q,min);const cc=lc==='ok'?'#6ee7b7':lc==='low'?'#fcd34d':'#fca5a5';
+              return `<span style="font-size:11px;color:var(--t3)">${b}: <strong style="color:${cc};font-family:'Kanit',sans-serif">${q}</strong></span>`;
+            }).join('')}
+            <span style="font-size:11px;color:var(--t3)">ขั้นต่ำ: <strong style="color:var(--t2)">${min}</strong></span>
+            <span class="badge ${CAT_CLR[it.cat]}" style="font-size:9px;padding:1px 6px">${it.cat}</span>
+          </div>
+        </div>
+        <div id="fi-qty-wrap-${it.id}" style="display:${checked?'flex':'none'};align-items:center;gap:5px;flex-shrink:0" onclick="event.stopPropagation()">
+          <input type="number" id="fi-qty-${it.id}" class="finput" value="${qty}" placeholder="0" min="1"
+            style="width:80px;padding:5px 10px;font-size:14px;font-family:'Kanit',sans-serif;text-align:center" oninput="updateImportCount()">
+          <span style="font-size:11px;color:var(--t2)">${it.unit}</span>
+        </div>
+      </div>`;
+
+    } else { // tiles
+      return `<div id="fi-row-${it.id}" onclick="toggleImportItem('${it.id}')"
+        style="display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:12px;cursor:pointer;background:${rowBg};border:${rowBorder};transition:all .15s">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+          <div id="fi-chk-${it.id}" style="width:18px;height:18px;border-radius:5px;${chkStyle}flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-top:1px">${chkSVG}</div>
           <div style="flex:1;min-width:0">
-            <div style="font-size:13px;font-weight:500;color:var(--t1);font-family:'Kanit',sans-serif">${it.name}</div>
-            <div style="font-size:11px;color:var(--t2);margin-top:1px">
-              ${it.unit}
-              <span style="margin-left:8px;color:${lvClr};font-weight:600">${cur} คงเหลือ</span>
-              <span style="color:var(--t3)"> / ขั้นต่ำ ${min}</span>
-            </div>
+            <div style="font-size:12px;font-weight:600;color:var(--t1);font-family:'Kanit',sans-serif;line-height:1.4">${it.name}</div>
+            <div style="font-size:10px;color:var(--t2);margin-top:2px">${it.unit}</div>
           </div>
-          <div id="fi-qty-wrap-${it.id}" style="display:none;align-items:center;gap:6px" onclick="event.stopPropagation()">
-            <input type="number" id="fi-qty-${it.id}" class="finput" placeholder="0" min="1"
-              style="width:80px;padding:5px 10px;font-size:14px;font-family:'Kanit',sans-serif;text-align:center"
-              oninput="updateImportCount()">
-            <span style="font-size:12px;color:var(--t2);flex-shrink:0">${it.unit}</span>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-family:'Kanit',sans-serif;font-size:18px;font-weight:800;color:${lvClr};line-height:1">${cur}</div>
+            <div style="font-size:9px;color:var(--t3)">คงเหลือ</div>
           </div>
-        </div>`;
-      }).join('')}
-    </div>`).join('');
+        </div>
+        <div style="height:3px;background:var(--border);border-radius:99px;overflow:hidden">
+          <div style="height:100%;width:${min>0?Math.min(100,Math.round(cur/min*100)):100}%;background:${lvClr};border-radius:99px;transition:width .5s"></div>
+        </div>
+        <div id="fi-qty-wrap-${it.id}" style="display:${checked?'flex':'none'};align-items:center;gap:6px" onclick="event.stopPropagation()">
+          <input type="number" id="fi-qty-${it.id}" class="finput" value="${qty}" placeholder="จำนวน" min="1"
+            style="flex:1;padding:5px 10px;font-size:13px;font-family:'Kanit',sans-serif;text-align:center" oninput="updateImportCount()">
+          <span style="font-size:11px;color:var(--t2)">${it.unit}</span>
+        </div>
+      </div>`;
+    }
+  };
+
+  // container style by view
+  const containerStyle = {
+    small:   'display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;padding:12px',
+    list:    'display:flex;flex-direction:column;gap:3px;padding:10px 14px',
+    details: 'display:flex;flex-direction:column;gap:6px;padding:12px 14px',
+    tiles:   'display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;padding:12px',
+  }[importView];
+
+  list.style.cssText = containerStyle + ';max-height:55vh;overflow-y:auto';
+
+  list.innerHTML = importView === 'small' || importView === 'tiles'
+    ? items.map(renderItem).join('')  // flat — no group headers
+    : Object.entries(grouped).map(([grpName, grpItems])=>`
+        <div style="margin-bottom:${importView==='list'?'2':'6'}px">
+          <div style="font-size:10px;font-family:'Kanit',sans-serif;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;padding:6px 6px 3px">${grpName}</div>
+          ${grpItems.map(renderItem).join('')}
+        </div>`).join('');
 
   updateImportCount();
 }
@@ -3075,29 +4021,35 @@ function submitImport(){
   const date = document.getElementById('fi-date').value;
   const now  = date ? new Date(date).toISOString() : new Date().toISOString();
 
-  // collect all checked items
   const selected = ITEMS.filter(it=>{
     const w = document.getElementById(`fi-qty-wrap-${it.id}`);
     return w && w.style.display==='flex';
-  }).map(it=>({
-    it,
-    qty: parseInt(document.getElementById(`fi-qty-${it.id}`)?.value)||0
-  })).filter(({qty})=>qty>0);
+  }).map(it=>({ it, qty: parseInt(document.getElementById(`fi-qty-${it.id}`)?.value)||0 }))
+    .filter(({qty})=>qty>0);
 
   if(selected.length===0){ showToast('⚠️','กรุณาเลือกและระบุจำนวนสินค้าอย่างน้อย 1 รายการ'); return; }
 
-  selected.forEach(({it, qty})=>{
-    const t={id:genId(),type:'import',itemId:it.id,building:bldg,qty,
-      requester:who,note:'',status:'approved',
-      createdAt:now,approvedAt:now,approvedBy:'ระบบ'};
-    transactions.unshift(t);
-    const group=it.cat==='ซ่อมบำรุง'?'maintenance':'consumer';
-    pushToGAS(t,group);
+  showConfirm({
+    title: 'ยืนยันการนำเข้าสินค้า',
+    subtitle: `นำเข้าไปยัง ${bldg} โดย ${who}`,
+    iconBg: 'rgba(16,185,129,.15)', iconColor: '#34d399',
+    iconSvg: '<polyline points="8 17 12 21 16 17"/><line x1="12" y1="3" x2="12" y2="21"/>',
+    items: selected.map(({it,qty})=>({ name:it.name, qty, unit:it.unit })),
+    info: `<strong>${selected.length} รายการ</strong> · อาคาร <strong>${bldg}</strong> · สถานะ: <span style="color:#6ee7b7">อนุมัติทันที</span>`,
+    okLabel: 'ยืนยันนำเข้า', okClass: 'btn-green',
+    onConfirm: ()=>{
+      selected.forEach(({it,qty})=>{
+        const t={id:genId(),type:'import',itemId:it.id,building:bldg,qty,
+          requester:who,note:'',status:'approved',
+          createdAt:now,approvedAt:now,approvedBy:'ระบบ'};
+        transactions.unshift(t);
+        pushToGAS(t, it.cat==='ซ่อมบำรุง'?'maintenance':'consumer');
+      });
+      saveState();
+      showToast('✅',`นำเข้า ${selected.length} รายการ → ${bldg} สำเร็จ`);
+      clearImportForm();
+    }
   });
-
-  saveState();
-  showToast('✅',`นำเข้า ${selected.length} รายการ → ${bldg} สำเร็จ`);
-  clearImportForm();
 }
 
 function updateImportUnit(){}  // legacy stub
@@ -3193,8 +4145,7 @@ function submitCheckin(){
 let withdrawGroup = 'consumer';
 
 function renderWithdraw(){
-  document.getElementById('topbar-actions').innerHTML=
-    `<button class="btn btn-ghost" onclick="navigate('admin')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> กลับ Admin</button>`;
+  document.getElementById('topbar-actions').innerHTML='';
 
   document.getElementById('content').innerHTML = `
   <div class="sec fade-in">
@@ -3238,8 +4189,11 @@ function renderWithdraw(){
       </div>
       <div>
         <label class="flabel">&nbsp;</label>
-        <input type="text" class="finput" id="fw-search" placeholder="🔍 ค้นหา..." 
-          oninput="renderWithdrawList(this.value)" style="min-width:160px">
+        <div style="display:flex;align-items:center;gap:6px">
+          <input type="text" class="finput" id="fw-search" placeholder="🔍 ค้นหา..." 
+            oninput="renderWithdrawList(this.value)" style="min-width:140px">
+          ${viewModeBar(withdrawView, 'setWithdrawView')}
+        </div>
       </div>
     </div>
 
@@ -3273,11 +4227,16 @@ function setWithdrawGroup(grp){
   renderWithdrawList('');
 }
 
+function setWithdrawView(v){
+  withdrawView = v;
+  renderWithdrawList(document.getElementById('fw-search')?.value||'');
+}
+
 function renderWithdrawList(q){
   const bldg = document.getElementById('fw-bldg')?.value || BUILDINGS[0];
   const items = ITEMS.filter(it=>{
     const inGroup = withdrawGroup==='maintenance' ? it.cat==='ซ่อมบำรุง' : it.cat!=='ซ่อมบำรุง';
-    return inGroup && (!q || it.name.includes(q) || it.cat.includes(q) || (it.subcat||'').includes(q));
+    return inGroup && (!q || it.name.toLowerCase().includes(q.toLowerCase()) || it.cat.includes(q) || (it.subcat||'').includes(q));
   });
 
   const list = document.getElementById('fw-item-list');
@@ -3286,36 +4245,115 @@ function renderWithdrawList(q){
   const grouped = {};
   items.forEach(it=>{ (grouped[it.subcat||it.cat] = grouped[it.subcat||it.cat]||[]).push(it); });
 
-  list.innerHTML = Object.entries(grouped).map(([grpName, grpItems])=>`
-    <div style="margin-bottom:4px">
-      <div style="font-size:11px;font-family:'Kanit',sans-serif;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;padding:8px 6px 4px">${grpName}</div>
-      ${grpItems.map(it=>{
-        const cur = getStock(it.id, bldg);
-        const min = getMin(it.id);
-        const lv  = stockLevel(cur,min);
-        const lvClr = lv==='ok'?'#6ee7b7':lv==='low'?'#fcd34d':'#fca5a5';
-        const noStock = cur <= 0;
-        return `<div class="fi-row" id="fw-row-${it.id}" onclick="${noStock?'showToast(\'❌\',\'สต็อกหมด\')':'toggleWithdrawItem(\''+it.id+'\')'}"
-          style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:${noStock?'not-allowed':'pointer'};border:1px solid transparent;transition:all .15s;background:${noStock?'rgba(244,63,94,.04)':'var(--bg-glass)'};opacity:${noStock?'.5':'1'}">
-          <div id="fw-chk-${it.id}" style="width:18px;height:18px;border-radius:5px;border:2px solid var(--border-hi);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s"></div>
+  const renderWItem = (it) => {
+    const cur   = getStock(it.id, bldg);
+    const min   = getMin(it.id);
+    const lv    = stockLevel(cur, min);
+    const lvClr = lv==='ok'?'#6ee7b7':lv==='low'?'#fcd34d':'#fca5a5';
+    const noStock = cur <= 0;
+    const checked = document.getElementById(`fw-qty-wrap-${it.id}`)?.style.display === 'flex';
+    const rowBg  = noStock?'rgba(244,63,94,.04)':checked?'rgba(249,115,22,.07)':'var(--bg-glass)';
+    const rowBdr = noStock?'1px solid transparent':checked?'1px solid rgba(249,115,22,.25)':'1px solid transparent';
+    const chkStyle = checked ? 'background:#f97316;border-color:#f97316;' : 'border:2px solid var(--border-hi);';
+    const chkSVG = checked ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : '';
+    const qty = document.getElementById(`fw-qty-${it.id}`)?.value || '';
+    const clickFn = noStock ? `showToast('❌','สต็อกหมด')` : `toggleWithdrawItem('${it.id}')`;
+    const opacity = noStock ? 'opacity:.45;' : '';
+
+    if(withdrawView === 'small'){
+      return `<div id="fw-row-${it.id}" onclick="${clickFn}"
+        style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;border-radius:10px;cursor:${noStock?'not-allowed':'pointer'};background:${rowBg};border:${rowBdr};transition:all .15s;position:relative;text-align:center;${opacity}">
+        <div id="fw-chk-${it.id}" style="position:absolute;top:5px;right:5px;width:15px;height:15px;border-radius:4px;${chkStyle}display:flex;align-items:center;justify-content:center">${chkSVG}</div>
+        <div style="width:38px;height:38px;border-radius:10px;background:var(--bg-card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center">
+          <span style="font-size:12px;font-family:'Kanit',sans-serif;font-weight:800;color:${lvClr}">${cur}</span>
+        </div>
+        <div style="font-size:9px;color:var(--t1);font-family:'Kanit',sans-serif;line-height:1.3;max-width:78px;word-break:break-word">${it.name.length>18?it.name.substring(0,16)+'…':it.name}</div>
+        <div id="fw-qty-wrap-${it.id}" style="display:${checked?'flex':'none'};align-items:center;gap:2px" onclick="event.stopPropagation()">
+          <input type="number" id="fw-qty-${it.id}" class="finput" value="${qty}" placeholder="0" min="1" max="${cur}"
+            style="width:50px;padding:3px 5px;font-size:12px;font-family:'Kanit',sans-serif;text-align:center" oninput="updateWithdrawCount()">
+        </div>
+      </div>`;
+
+    } else if(withdrawView === 'list'){
+      return `<div class="fi-row" id="fw-row-${it.id}" onclick="${clickFn}"
+        style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;cursor:${noStock?'not-allowed':'pointer'};border:${rowBdr};transition:all .15s;background:${rowBg};${opacity}">
+        <div id="fw-chk-${it.id}" style="width:17px;height:17px;border-radius:4px;${chkStyle}flex-shrink:0;display:flex;align-items:center;justify-content:center">${chkSVG}</div>
+        <div style="flex:1;min-width:0;font-size:13px;font-weight:500;color:var(--t1);font-family:'Kanit',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${it.name}</div>
+        ${noStock?'<span style="font-size:10px;background:rgba(244,63,94,.12);color:#fda4af;padding:1px 7px;border-radius:5px">หมด</span>'
+          :`<span style="font-size:11px;color:${lvClr};font-family:'Kanit',sans-serif;font-weight:600;flex-shrink:0">${cur} ${it.unit}</span>`}
+        <div id="fw-qty-wrap-${it.id}" style="display:${checked?'flex':'none'};align-items:center;gap:5px;flex-shrink:0" onclick="event.stopPropagation()">
+          <input type="number" id="fw-qty-${it.id}" class="finput" value="${qty}" placeholder="0" min="1" max="${cur}"
+            style="width:70px;padding:4px 8px;font-size:13px;font-family:'Kanit',sans-serif;text-align:center" oninput="updateWithdrawCount()">
+          <span style="font-size:11px;color:var(--t2)">${it.unit}</span>
+        </div>
+      </div>`;
+
+    } else if(withdrawView === 'details'){
+      const allStocks = BUILDINGS.map(b=>({ b, q:getStock(it.id,b) }));
+      return `<div class="fi-row" id="fw-row-${it.id}" onclick="${clickFn}"
+        style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:${noStock?'not-allowed':'pointer'};border:${rowBdr};transition:all .15s;background:${rowBg};${opacity}">
+        <div id="fw-chk-${it.id}" style="width:18px;height:18px;border-radius:5px;${chkStyle}flex-shrink:0;display:flex;align-items:center;justify-content:center">${chkSVG}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--t1);font-family:'Kanit',sans-serif">${it.name}</div>
+          <div style="display:flex;gap:10px;margin-top:4px;flex-wrap:wrap">
+            ${allStocks.map(({b,q})=>{
+              const lc=stockLevel(q,min);const cc=lc==='ok'?'#6ee7b7':lc==='low'?'#fcd34d':'#fca5a5';
+              return `<span style="font-size:11px;color:var(--t3)">${b}: <strong style="color:${cc};font-family:'Kanit',sans-serif">${q}</strong></span>`;
+            }).join('')}
+            <span style="font-size:11px;color:var(--t3)">ขั้นต่ำ: <strong>${min}</strong></span>
+          </div>
+        </div>
+        <div id="fw-qty-wrap-${it.id}" style="display:${checked?'flex':'none'};align-items:center;gap:5px;flex-shrink:0" onclick="event.stopPropagation()">
+          <input type="number" id="fw-qty-${it.id}" class="finput" value="${qty}" placeholder="0" min="1" max="${cur}"
+            style="width:80px;padding:5px 10px;font-size:14px;font-family:'Kanit',sans-serif;text-align:center" oninput="updateWithdrawCount()">
+          <span style="font-size:11px;color:var(--t2)">${it.unit}</span>
+        </div>
+      </div>`;
+
+    } else { // tiles
+      const pct = min>0?Math.min(100,Math.round(cur/min*100)):100;
+      return `<div id="fw-row-${it.id}" onclick="${clickFn}"
+        style="display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:12px;cursor:${noStock?'not-allowed':'pointer'};background:${rowBg};border:${rowBdr};transition:all .15s;${opacity}">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px">
+          <div id="fw-chk-${it.id}" style="width:18px;height:18px;border-radius:5px;${chkStyle}flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:2px">${chkSVG}</div>
           <div style="flex:1;min-width:0">
-            <div style="font-size:13px;font-weight:500;color:var(--t1);font-family:'Kanit',sans-serif">${it.name}</div>
-            <div style="font-size:11px;color:var(--t2);margin-top:1px">
-              ${it.unit}
-              <span style="margin-left:8px;color:${lvClr};font-weight:600">${cur} คงเหลือ</span>
-              <span style="color:var(--t3)"> / ขั้นต่ำ ${min}</span>
-              ${noStock?'<span style="margin-left:8px;color:#fca5a5;font-size:10px;background:rgba(244,63,94,.12);padding:1px 6px;border-radius:4px">หมดสต็อก</span>':''}
-            </div>
+            <div style="font-size:12px;font-weight:600;color:var(--t1);font-family:'Kanit',sans-serif;line-height:1.4">${it.name}</div>
+            <div style="font-size:10px;color:var(--t2);margin-top:1px">${it.unit}</div>
           </div>
-          <div id="fw-qty-wrap-${it.id}" style="display:none;align-items:center;gap:6px" onclick="event.stopPropagation()">
-            <input type="number" id="fw-qty-${it.id}" class="finput" placeholder="0" min="1" max="${cur}"
-              style="width:80px;padding:5px 10px;font-size:14px;font-family:'Kanit',sans-serif;text-align:center"
-              oninput="updateWithdrawCount()">
-            <span style="font-size:12px;color:var(--t2);flex-shrink:0">${it.unit}</span>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-family:'Kanit',sans-serif;font-size:18px;font-weight:800;color:${lvClr}">${cur}</div>
+            <div style="font-size:9px;color:var(--t3)">คงเหลือ</div>
           </div>
-        </div>`;
-      }).join('')}
-    </div>`).join('');
+        </div>
+        <div style="height:3px;background:var(--border);border-radius:99px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${lvClr};border-radius:99px"></div>
+        </div>
+        ${noStock?'<div style="font-size:10px;text-align:center;color:#fda4af;background:rgba(244,63,94,.1);border-radius:6px;padding:3px">หมดสต็อก</div>':''}
+        <div id="fw-qty-wrap-${it.id}" style="display:${checked?'flex':'none'};align-items:center;gap:5px" onclick="event.stopPropagation()">
+          <input type="number" id="fw-qty-${it.id}" class="finput" value="${qty}" placeholder="จำนวน" min="1" max="${cur}"
+            style="flex:1;padding:5px 10px;font-size:13px;font-family:'Kanit',sans-serif;text-align:center" oninput="updateWithdrawCount()">
+          <span style="font-size:11px;color:var(--t2)">${it.unit}</span>
+        </div>
+      </div>`;
+    }
+  };
+
+  const containerStyle = {
+    small:   'display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px;padding:12px',
+    list:    'display:flex;flex-direction:column;gap:3px;padding:10px 14px',
+    details: 'display:flex;flex-direction:column;gap:6px;padding:12px 14px',
+    tiles:   'display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:8px;padding:12px',
+  }[withdrawView];
+
+  list.style.cssText = containerStyle + ';max-height:52vh;overflow-y:auto';
+
+  list.innerHTML = withdrawView === 'small' || withdrawView === 'tiles'
+    ? items.map(renderWItem).join('')
+    : Object.entries(grouped).map(([grpName, grpItems])=>`
+        <div style="margin-bottom:${withdrawView==='list'?'2':'6'}px">
+          <div style="font-size:10px;font-family:'Kanit',sans-serif;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;padding:6px 6px 3px">${grpName}</div>
+          ${grpItems.map(renderWItem).join('')}
+        </div>`).join('');
 
   updateWithdrawCount();
 }
@@ -3377,32 +4415,38 @@ function submitWithdraw(){
   const selected = ITEMS.filter(it=>{
     const w = document.getElementById(`fw-qty-wrap-${it.id}`);
     return w && w.style.display==='flex';
-  }).map(it=>({
-    it,
-    qty: parseInt(document.getElementById(`fw-qty-${it.id}`)?.value)||0
-  })).filter(({qty})=>qty>0);
+  }).map(it=>({ it, qty: parseInt(document.getElementById(`fw-qty-${it.id}`)?.value)||0 }))
+    .filter(({qty})=>qty>0);
 
   if(selected.length===0){ showToast('⚠️','กรุณาเลือกและระบุจำนวนสินค้าอย่างน้อย 1 รายการ'); return; }
 
-  // validate stock
   for(const {it,qty} of selected){
     const cur = getStock(it.id, bldg);
     if(qty > cur){ showToast('❌',`${it.name}: สต็อกไม่เพียงพอ (มี ${cur} ${it.unit})`); return; }
   }
 
-  selected.forEach(({it, qty})=>{
-    const t={id:genId(),type:'withdraw',itemId:it.id,building:bldg,qty,
-      requester:who,note:reason,status:'pending',
-      createdAt:new Date().toISOString()};
-    transactions.unshift(t);
-    const group=it.cat==='ซ่อมบำรุง'?'maintenance':'consumer';
-    pushToGAS(t,group);
+  showConfirm({
+    title: 'ยืนยันคำขอเบิกสินค้า',
+    subtitle: `เบิกจาก ${bldg} โดย ${who}`,
+    iconBg: 'rgba(249,115,22,.15)', iconColor: '#fb923c',
+    iconSvg: '<polyline points="8 7 12 3 16 7"/><line x1="12" y1="21" x2="12" y2="3"/>',
+    items: selected.map(({it,qty})=>({ name:it.name, qty, unit:it.unit })),
+    info: `<strong>${selected.length} รายการ</strong> · อาคาร <strong>${bldg}</strong> · ⏳ ต้องรอการอนุมัติก่อนหักสต็อก`,
+    okLabel: 'ส่งคำขอเบิก', okClass: 'btn-orange',
+    onConfirm: ()=>{
+      selected.forEach(({it,qty})=>{
+        const t={id:genId(),type:'withdraw',itemId:it.id,building:bldg,qty,
+          requester:who,note:reason,status:'pending',
+          createdAt:new Date().toISOString()};
+        transactions.unshift(t);
+        pushToGAS(t, it.cat==='ซ่อมบำรุง'?'maintenance':'consumer');
+      });
+      saveState();
+      showToast('📤',`ส่งคำขอเบิก ${selected.length} รายการ — รอการอนุมัติ`);
+      updateBadge();
+      clearWithdrawForm();
+    }
   });
-
-  saveState();
-  showToast('📤',`ส่งคำขอเบิก ${selected.length} รายการ — รอการอนุมัติ`);
-  updateBadge();
-  clearWithdrawForm();
 }
 
 function updateWithdrawInfo(){}  // legacy stub
@@ -3411,8 +4455,7 @@ function updateWithdrawInfo(){}  // legacy stub
    PAGE: APPROVE
 ================================================================ */
 function renderApprove(){
-  document.getElementById('topbar-actions').innerHTML=
-    `<button class="btn btn-ghost" onclick="navigate('admin')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> กลับ Admin</button>`;
+  document.getElementById('topbar-actions').innerHTML='';
   const pending=transactions.filter(t=>t.type==='withdraw'&&t.status==='pending')
     .sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt));
 
@@ -3510,8 +4553,7 @@ function confirmReject(){
 ================================================================ */
 let histFilter={bldg:'all',type:'',q:''};
 function renderHistory(){
-  document.getElementById('topbar-actions').innerHTML=
-    `<button class="btn btn-ghost" onclick="navigate('admin')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> กลับ Admin</button>`;
+  document.getElementById('topbar-actions').innerHTML='';
   document.getElementById('content').innerHTML=`
   <div class="sec fade-in">
     <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none">
@@ -3628,7 +4670,7 @@ function refreshHistory(fromAdmin){
         </tr>`;
       }).join('')}</tbody>
     </table>
-    ${txns.length===0?`<div class="tbl-empty"><div class="ei" style="font-size:40px;opacity:.4">○</div><p>ไม่พบรายการ</p></div>`:''}
+    ${txns.length===0?emptyState("🔍","ไม่พบรายการ","ลองเปลี่ยนตัวกรองหรือค้นหาด้วยคำอื่น"):''}
     <div class="tbl-foot"><span>แสดง ${txns.length} รายการ</span></div>
     </div>`;
   }
@@ -3639,36 +4681,185 @@ function refreshHistory(fromAdmin){
 ================================================================ */
 function renderSettings(){
   document.getElementById('topbar-actions').innerHTML=
-    `<button class="btn btn-ghost" onclick="navigate('admin')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> กลับ Admin</button>
-     <button class="btn btn-green" onclick="saveSettings()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึกทั้งหมด</button>`;
-  document.getElementById('content').innerHTML=`
+    `<button class="btn btn-green" onclick="saveSettings()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      บันทึกทั้งหมด
+    </button>`;
+
+  const now = new Date();
+  const yr  = now.getFullYear();
+  const mo  = now.getMonth() + 1;
+
+  const consumerItems = ITEMS.filter(it => it.cat !== 'ซ่อมบำรุง');
+  const maintItems    = ITEMS.filter(it => it.cat === 'ซ่อมบำรุง');
+
+  document.getElementById('content').innerHTML = `
+  <!-- ══ อุปโภค บริโภค + ราคา ══ -->
   <div class="sec fade-in">
-    <div class="sec-head"><span class="sec-title">สต็อกขั้นต่ำ (Safety Stock)</span>
-      <span style="font-size:12px;color:var(--t2)">แก้ไขค่าขั้นต่ำที่ต้องมีในคลัง</span></div>
-    <div class="tbl-wrap"><table>
-      <thead><tr><th>#</th><th>ชื่อสินค้า</th><th>หมวด</th><th>หน่วย</th><th>ค่าขั้นต่ำ (ปัจจุบัน)</th></tr></thead>
-      <tbody>${ITEMS.map(it=>`<tr>
-        <td class="td-no">${it.no}</td>
-        <td class="td-name">${it.name}</td>
-        <td><span class="badge ${CAT_CLR[it.cat]}">${CAT_ICO[it.cat]} ${it.cat}</span></td>
-        <td style="color:var(--t2)">${it.unit}</td>
-        <td><input type="number" class="finput" id="min-${it.id}" value="${getMin(it.id)}" min="0" style="width:90px;text-align:center;font-family:'Kanit',sans-serif;font-weight:600"></td>
-      </tr>`).join('')}</tbody>
-    </table></div>
-    <div style="padding:14px 18px;display:flex;justify-content:flex-end">
-      <button class="btn btn-green" onclick="saveSettings()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> บันทึกทั้งหมด</button>
+    <div class="sec-head">
+      <div>
+        <span class="sec-title">🛒 อุปโภค บริโภค — ขั้นต่ำ & ราคา</span>
+        <div style="font-size:12px;color:var(--t2);margin-top:2px">ราคาใช้คำนวณมูลค่าสต็อกและสรุปรายเดือน · เดือน ${mo}/${yr}</div>
+      </div>
     </div>
+    <div class="tbl-wrap"><table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>ชื่อสินค้า</th>
+          <th>หมวด</th>
+          <th>หน่วย</th>
+          <th style="text-align:center;min-width:90px">ขั้นต่ำ</th>
+          <th style="text-align:center;min-width:110px">
+            ราคา/หน่วย (฿)
+            <div style="font-size:9px;font-weight:400;color:var(--t3);margin-top:1px">เดือน ${mo}/${yr}</div>
+          </th>
+          <th style="text-align:center;min-width:100px">มูลค่ารวม</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${consumerItems.map(it=>{
+          const cur   = BUILDINGS.reduce((s,b)=>s+getStock(it.id,b),0);
+          const min   = getMin(it.id);
+          const price = getCurrentPrice(it.id);
+          const value = cur * price;
+          const lv    = stockLevel(cur,min);
+          const lvClr = lv==='ok'?'#6ee7b7':lv==='low'?'#fcd34d':'#fca5a5';
+          return `<tr>
+            <td class="td-no">${it.no}</td>
+            <td class="td-name">${it.name}<small>${it.unit}</small></td>
+            <td><span class="badge ${CAT_CLR[it.cat]}">${it.cat}</span></td>
+            <td style="color:var(--t2);font-size:12px">${it.unit}</td>
+            <td style="text-align:center">
+              <input type="number" class="finput" id="min-${it.id}" value="${min}" min="0"
+                style="width:80px;text-align:center;font-family:'Kanit',sans-serif;font-weight:600">
+            </td>
+            <td style="text-align:center">
+              <div style="display:flex;align-items:center;gap:4px;justify-content:center">
+                <span style="font-size:12px;color:var(--t3)">฿</span>
+                <input type="number" class="finput" id="price-${it.id}" value="${price||''}"
+                  placeholder="0.00" min="0" step="0.01"
+                  style="width:90px;text-align:right;font-family:'Kanit',sans-serif;font-weight:600"
+                  oninput="updateSettingsValue('${it.id}')">
+              </div>
+            </td>
+            <td style="text-align:center" id="val-${it.id}">
+              ${price>0
+                ? `<span style="font-family:'Kanit',sans-serif;font-weight:700;color:${lvClr}">฿${value.toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:0})}</span>
+                   <div style="font-size:10px;color:var(--t3)">${cur} ${it.unit}</div>`
+                : `<span style="color:var(--t3);font-size:12px">ยังไม่ระบุ</span>`}
+            </td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+      <tfoot>
+        <tr style="border-top:2px solid var(--border-hi)">
+          <td colspan="5" style="padding:10px 8px;font-family:'Kanit',sans-serif;font-weight:600;color:var(--t2)">มูลค่ารวม อุปโภค บริโภค</td>
+          <td></td>
+          <td style="text-align:center;padding:10px 8px" id="settings-total-value">
+            ${(()=>{
+              const total = consumerItems.reduce((s,it)=>{
+                const cur=BUILDINGS.reduce((ss,b)=>ss+getStock(it.id,b),0);
+                return s + cur*getCurrentPrice(it.id);
+              },0);
+              return total>0
+                ? `<span style="font-family:'Kanit',sans-serif;font-size:16px;font-weight:800;color:var(--indigo)">฿${total.toLocaleString('th-TH')}</span>`
+                : '<span style="color:var(--t3);font-size:12px">ยังไม่ระบุราคา</span>';
+            })()}
+          </td>
+        </tr>
+      </tfoot>
+    </table></div>
+  </div>
+
+  <!-- ══ ส่วนกลาง — ขั้นต่ำเท่านั้น ══ -->
+  <div class="sec fade-in">
+    <div class="sec-head">
+      <span class="sec-title">🔧 ส่วนกลาง — ขั้นต่ำ</span>
+    </div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>#</th><th>ชื่ออุปกรณ์</th><th>ระบบ</th><th>หน่วย</th><th style="text-align:center">ขั้นต่ำ</th></tr></thead>
+      <tbody>
+        ${maintItems.map(it=>`<tr>
+          <td class="td-no">${it.no}</td>
+          <td class="td-name">${it.name}</td>
+          <td><span class="badge ${it.subcat==='ไฟฟ้า'?'b-yellow':'b-cyan'}">${SUBCAT_ICO[it.subcat]} ${it.subcat}</span></td>
+          <td style="color:var(--t2);font-size:12px">${it.unit}</td>
+          <td style="text-align:center">
+            <input type="number" class="finput" id="min-${it.id}" value="${getMin(it.id)}" min="0"
+              style="width:80px;text-align:center;font-family:'Kanit',sans-serif;font-weight:600">
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div>
+  </div>
+
+  <div style="padding:0;display:flex;justify-content:flex-end">
+    <button class="btn btn-green" onclick="saveSettings()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      บันทึกทั้งหมด
+    </button>
   </div>`;
 }
 
+function updateSettingsValue(itemId){
+  const price = parseFloat(document.getElementById(`price-${itemId}`)?.value)||0;
+  const cur   = BUILDINGS.reduce((s,b)=>s+getStock(itemId,b),0);
+  const it    = ITEMS.find(x=>x.id===itemId);
+  const value = cur * price;
+  const min   = getMin(itemId);
+  const lvClr = stockLevel(cur,min)==='ok'?'#6ee7b7':stockLevel(cur,min)==='low'?'#fcd34d':'#fca5a5';
+  const cell  = document.getElementById(`val-${itemId}`);
+  if(cell){
+    cell.innerHTML = price>0
+      ? `<span style="font-family:'Kanit',sans-serif;font-weight:700;color:${lvClr}">฿${value.toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:0})}</span>
+         <div style="font-size:10px;color:var(--t3)">${cur} ${it?.unit||''}</div>`
+      : `<span style="color:var(--t3);font-size:12px">ยังไม่ระบุ</span>`;
+  }
+  // update footer total
+  const consumerItems = ITEMS.filter(it=>it.cat!=='ซ่อมบำรุง');
+  const total = consumerItems.reduce((s,it)=>{
+    const p = parseFloat(document.getElementById(`price-${it.id}`)?.value)||getCurrentPrice(it.id);
+    const q = BUILDINGS.reduce((ss,b)=>ss+getStock(it.id,b),0);
+    return s + q*p;
+  },0);
+  const foot = document.getElementById('settings-total-value');
+  if(foot) foot.innerHTML = total>0
+    ? `<span style="font-family:'Kanit',sans-serif;font-size:16px;font-weight:800;color:var(--indigo)">฿${total.toLocaleString('th-TH')}</span>`
+    : '<span style="color:var(--t3);font-size:12px">ยังไม่ระบุราคา</span>';
+}
+
 function saveSettings(){
+  const now = new Date();
+  const yr  = now.getFullYear();
+  const mo  = now.getMonth()+1;
+
   ITEMS.forEach(it=>{
-    const v=parseInt(document.getElementById(`min-${it.id}`)?.value)||0;
-    if(v!==it.min) minStockOverrides[it.id]=v;
+    // min stock
+    const v = parseInt(document.getElementById(`min-${it.id}`)?.value)||0;
+    if(v !== it.min) minStockOverrides[it.id] = v;
     else delete minStockOverrides[it.id];
+    // price (consumer only)
+    if(it.cat !== 'ซ่อมบำรุง'){
+      const p = parseFloat(document.getElementById(`price-${it.id}`)?.value)||0;
+      if(p > 0) setPrice(it.id, yr, mo, p);
+    }
   });
   saveState();
-  showToast('✅','บันทึกค่าสต็อกขั้นต่ำแล้ว');
+  // Push settings to GAS
+  if(USE_GAS){
+    const settings = {};
+    ITEMS.forEach(it=>{ settings[it.id] = getMin(it.id); });
+    gasPost({ action:'updateSettings', settings });
+    // Push prices for consumer items
+    const prices = {};
+    ITEMS.filter(it=>it.cat!=='ซ่อมบำรุง').forEach(it=>{
+      const p = parseFloat(document.getElementById(`price-${it.id}`)?.value)||0;
+      if(p>0) prices[it.id] = p;
+    });
+    if(Object.keys(prices).length>0) gasPost({ action:'updatePrices', prices });
+  }
+  showToast('✅','บันทึกค่าตั้งสต็อกและราคาแล้ว');
 }
 
 /* ================================================================
@@ -3715,10 +4906,7 @@ const GS_URL = 'https://script.google.com/macros/s/AKfycbwPlaceholderURL/exec'; 
 let monthlyState = { year: new Date().getFullYear(), month: new Date().getMonth() + 1 };
 
 function renderMonthly(){
-  document.getElementById('topbar-actions').innerHTML =
-    `<button class="btn btn-ghost" onclick="navigate('admin')" style="display:flex;align-items:center;gap:6px">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> กลับ Admin
-    </button>`;
+  document.getElementById('topbar-actions').innerHTML = '';
   refreshMonthly();
 }
 
@@ -4017,6 +5205,104 @@ document.getElementById('ov-login').addEventListener('click', e=>{
 document.getElementById('login-user').addEventListener('keydown', e=>{
   if(e.key==='Enter') document.getElementById('login-pass').focus();
 });
+
+/* ================================================================
+   PRICE MODAL
+================================================================ */
+let _priceGroup = 'consumer';
+
+function openPriceModal(group){
+  _priceGroup = group;
+  const sub = group==='consumer' ? 'สต็อก อุปโภค บริโภค' : 'สต็อก ส่วนกลาง';
+  document.getElementById('price-modal-sub').textContent = `${sub} · ตั้งราคาต่อหน่วยแยกตามเดือน`;
+  document.getElementById('ov-price').classList.add('open');
+  refreshPriceModal();
+}
+
+function refreshPriceModal(){
+  const month = parseInt(document.getElementById('price-month-sel').value);
+  const year  = parseInt(document.getElementById('price-year-sel').value);
+  const items = _priceGroup==='consumer'
+    ? ITEMS.filter(it=>it.cat!=='ซ่อมบำรุง')
+    : ITEMS.filter(it=>it.cat==='ซ่อมบำรุง');
+
+  const TH_MONTHS = ['','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+                     'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+
+  // group by cat or subcat
+  const grouped = {};
+  items.forEach(it=>{ const g=it.subcat||it.cat; (grouped[g]=grouped[g]||[]).push(it); });
+
+  let html = `<table style="width:100%;border-collapse:collapse">
+    <thead style="position:sticky;top:0;z-index:2">
+      <tr style="background:var(--bg-panel)">
+        <th style="padding:10px 16px;text-align:left;font-size:11px;font-family:'Kanit',sans-serif;color:var(--t3);font-weight:600;border-bottom:1px solid var(--border)">สินค้า</th>
+        <th style="padding:10px 16px;text-align:center;font-size:11px;font-family:'Kanit',sans-serif;color:var(--t3);font-weight:600;border-bottom:1px solid var(--border)">หน่วย</th>
+        <th style="padding:10px 16px;text-align:center;font-size:11px;font-family:'Kanit',sans-serif;color:var(--t3);font-weight:600;border-bottom:1px solid var(--border)">ราคาที่สืบทอด<br><span style="font-weight:400;color:var(--t3)">(จากเดือนก่อน)</span></th>
+        <th style="padding:10px 16px;text-align:center;font-size:11px;font-family:'Kanit',sans-serif;color:#fcd34d;font-weight:600;border-bottom:1px solid var(--border)">${TH_MONTHS[month]} ${year+543}<br><span style="font-weight:400;color:var(--t3)">ราคาใหม่</span></th>
+      </tr>
+    </thead><tbody>`;
+
+  Object.entries(grouped).forEach(([grpName, grpItems])=>{
+    html += `<tr><td colspan="4" style="padding:8px 16px 4px;font-size:10px;font-family:'Kanit',sans-serif;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;background:var(--bg-glass)">${grpName}</td></tr>`;
+    grpItems.forEach(it=>{
+      const inherited = getPrice(it.id, year, month);
+      const thisMonthKey = `${year}_${month}`;
+      const thisMonthVal = (itemPrices[it.id]||{})[thisMonthKey] ?? '';
+      html += `<tr style="border-bottom:1px solid var(--border);transition:background .12s" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''">
+        <td style="padding:10px 16px">
+          <div style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:500;color:var(--t1)">${it.name}</div>
+        </td>
+        <td style="padding:10px 16px;text-align:center;color:var(--t2);font-size:12px">${it.unit}</td>
+        <td style="padding:10px 16px;text-align:center">
+          ${inherited>0
+            ? `<span style="font-family:'Kanit',sans-serif;font-size:13px;color:var(--t2)">฿${inherited.toLocaleString()}</span>`
+            : `<span style="color:var(--t3);font-size:11px">ยังไม่มีราคา</span>`}
+        </td>
+        <td style="padding:6px 16px;text-align:center">
+          <input type="number" id="price-inp-${it.id}" class="finput"
+            value="${thisMonthVal}"
+            placeholder="${inherited>0?inherited:0}"
+            min="0" step="0.01"
+            style="width:110px;text-align:center;font-family:'Kanit',sans-serif;font-size:13px;font-weight:600;color:#fcd34d">
+        </td>
+      </tr>`;
+    });
+  });
+
+  html += `</tbody></table>`;
+  document.getElementById('price-modal-body').innerHTML = html;
+}
+
+function savePriceModal(){
+  const month = parseInt(document.getElementById('price-month-sel').value);
+  const year  = parseInt(document.getElementById('price-year-sel').value);
+  const items = _priceGroup==='consumer'
+    ? ITEMS.filter(it=>it.cat!=='ซ่อมบำรุง')
+    : ITEMS.filter(it=>it.cat==='ซ่อมบำรุง');
+
+  let changed = 0;
+  items.forEach(it=>{
+    const inp = document.getElementById(`price-inp-${it.id}`);
+    if(!inp) return;
+    const val = inp.value.trim();
+    if(val===''){
+      // clear this month's price if set
+      if(itemPrices[it.id]) delete itemPrices[it.id][`${year}_${month}`];
+    } else {
+      const price = parseFloat(val);
+      if(!isNaN(price) && price>=0){
+        if(!itemPrices[it.id]) itemPrices[it.id]={};
+        itemPrices[it.id][`${year}_${month}`] = price;
+        changed++;
+      }
+    }
+  });
+  saveState();
+  showToast('✅',`บันทึกราคา ${changed} รายการแล้ว`);
+  closeOverlay('ov-price');
+  render(currentPage);
+}
 
 loadState();
 updateBadge();
