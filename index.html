@@ -1112,24 +1112,33 @@ td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 90;
   background: var(--bg-panel);
   border-top: 1px solid var(--border);
-  padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 .bnav-items {
-  display: flex; justify-content: space-around;
-  max-width: 480px; margin: 0 auto;
+  display: flex;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  gap: 2px;
+  padding: 6px 8px 8px;
 }
+.bnav-items::-webkit-scrollbar { display: none; }
 .bnav-item {
   display: flex; flex-direction: column; align-items: center; gap: 3px;
-  padding: 6px 12px; border-radius: 12px;
-  cursor: pointer; color: var(--t3); font-size: 10px;
-  font-family: 'Kanit', sans-serif; transition: all .2s;
+  padding: 6px 10px; border-radius: 10px;
+  cursor: pointer; color: var(--t3); font-size: 9px;
+  font-family: 'Kanit', sans-serif; transition: all .18s;
   border: none; background: none;
-  min-width: 60px;
+  min-width: 52px; flex-shrink: 0;
+  white-space: nowrap;
 }
-.bnav-item svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
-.bnav-item.active { color: var(--indigo); }
+.bnav-item svg { width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.bnav-item.active {
+  color: var(--indigo);
+  background: rgba(99,102,241,.1);
+}
 .bnav-item.active svg { stroke: var(--indigo); }
 [data-theme="light"] .bnav-item.active { color: var(--indigo); }
 
@@ -1456,14 +1465,14 @@ td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
 
     <div class="nb" data-page="allitems">
       <div class="nb-icon">
-        <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
       </div>
       <span class="nb-label">รายการสินค้าทั้งหมด</span>
     </div>
 
     <div class="nb" data-page="stock">
       <div class="nb-icon">
-        <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/><circle cx="12" cy="7" r="1" fill="currentColor"/></svg>
       </div>
       <span class="nb-label">สต็อก อุปโภค บริโภค</span>
     </div>
@@ -1477,21 +1486,21 @@ td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
 
     <div class="nb" data-page="import">
       <div class="nb-icon">
-        <svg viewBox="0 0 24 24"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+        <svg viewBox="0 0 24 24"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="3" x2="12" y2="21"/><path d="M3 12h4M17 12h4"/></svg>
       </div>
       <span class="nb-label">นำเข้าสินค้า</span>
     </div>
 
     <div class="nb" data-page="withdraw">
       <div class="nb-icon">
-        <svg viewBox="0 0 24 24"><polyline points="8 7 12 3 16 7"/><line x1="12" y1="21" x2="12" y2="3"/></svg>
+        <svg viewBox="0 0 24 24"><polyline points="8 7 12 3 16 7"/><line x1="12" y1="21" x2="12" y2="3"/><path d="M3 12h4M17 12h4"/></svg>
       </div>
       <span class="nb-label">เบิกสินค้า</span>
     </div>
 
     <div class="nb" data-page="approve">
       <div class="nb-icon">
-        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
       </div>
       <span class="nb-label">อนุมัติ</span>
       <span class="nb-badge" id="badge-ap" style="display:none">0</span>
@@ -1499,7 +1508,7 @@ td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
 
     <div class="nb" data-page="calendar">
       <div class="nb-icon">
-        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
       </div>
       <span class="nb-label">ปฏิทินสต็อก</span>
     </div>
@@ -1515,7 +1524,7 @@ td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
 
     <div class="nb" data-page="admin" id="nb-admin">
       <div class="nb-icon">
-        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
       </div>
       <span class="nb-label">Admin Panel</span>
     </div>
@@ -1609,24 +1618,52 @@ td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
 <nav id="bottom-nav">
   <div class="bnav-items">
     <button class="bnav-item active" data-page="dashboard" onclick="navigate('dashboard')">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
       หลัก
     </button>
+    <button class="bnav-item" data-page="allitems" onclick="navigate('allitems')">
+      <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+      ทั้งหมด
+    </button>
     <button class="bnav-item" data-page="stock" onclick="navigate('stock')">
-      <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-      สต็อก
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/><circle cx="12" cy="7" r="1" fill="currentColor"/></svg>
+      อุปโภค
+    </button>
+    <button class="bnav-item" data-page="maintenance" onclick="navigate('maintenance')">
+      <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      ส่วนกลาง
+    </button>
+    <button class="bnav-item" data-page="import" onclick="navigate('import')">
+      <svg viewBox="0 0 24 24"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="3" x2="12" y2="21"/><path d="M3 12h4M17 12h4"/></svg>
+      นำเข้า
     </button>
     <button class="bnav-item" data-page="withdraw" onclick="navigate('withdraw')">
-      <svg viewBox="0 0 24 24"><polyline points="8 7 12 3 16 7"/><line x1="12" y1="21" x2="12" y2="3"/></svg>
+      <svg viewBox="0 0 24 24"><polyline points="8 7 12 3 16 7"/><line x1="12" y1="21" x2="12" y2="3"/><path d="M3 12h4M17 12h4"/></svg>
       เบิก
     </button>
-    <button class="bnav-item" data-page="approve" onclick="navigate('approve')" id="bnav-admin">
-      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+    <button class="bnav-item" data-page="approve" onclick="navigate('approve')" id="bnav-approve">
+      <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
       อนุมัติ
     </button>
+    <button class="bnav-item" data-page="calendar" onclick="navigate('calendar')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
+      ปฏิทิน
+    </button>
+    <button class="bnav-item" data-page="monthly" onclick="navigate('monthly')">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg>
+      รายเดือน
+    </button>
+    <button class="bnav-item" data-page="history" onclick="navigate('history')">
+      <svg viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/><polyline points="3 3 6.5 6.5"/><polyline points="21 3 17.5 6.5"/></svg>
+      ประวัติ
+    </button>
     <button class="bnav-item" data-page="admin" onclick="navigate('admin')">
-      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
       Admin
+    </button>
+    <button class="bnav-item" data-page="settings" onclick="navigate('settings')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      ตั้งค่า
     </button>
   </div>
 </nav>
@@ -2269,7 +2306,9 @@ function navigate(page){
     el.classList.toggle('active', el.dataset.page===page);
   });
   document.querySelectorAll('.bnav-item[data-page]').forEach(el=>{
-    el.classList.toggle('active', el.dataset.page===page);
+    const isActive = el.dataset.page===page;
+    el.classList.toggle('active', isActive);
+    if(isActive) setTimeout(()=>el.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'}),50);
   });
   const titles = {
     dashboard:'Dashboard',
@@ -2628,15 +2667,104 @@ let aiState = { cat: 'all', showOnly: 'all', q: '', view: 'grid', sort: 'name' }
 
 /* Category icon+color config */
 const AI_CAT_CFG = {
-  'สำนักงาน': { emoji:'🖥️', bg:'rgba(99,102,241,.15)',  color:'#a5b4fc', dark:'#6366f1' },
-  'อุปโภค':   { emoji:'🧴', bg:'rgba(139,92,246,.15)', color:'#c4b5fd', dark:'#8b5cf6' },
-  'บริโภค':   { emoji:'☕', bg:'rgba(14,165,233,.15)',  color:'#7dd3fc', dark:'#0ea5e9' },
-  'ซ่อมบำรุง':{ emoji:'🔧', bg:'rgba(245,158,11,.15)', color:'#fcd34d', dark:'#f59e0b' },
+  'สำนักงาน': { bg:'rgba(99,102,241,.18)',  color:'#a5b4fc', dark:'#6366f1' },
+  'อุปโภค':   { bg:'rgba(139,92,246,.18)', color:'#c4b5fd', dark:'#8b5cf6' },
+  'บริโภค':   { bg:'rgba(14,165,233,.18)',  color:'#7dd3fc', dark:'#0ea5e9' },
+  'ซ่อมบำรุง':{ bg:'rgba(245,158,11,.18)', color:'#fcd34d', dark:'#f59e0b' },
 };
 const AI_SUBCAT_CFG = {
-  'ไฟฟ้า':  { emoji:'⚡', bg:'rgba(234,179,8,.15)',   color:'#fde047', dark:'#ca8a04' },
-  'ประปา':  { emoji:'🚿', bg:'rgba(14,165,233,.15)',  color:'#7dd3fc', dark:'#0284c7' },
+  'ไฟฟ้า':  { bg:'rgba(234,179,8,.18)',   color:'#fde047', dark:'#ca8a04' },
+  'ประปา':  { bg:'rgba(14,165,233,.18)',  color:'#7dd3fc', dark:'#0284c7' },
 };
+
+/* ── SVG icon per item (ใกล้เคียงชื่อสินค้า) ── */
+const ITEM_SVG = {
+  // ── สำนักงาน ──
+  'I01': '<path d="M18 6H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h13l4-3.5L18 6z"/><path d="M12 6V2"/><path d="M12 19v-7"/>',  // เชือกฟาง → rope spool
+  'I02': '<rect x="6" y="11" width="12" height="9" rx="1"/><path d="M9 11V8a3 3 0 0 1 6 0v3"/><circle cx="12" cy="15" r="1" fill="currentColor"/>',  // ถ่าน AA → battery lock
+  'I03': '<rect x="6" y="11" width="12" height="9" rx="1"/><path d="M9 11V8a3 3 0 0 1 6 0v3"/><circle cx="12" cy="15" r="1" fill="currentColor"/>',  // ถ่าน AAA
+  'I04': '<path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/>',  // ปากกา → pen
+  'I05': '<path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/>',
+  'I06': '<path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/>',
+  'I07': '<path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/>',
+  'I08': '<rect x="3" y="14" width="18" height="4" rx="1"/><path d="M5 14V6"/><path d="M19 14V6"/>',  // แปรง → eraser
+  'I10': '<path d="M14 6h1a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h1"/><path d="M9 3h6v4H9z"/><path d="M12 15v2"/><path d="M8 20h8"/>',  // กระติก → kettle
+
+  // ── อุปโภค ──
+  'I09': '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2"/><path d="M8 10h8M8 14h6"/>',  // ทิชชู่กล่อง → tissue box
+  'I11': '<path d="M8 2h8l2 4H6L8 2z"/><path d="M6 6v14a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V6"/><path d="M8 11h8M8 15h5"/>',  // ขวดโหล → jar
+  'I12': '<path d="M8 3h8l2 2v2H6V5L8 3z"/><path d="M6 7v11a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7"/><circle cx="12" cy="13" r="2"/>',  // แก้วน้ำ → glass
+  'I13': '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 6c-2.21 0-4 1.79-4 4 0 1.11.46 2.11 1.2 2.83L12 18l2.8-5.17C15.54 12.11 16 11.11 16 10c0-2.21-1.79-4-4-4z" fill="currentColor" opacity=".3"/><circle cx="12" cy="10" r="1.5" fill="currentColor"/>',  // เจลหอม → flower/scent
+  'I14': '<path d="M5 12h14"/><path d="M5 12a2 2 0 0 1-2-2V6h18v4a2 2 0 0 1-2 2"/><path d="M12 12v8M9 20h6"/>',  // ช้อนกาแฟ → spoon
+  'I15': '<path d="M5 12h14"/><path d="M5 12a2 2 0 0 1-2-2V6h18v4a2 2 0 0 1-2 2"/><path d="M12 12v8M9 20h6"/>',  // ช้อนพลาสติก
+  'I16': '<path d="M9 3h6l3 7H6L9 3z"/><path d="M3 10h18v4H3z"/><path d="M6 14l1 7h10l1-7"/>',  // ถ้วยกระดาษ → cup
+  'I17': '<path d="M9 3h6l3 7H6L9 3z"/><path d="M3 10h18v4H3z"/><path d="M6 14l1 7h10l1-7"/>',
+  'I18': '<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/>',  // ถัง → trash bin
+  'I19': '<path d="M3 3h18v6l-2 12H5L3 9V3z"/><path d="M3 9h18"/>',  // ถุงขยะ → bag
+  'I20': '<path d="M3 3h18v6l-2 12H5L3 9V3z"/><path d="M3 9h18"/>',
+  'I21': '<path d="M3 3h18v6l-2 12H5L3 9V3z"/><path d="M3 9h18"/>',
+  'I22': '<path d="M3 3h18v6l-2 12H5L3 9V3z"/><path d="M3 9h18"/>',
+  'I23': '<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M2 12h20M6 6v12M10 6v12M14 6v12M18 6v12"/>',  // ผ้าขนหนู → cloth/towel
+  'I24': '<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M2 12h20M6 6v12M10 6v12M14 6v12M18 6v12"/>',  // ผ้าเช็ดแก้ว
+  'I25': '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>',  // แผ่นใยขัด → grid pad
+  'I26': '<ellipse cx="12" cy="12" rx="9" ry="6"/><path d="M3 12c0-2 4-5 9-5s9 3 9 5"/><path d="M12 18v-6"/>',  // ฟองน้ำ → sponge shape
+  'I27': '<path d="M9 2h6v3H9z"/><path d="M8 5h8l1 3H7L8 5z"/><path d="M5 8h14v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8z"/><path d="M9 12c0 1.5 6 1.5 6 0"/>',  // สเปรย์ → spray bottle
+  'I34': '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M7 4v6M12 4v6M17 4v6"/>',  // กระดาษชำระม้วน → toilet paper
+  'I35': '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M7 4v6M12 4v6M17 4v6"/>',
+  'I36': '<path d="M9 2h6v3H9z"/><path d="M8 5h8l1 3H7L8 5z"/><path d="M5 8h14v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8z"/><path d="M9 12c0 1.5 6 1.5 6 0"/>',  // แอลกอฮอล์สเปรย์
+  'I37': '<path d="M9 2h6v3H9z"/><path d="M8 5h8l1 3H7L8 5z"/><path d="M5 8h14v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8z"/><path d="M9 12c0 1.5 6 1.5 6 0"/>',  // น้ำยาพ่น
+  'I38': '<path d="M7 2h10l2 4H5L7 2z"/><path d="M5 6v14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6"/><path d="M9 10c0 1.5 6 1.5 6 0"/>',  // ถุงมือ → glove box
+
+  // ── บริโภค ──
+  'I28': '<path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>',  // กาแฟ → coffee cup
+  'I29': '<path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>',  // ครีมเทียม
+  'I30': '<path d="M8 2h8l2 4H6L8 2z"/><rect x="5" y="6" width="14" height="15" rx="2"/><path d="M12 10v6M9 13h6"/>',  // น้ำตาล → sugar bag
+  'I31': '<path d="M8 2h8l2 4H6L8 2z"/><rect x="5" y="6" width="14" height="15" rx="2"/><path d="M12 10v6M9 13h6"/>',  // โอวัลติน
+  'I32': '<path d="M5 3h14l1 3H4L5 3z"/><path d="M4 6v2a8 8 0 0 0 16 0V6"/><path d="M12 8v6"/>',  // น้ำดื่มขวด → water bottle pack
+  'I33': '<path d="M5 3h14l1 3H4L5 3z"/><path d="M4 6v2a8 8 0 0 0 16 0V6"/><path d="M12 8v6"/>',
+
+  // ── ซ่อมบำรุง :: ไฟฟ้า ──
+  'M01': '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',  // หลอดไฟ T5 → light tube
+  'M02': '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',  // หลอดไฟ T8
+  'M03': '<rect x="2" y="3" width="20" height="14" rx="2"/><circle cx="12" cy="10" r="3" fill="currentColor" opacity=".4"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',  // LED Panel → monitor
+  'M04': '<circle cx="12" cy="8" r="4"/><path d="M12 12v4"/><path d="M9 20h6"/><path d="M8 17l-1 3M16 17l1 3"/>',  // Downlight → bulb downlight
+  'M05': '<rect x="2" y="7" width="20" height="10" rx="2"/><path d="M5 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2"/><circle cx="12" cy="12" r="2" fill="currentColor" opacity=".5"/>',  // ไดรเวอร์ → driver box
+  'M06': '<circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/>',  // สตาร์ทเตอร์ → starter
+  'M07': '<rect x="3" y="3" width="18" height="18" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor" opacity=".4"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M18 9h3M3 15h3M18 15h3"/>',  // หน้ากากปลั๊ก → wall plate
+  'M08': '<rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="10" cy="9" r="1.5" fill="currentColor"/><circle cx="14" cy="9" r="1.5" fill="currentColor"/><circle cx="12" cy="13" r="1.5" fill="currentColor"/>',  // เต้ารับ 3 ขา → outlet
+  'M09': '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="8" x2="12" y2="16"/>',  // สวิตช์ไฟ → toggle switch
+  'M10': '<path d="M12 22V12"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/><circle cx="12" cy="5" r="3"/><path d="M12 8v4"/>',  // MCB 10A → breaker
+  'M11': '<path d="M12 22V12"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/><circle cx="12" cy="5" r="3"/><path d="M12 8v4"/>',  // MCB 20A
+
+  // ── ซ่อมบำรุง :: ประปา ──
+  'M12': '<path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/><circle cx="12" cy="9" r="2.5" fill="currentColor" opacity=".5"/>',  // สายฉีดชำระ → water drop
+  'M13': '<path d="M5 8h14M5 12h14"/><path d="M12 3v3M9 21h6"/><path d="M5 12v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/>',  // ก๊อก → faucet
+  'M14': '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4" fill="currentColor" opacity=".3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>',  // สะดืออ่าง → drain
+  'M15': '<path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/><circle cx="12" cy="9" r="3"/>',  // ลูกลอย → float ball
+  'M16': '<path d="M2 12h20"/><path d="M2 7l3-3 3 3M2 17l3 3 3-3"/><path d="M22 7l-3-3-3 3M22 17l-3 3-3-3"/>',  // ท่อ PVC → pipe
+  'M17': '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4" fill="currentColor" opacity=".2"/><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/>',  // ข้อต่อตรง → connector
+  'M18': '<path d="M4 4l8 8-8 8"/><path d="M4 4h8v8"/>',  // ข้องอ 90° → elbow
+  'M19': '<rect x="6" y="3" width="12" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/>',  // กาวทาท่อ → glue tube
+  'M20': '<path d="M3 12h18"/><path d="M3 6h4a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H3"/><path d="M21 6h-4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"/>',  // เทปพันเกลียว → tape roll
+  'M21': '<path d="M6 3h12l2 5H4L6 3z"/><path d="M4 8v12a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V8"/><path d="M12 12v5M9 14h6"/>',  // ซิลิโคน → caulk tube
+};
+
+/* ── helper: get SVG path for item ── */
+function getItemSvg(itemId) {
+  return ITEM_SVG[itemId] || '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/>';
+}
+/* ── helper: get icon block ── */
+const ITEM_EMOJI = {"I01": "🧵", "I02": "🔋", "I03": "🔋", "I04": "🖊️", "I05": "🖊️", "I06": "🖊️", "I07": "🖊️", "I08": "🪄", "I10": "🫖", "I09": "🧻", "I11": "🫙", "I12": "🥤", "I13": "🌸", "I14": "🥄", "I15": "🥄", "I16": "🧃", "I17": "☕", "I18": "🗑️", "I19": "🛍️", "I20": "🛍️", "I21": "🛍️", "I22": "🛍️", "I23": "🧺", "I24": "🧺", "I25": "🔲", "I26": "🧽", "I27": "💨", "I34": "🧻", "I35": "🧻", "I36": "🧴", "I37": "🪲", "I38": "🧤", "I28": "☕", "I29": "🥛", "I30": "🍬", "I31": "🍫", "I32": "💧", "I33": "💧", "M01": "💡", "M02": "💡", "M03": "🔆", "M04": "🔅", "M05": "⚡", "M06": "🔌", "M07": "🔲", "M08": "🔌", "M09": "🔘", "M10": "⚡", "M11": "⚡", "M12": "🚿", "M13": "🚰", "M14": "🕳️", "M15": "🔵", "M16": "📏", "M17": "🔗", "M18": "↪️", "M19": "🖌️", "M20": "🎞️", "M21": "🔫"};
+
+function itemIconBlock(it, size=40) {
+  const cfg = AI_SUBCAT_CFG[it.subcat] || AI_CAT_CFG[it.cat] || { bg:'rgba(99,102,241,.15)', color:'#a5b4fc' };
+  const r = Math.round(size*0.28);
+  const emoji = ITEM_EMOJI[it.id] || '📦';
+  const fs = Math.round(size*0.5);
+  return `<div style="width:${size}px;height:${size}px;border-radius:${r}px;background:${cfg.bg};display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid ${cfg.color}22;font-size:${fs}px;line-height:1">
+    ${emoji}
+  </div>`;
+}
 
 function renderAllItems() {
   document.getElementById('topbar-actions').innerHTML = '';
@@ -2710,8 +2838,9 @@ function buildAllItemsUI() {
 
     ${['สำนักงาน','อุปโภค','บริโภค','ซ่อมบำรุง'].map(c => {
       const cfg = AI_CAT_CFG[c];
+      const catEmojis = {'สำนักงาน':'🖥️','อุปโภค':'🧴','บริโภค':'☕','ซ่อมบำรุง':'🔧'};
       return `<button class="ai-sb-btn ${aiState.cat===c?'active':''}" onclick="aiState.cat='${c}';buildAllItemsUI()">
-        <span style="font-size:15px">${cfg.emoji}</span>
+        <span style="font-size:15px;line-height:1">${catEmojis[c]||'📦'}</span>
         ${c}
         <span class="ai-sb-count">${catCounts[c]}</span>
       </button>`;
@@ -2801,7 +2930,7 @@ function aiCard(it, bldg) {
 
   return `<div class="ai-card" onclick="navigate('${it.cat==='ซ่อมบำรุง'?'maintenance':'stock'}')">
     <span class="ai-card-menu" title="เมนู">⋮</span>
-    <div class="ai-card-icon" style="background:${cfg.bg}">${cfg.emoji}</div>
+    <div class="ai-card-icon" style="background:transparent;padding:0">${itemIconBlock(it, 42)}</div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
       <div class="ai-card-size" style="color:${numClr}">${total} ${it.unit}</div>
       ${priceHtml}
@@ -2848,7 +2977,7 @@ function aiListRow(it, bldg) {
   }).join(' · ')}</span>` : '';
 
   return `<div class="ai-list-row" onclick="navigate('${it.cat==='ซ่อมบำรุง'?'maintenance':'stock'}')">
-    <div class="ai-list-icon" style="background:${cfg.bg}">${cfg.emoji}</div>
+    ${itemIconBlock(it, 38)}
     <div class="ai-list-info">
       <div class="ai-list-name">${it.name}</div>
       <div class="ai-list-meta">
