@@ -1810,47 +1810,48 @@ const STATUS_CLR= {approved:'b-green',pending:'b-yellow',rejected:'b-red'};
 const STATUS_LBL= {approved:'อนุมัติแล้ว',pending:'รอพิจารณา',rejected:'ปฏิเสธ'};
 
 const ITEMS = [
-  /* ── สำนักงาน ── */
-  {id:'I01',no:1, name:'เชือกฟาง 500 กรัม 100 เมตร',              unit:'ม้วน',    cat:'สำนักงาน', min:5},
-  {id:'I02',no:2, name:'ถ่านอัลคาไลน์ AA Panasonic (แพ็ค 4 ก้อน)',unit:'แพ็ค',    cat:'สำนักงาน', min:10},
-  {id:'I03',no:3, name:'ถ่านอัลคาไลน์ AAA Panasonic (แพ็ค 4 ก้อน)',unit:'แพ็ค',   cat:'สำนักงาน', min:10},
-  {id:'I04',no:4, name:'ปากกาไวท์บอร์ด สีเขียว PILOT 2.5มม.',     unit:'ด้าม',    cat:'สำนักงาน', min:5},
-  {id:'I05',no:5, name:'ปากกาไวท์บอร์ด สีดำ PILOT 2.5มม.',        unit:'ด้าม',    cat:'สำนักงาน', min:5},
-  {id:'I06',no:6, name:'ปากกาไวท์บอร์ด สีแดง PILOT 2.5มม.',       unit:'ด้าม',    cat:'สำนักงาน', min:5},
-  {id:'I07',no:7, name:'ปากกาไวท์บอร์ด สีน้ำเงิน PILOT 2.5มม.',   unit:'ด้าม',    cat:'สำนักงาน', min:5},
-  {id:'I08',no:8, name:'แปรงลบกระดาน TOTO',                        unit:'อัน',     cat:'สำนักงาน', min:3},
-  {id:'I10',no:9, name:'กระติกน้ำร้อน SHARP KP-36S 3.6 ล.',        unit:'เครื่อง', cat:'สำนักงาน', min:2},
-  /* ── อุปโภค ── */
-  {id:'I09',no:10,name:'กระดาษทิชชู่กล่อง 140 แผ่น KLEENEX',      unit:'กล่อง',   cat:'อุปโภค',   min:20},
-  {id:'I11',no:11,name:'ขวดโหลแก้วใส ฝาล็อค 1 ลิตร',             unit:'ขวด',     cat:'อุปโภค',   min:5},
-  {id:'I12',no:12,name:'แก้วน้ำ Ocean glass B01210 (6 ใบ/กล่อง)', unit:'กล่อง',   cat:'อุปโภค',   min:3},
-  {id:'I13',no:13,name:'เจลหอม Glade คูลแอร์ 180 กรัม',           unit:'ชิ้น',    cat:'อุปโภค',   min:6},
-  {id:'I14',no:14,name:'ช้อนกาแฟสแตนเลส ตราม้าลาย (12 คัน/กล่อง)',unit:'กล่อง',  cat:'อุปโภค',   min:2},
-  {id:'I15',no:15,name:'ช้อนคนกาแฟพลาสติก (100 คัน/แพ็ค)',        unit:'แพ็ค',    cat:'อุปโภค',   min:3},
-  {id:'I16',no:16,name:'ถ้วยกระดาษกรวย 4 ออนซ์ (180 ใบ/แพ็ค)',   unit:'แพ็ค',    cat:'อุปโภค',   min:5},
-  {id:'I17',no:17,name:'ถ้วยกระดาษมีหูจับ 6.5 ออนซ์ (50 ใบ/แพ็ค)',unit:'แพ็ค',   cat:'อุปโภค',   min:5},
-  {id:'I18',no:18,name:'ถังขยะ KEEP IN 5 ลิตร',                   unit:'ถัง',     cat:'อุปโภค',   min:5},
-  {id:'I19',no:19,name:'ถุงขยะดำ เล็ก 18×20 TPS (1กก./แพ็ค)',    unit:'แพ็ค',    cat:'อุปโภค',   min:10},
-  {id:'I20',no:20,name:'ถุงขยะดำ กลาง 24×28 TPS (1กก./แพ็ค)',    unit:'แพ็ค',    cat:'อุปโภค',   min:10},
-  {id:'I21',no:21,name:'ถุงขยะดำ ใหญ่ 30×40 TPS (1กก./แพ็ค)',    unit:'แพ็ค',    cat:'อุปโภค',   min:10},
-  {id:'I22',no:22,name:'ถุงขยะดำ ใหญ่ 36×45 TPS (1กก./แพ็ค)',    unit:'แพ็ค',    cat:'อุปโภค',   min:8},
-  {id:'I23',no:23,name:'ผ้าขนหนูเช็ดอเนกประสงค์ 15×30 นิ้ว',     unit:'ผืน',     cat:'อุปโภค',   min:10},
-  {id:'I24',no:24,name:'ผ้าเช็ดแก้ว 15×20 นิ้ว',                  unit:'ผืน',     cat:'อุปโภค',   min:10},
-  {id:'I25',no:25,name:'แผ่นใยขัด SCOTCH-BRITE 3×4 นิ้ว',        unit:'แผ่น',    cat:'อุปโภค',   min:10},
-  {id:'I26',no:26,name:'ฟองน้ำตาข่าย SCOTCH-BRITE 3.25×5.25 นิ้ว',unit:'ห่อ',   cat:'อุปโภค',   min:5},
-  {id:'I27',no:27,name:'สเปรย์ปรับอากาศ Daily Fresh 300ml',        unit:'ชิ้น',    cat:'อุปโภค',   min:6},
-  {id:'I34',no:28,name:'กระดาษชำระ NTL (12 ม้วน/หีบ)',             unit:'หีบ',     cat:'อุปโภค',   min:5},
-  {id:'I35',no:29,name:'กระดาษชำระ อาคาร Ari (12 ม้วน/หีบ)',       unit:'หีบ',     cat:'อุปโภค',   min:5},
-  {id:'I36',no:30,name:'แอลกอฮอล์น้ำ 75% ขนาด 5 ลิตร',           unit:'ขวด',     cat:'อุปโภค',   min:5},
-  {id:'I37',no:31,name:'น้ำยาพ่นควัน ขนาด 1 ลิตร',                unit:'ขวด',     cat:'อุปโภค',   min:3},
-  {id:'I38',no:32,name:'ถุงมือยางทางการแพทย์',                     unit:'ชิ้น',    cat:'อุปโภค',   min:50},
-  /* ── บริโภค ── */
-  {id:'I28',no:33,name:'กาแฟ Nescafé Red Cup 400 กรัม (2ถุง/กล่อง)',unit:'กล่อง', cat:'บริโภค',   min:5},
-  {id:'I29',no:34,name:'ครีมเทียม Coffee-Mate 900 กรัม (2ถุง/กล่อง)',unit:'กล่อง',cat:'บริโภค',   min:5},
-  {id:'I30',no:35,name:'น้ำตาล วังขนาย 1,000 กรัม',               unit:'ถุง',     cat:'บริโภค',   min:5},
-  {id:'I31',no:36,name:'โอวัลติน 700 กรัม',                        unit:'ถุง',     cat:'บริโภค',   min:3},
-  {id:'I32',no:37,name:'น้ำดื่มสิงห์ 330ml (12 ขวด/แพ็ค)',        unit:'แพ็ค',    cat:'บริโภค',   min:10},
-  {id:'I33',no:38,name:'น้ำดื่มสิงห์ 600ml (12 ขวด/แพ็ค)',        unit:'แพ็ค',    cat:'บริโภค',   min:10},
+  /* ── 1-8 : สำนักงาน · GNR3 ── */
+  {id:'I01',no:1, name:'เชือกฟาง 500 กรัม 100 เมตร',               unit:'ม้วน',    cat:'สำนักงาน', min:5,  team:'gnr3'},
+  {id:'I02',no:2, name:'ถ่านอัลคาไลน์ AA Panasonic (แพ็ค 4 ก้อน)', unit:'แพ็ค',    cat:'สำนักงาน', min:10, team:'gnr3'},
+  {id:'I03',no:3, name:'ถ่านอัลคาไลน์ AAA Panasonic (แพ็ค 4 ก้อน)',unit:'แพ็ค',    cat:'สำนักงาน', min:10, team:'gnr3'},
+  {id:'I04',no:4, name:'ปากกาไวท์บอร์ด สีเขียว PILOT 2.5มม.',      unit:'ด้าม',    cat:'สำนักงาน', min:5,  team:'gnr3'},
+  {id:'I05',no:5, name:'ปากกาไวท์บอร์ด สีดำ PILOT 2.5มม.',         unit:'ด้าม',    cat:'สำนักงาน', min:5,  team:'gnr3'},
+  {id:'I06',no:6, name:'ปากกาไวท์บอร์ด สีแดง PILOT 2.5มม.',        unit:'ด้าม',    cat:'สำนักงาน', min:5,  team:'gnr3'},
+  {id:'I07',no:7, name:'ปากกาไวท์บอร์ด สีน้ำเงิน PILOT 2.5มม.',    unit:'ด้าม',    cat:'สำนักงาน', min:5,  team:'gnr3'},
+  {id:'I08',no:8, name:'แปรงลบกระดาน TOTO',                         unit:'อัน',     cat:'สำนักงาน', min:3,  team:'gnr3'},
+  /* ── 9-27 : อุปโภค · GNR3 ── */
+  {id:'I09',no:9, name:'กระดาษทิชชู่กล่อง 140 แผ่น KLEENEX',       unit:'กล่อง',   cat:'อุปโภค',   min:20, team:'gnr3'},
+  {id:'I10',no:10,name:'กระติกน้ำร้อน SHARP KP-36S 3.6 ล.',         unit:'เครื่อง', cat:'สำนักงาน', min:2,  team:'gnr3'},
+  {id:'I11',no:11,name:'ขวดโหลแก้วใส ฝาล็อค 1 ลิตร',              unit:'ขวด',     cat:'อุปโภค',   min:5,  team:'gnr3'},
+  {id:'I12',no:12,name:'แก้วน้ำ Ocean glass B01210 (6 ใบ/กล่อง)',  unit:'กล่อง',   cat:'อุปโภค',   min:3,  team:'gnr3'},
+  {id:'I13',no:13,name:'เจลหอม Glade คูลแอร์ 180 กรัม',            unit:'ชิ้น',    cat:'อุปโภค',   min:6,  team:'gnr3'},
+  {id:'I14',no:14,name:'ช้อนกาแฟสแตนเลส ตราม้าลาย (12 คัน/กล่อง)',unit:'กล่อง',   cat:'อุปโภค',   min:2,  team:'gnr3'},
+  {id:'I15',no:15,name:'ช้อนคนกาแฟพลาสติก (100 คัน/แพ็ค)',         unit:'แพ็ค',    cat:'อุปโภค',   min:3,  team:'gnr3'},
+  {id:'I16',no:16,name:'ถ้วยกระดาษกรวย 4 ออนซ์ (180 ใบ/แพ็ค)',    unit:'แพ็ค',    cat:'อุปโภค',   min:5,  team:'gnr3'},
+  {id:'I17',no:17,name:'ถ้วยกระดาษมีหูจับ 6.5 ออนซ์ (50 ใบ/แพ็ค)',unit:'แพ็ค',    cat:'อุปโภค',   min:5,  team:'gnr3'},
+  {id:'I18',no:18,name:'ถังขยะ KEEP IN 5 ลิตร',                    unit:'ถัง',     cat:'อุปโภค',   min:5,  team:'gnr3'},
+  {id:'I19',no:19,name:'ถุงขยะดำ เล็ก 18×20 TPS (1กก./แพ็ค)',     unit:'แพ็ค',    cat:'อุปโภค',   min:10, team:'gnr3'},
+  {id:'I20',no:20,name:'ถุงขยะดำ กลาง 24×28 TPS (1กก./แพ็ค)',     unit:'แพ็ค',    cat:'อุปโภค',   min:10, team:'gnr3'},
+  {id:'I21',no:21,name:'ถุงขยะดำ ใหญ่ 30×40 TPS (1กก./แพ็ค)',     unit:'แพ็ค',    cat:'อุปโภค',   min:10, team:'gnr3'},
+  {id:'I22',no:22,name:'ถุงขยะดำ ใหญ่ 36×45 TPS (1กก./แพ็ค)',     unit:'แพ็ค',    cat:'อุปโภค',   min:8,  team:'gnr3'},
+  {id:'I23',no:23,name:'ผ้าขนหนูเช็ดอเนกประสงค์ 15×30 นิ้ว',      unit:'ผืน',     cat:'อุปโภค',   min:10, team:'gnr3'},
+  {id:'I24',no:24,name:'ผ้าเช็ดแก้ว 15×20 นิ้ว',                   unit:'ผืน',     cat:'อุปโภค',   min:10, team:'gnr3'},
+  {id:'I25',no:25,name:'แผ่นใยขัด SCOTCH-BRITE 3×4 นิ้ว',         unit:'แผ่น',    cat:'อุปโภค',   min:10, team:'gnr3'},
+  {id:'I26',no:26,name:'ฟองน้ำตาข่าย SCOTCH-BRITE 3.25×5.25 นิ้ว',unit:'ห่อ',    cat:'อุปโภค',   min:5,  team:'gnr3'},
+  {id:'I27',no:27,name:'สเปรย์ปรับอากาศ Daily Fresh 300ml',         unit:'ชิ้น',    cat:'อุปโภค',   min:6,  team:'gnr3'},
+  /* ── 28-33 : บริโภค · GNR3 ── */
+  {id:'I28',no:28,name:'กาแฟ Nescafé Red Cup 400 กรัม (2ถุง/กล่อง)', unit:'กล่อง', cat:'บริโภค',   min:5,  team:'gnr3'},
+  {id:'I29',no:29,name:'ครีมเทียม Coffee-Mate 900 กรัม (2ถุง/กล่อง)',unit:'กล่อง', cat:'บริโภค',   min:5,  team:'gnr3'},
+  {id:'I30',no:30,name:'น้ำตาล วังขนาย 1,000 กรัม',                unit:'ถุง',     cat:'บริโภค',   min:5,  team:'gnr3'},
+  {id:'I31',no:31,name:'โอวัลติน 700 กรัม',                         unit:'ถุง',     cat:'บริโภค',   min:3,  team:'gnr3'},
+  {id:'I32',no:32,name:'น้ำดื่มสิงห์ 330ml (12 ขวด/แพ็ค)',         unit:'แพ็ค',    cat:'บริโภค',   min:10, team:'gnr3'},
+  {id:'I33',no:33,name:'น้ำดื่มสิงห์ 600ml (12 ขวด/แพ็ค)',         unit:'แพ็ค',    cat:'บริโภค',   min:10, team:'gnr3'},
+  /* ── 34-38 : isourcing ── */
+  {id:'I34',no:34,name:'กระดาษชำระม้วนใหญ่ NTL (12 ม้วน/หีบ)',      unit:'หีบ',     cat:'อุปโภค',   min:5,  team:'isourcing'},
+  {id:'I35',no:35,name:'กระดาษชำระม้วนใหญ่ อาคาร Ari (12 ม้วน/หีบ)',unit:'หีบ',     cat:'อุปโภค',   min:5,  team:'isourcing'},
+  {id:'I36',no:36,name:'แอลกอฮอล์น้ำ 75% ขนาด 5 ลิตร',             unit:'ขวด',     cat:'อุปโภค',   min:5,  team:'isourcing'},
+  {id:'I37',no:37,name:'น้ำยาพ่นควัน ขนาด 1 ลิตร',                 unit:'ขวด',     cat:'อุปโภค',   min:3,  team:'isourcing'},
+  {id:'I38',no:38,name:'ถุงมือยางทางการแพทย์',                      unit:'กล่อง',   cat:'อุปโภค',   min:50, team:'isourcing'},
   /* ── ซ่อมบำรุง :: ไฟฟ้า ── */
   {id:'M01',no:39,name:'หลอดไฟ T5 (แพ็ค 2 หลอด)',                 unit:'แพ็ค',    cat:'ซ่อมบำรุง',subcat:'ไฟฟ้า',min:5},
   {id:'M02',no:40,name:'หลอดไฟ T8 (แพ็ค 2 หลอด)',                 unit:'แพ็ค',    cat:'ซ่อมบำรุง',subcat:'ไฟฟ้า',min:5},
@@ -2171,12 +2172,49 @@ function normalizeTransaction(r) {
 async function syncFromGAS() {
   if (!USE_GAS) return;
   try {
+    // 1. Pull transactions (source of stock truth)
     const r = await gasGet({ action: 'getTransactions' });
     if (r?.ok && Array.isArray(r.transactions)) {
       transactions = r.transactions.map(normalizeTransaction);
-      saveState();
       console.log(`GAS sync OK: ${transactions.length} transactions`);
     }
+
+    // 2. Pull prices from GAS (graceful — GAS may not support yet)
+    try {
+      const rp = await gasGet({ action: 'getPrices' });
+      if (rp?.ok && rp.prices && typeof rp.prices === 'object') {
+        // GAS is source of truth: merge GAS prices over local
+        Object.entries(rp.prices).forEach(([itemId, monthPrices]) => {
+          if (typeof monthPrices === 'object') {
+            if (!itemPrices[itemId]) itemPrices[itemId] = {};
+            Object.assign(itemPrices[itemId], monthPrices);
+          } else if (typeof monthPrices === 'number') {
+            // Flat format: { itemId: price } — store under current year/month
+            const now = new Date();
+            const k = `${now.getFullYear()}_${now.getMonth()+1}`;
+            if (!itemPrices[itemId]) itemPrices[itemId] = {};
+            itemPrices[itemId][k] = monthPrices;
+          }
+        });
+        console.log('GAS prices synced');
+      }
+    } catch(ep) { console.log('getPrices not yet supported by GAS:', ep?.message||ep); }
+
+    // 3. Pull min-stock settings from GAS (graceful)
+    try {
+      const rs = await gasGet({ action: 'getSettings' });
+      if (rs?.ok && rs.settings && typeof rs.settings === 'object') {
+        Object.entries(rs.settings).forEach(([id, val]) => {
+          const v = parseInt(val) || 0;
+          const it = ITEMS.find(x => x.id === id);
+          if (v !== (it?.min || 0)) minStockOverrides[id] = v;
+          else delete minStockOverrides[id];
+        });
+        console.log('GAS settings synced');
+      }
+    } catch(es) { console.log('getSettings not yet supported by GAS:', es?.message||es); }
+
+    saveState();
   } catch(e) {
     console.warn('GAS sync failed, keeping local data:', e.message);
   }
@@ -2210,11 +2248,6 @@ async function pushRejectToGAS(txnId, reason) {
   try { await gasPost({ action: 'rejectTransaction', txnId, reason }); } catch(e) {}
 }
 
-/* ── Push monthly order to GAS ── */
-async function pushMonthlyOrderToGAS(month, year, items) {
-  if (!USE_GAS) return;
-  try { await gasPost({ action: 'saveMonthlyOrder', month, year, items, createdBy: 'Admin' }); } catch(e) {}
-}
 /* ── Push monthly order to GAS ── */
 async function pushMonthlyOrderToGAS(month, year, items) {
   if (!USE_GAS) return;
@@ -2709,7 +2742,7 @@ function showLoginModal(){
 /* ================================================================
    PAGE: ALL ITEMS — Storage Card Grid Style
 ================================================================ */
-let aiState = { cat: 'all', showOnly: 'all', q: '', view: 'grid', sort: 'name' };
+let aiState = { cat: 'all', showOnly: 'all', q: '', view: 'grid', sort: 'no' };
 
 /* Category icon+color config */
 const AI_CAT_CFG = {
@@ -2825,27 +2858,28 @@ function buildAllItemsUI() {
   if (!wrap) return;
 
   const bldg = globalBldg;
-  const allCats = ['all','สำนักงาน','อุปโภค','บริโภค','ซ่อมบำรุง'];
-  const catCounts = {};
-  allCats.forEach(c => {
-    catCounts[c] = c === 'all' ? ITEMS.length : ITEMS.filter(it => it.cat === c).length;
-  });
+
+  // Category definitions: 'all' | 'consumer' | 'ซ่อมบำรุง'
+  const consumerCount    = ITEMS.filter(it => it.cat !== 'ซ่อมบำรุง').length;
+  const maintenanceCount = ITEMS.filter(it => it.cat === 'ซ่อมบำรุง').length;
 
   // Filter items
   let items = ITEMS.filter(it => {
-    if (aiState.cat !== 'all' && it.cat !== aiState.cat) return false;
+    if (aiState.cat === 'consumer'    && it.cat === 'ซ่อมบำรุง') return false;
+    if (aiState.cat === 'ซ่อมบำรุง'  && it.cat !== 'ซ่อมบำรุง') return false;
     if (aiState.q && !it.name.toLowerCase().includes(aiState.q.toLowerCase())) return false;
     const total = bldg === 'all' ? getTotalStock(it.id) : getStock(it.id, bldg);
     const min = getMin(it.id);
-    if (aiState.showOnly === 'ok')    return total >= min && total > 0;
-    if (aiState.showOnly === 'low')   return total < min && total > 0;
-    if (aiState.showOnly === 'out')   return total <= 0;
+    if (aiState.showOnly === 'ok')  return total >= min && total > 0;
+    if (aiState.showOnly === 'low') return total < min && total > 0;
+    if (aiState.showOnly === 'out') return total <= 0;
     return true;
   });
 
   // Sort
   items = [...items].sort((a, b) => {
-    if (aiState.sort === 'name') return a.name.localeCompare(b.name, 'th');
+    if (aiState.sort === 'no')    return a.no - b.no;
+    if (aiState.sort === 'name')  return a.name.localeCompare(b.name, 'th');
     if (aiState.sort === 'stock') {
       const qa = bldg === 'all' ? getTotalStock(a.id) : getStock(a.id, bldg);
       const qb = bldg === 'all' ? getTotalStock(b.id) : getStock(b.id, bldg);
@@ -2854,7 +2888,7 @@ function buildAllItemsUI() {
     if (aiState.sort === 'low') {
       const qa = bldg === 'all' ? getTotalStock(a.id) : getStock(a.id, bldg);
       const qb = bldg === 'all' ? getTotalStock(b.id) : getStock(b.id, bldg);
-      return qa - qb; // ascending (lowest first)
+      return qa - qb;
     }
     return 0;
   });
@@ -2863,6 +2897,55 @@ function buildAllItemsUI() {
   const totalStock = items.reduce((s, it) => {
     return s + (bldg === 'all' ? getTotalStock(it.id) : getStock(it.id, bldg));
   }, 0);
+
+  // Split consumer items into gnr3 / isourcing groups (for team separators)
+  const showingConsumer = aiState.cat === 'consumer' || aiState.cat === 'all';
+  const gnr3Items = items.filter(it => it.cat !== 'ซ่อมบำรุง' && it.team !== 'isourcing');
+  const isrcItems = items.filter(it => it.cat !== 'ซ่อมบำรุง' && it.team === 'isourcing');
+  const maintItems = items.filter(it => it.cat === 'ซ่อมบำรุง');
+
+  // Render items with team separators when sort='no' and showing consumer items
+  const renderWithSeparators = (isGrid) => {
+    const useNo = aiState.sort === 'no';
+    const containerOpen = isGrid ? `<div class="ai-grid">` : `<div class="ai-list">`;
+    const containerClose = `</div>`;
+
+    // separator bar
+    const sep = (label, color, count) => isGrid
+      ? `<div style="grid-column:1/-1;padding:8px 4px 4px;display:flex;align-items:center;gap:8px">
+           <span style="font-size:10px;font-family:'Kanit',sans-serif;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.08em">${label}</span>
+           <span style="font-size:10px;color:var(--t3);font-family:'Kanit',sans-serif">(${count} รายการ)</span>
+           <div style="flex:1;height:1px;background:var(--border)"></div>
+         </div>`
+      : `<div style="padding:8px 20px 4px;display:flex;align-items:center;gap:8px;background:var(--bg-glass)">
+           <span style="font-size:10px;font-family:'Kanit',sans-serif;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.08em">${label}</span>
+           <span style="font-size:10px;color:var(--t3);font-family:'Kanit',sans-serif">(${count} รายการ)</span>
+         </div>`;
+
+    const renderFn = isGrid ? (it) => aiCard(it, bldg) : (it) => aiListRow(it, bldg);
+
+    if (aiState.cat === 'ซ่อมบำรุง' || !useNo) {
+      // flat, no separators
+      return containerOpen + items.map(renderFn).join('') + containerClose;
+    }
+
+    // split by team with headers
+    let html = containerOpen;
+    if (gnr3Items.length > 0) {
+      html += sep('📦 GNR3 · รายการ 1–33', '#a5b4fc', gnr3Items.length);
+      html += gnr3Items.map(renderFn).join('');
+    }
+    if (isrcItems.length > 0) {
+      html += sep('🏢 isourcing · รายการ 34–38', '#fcd34d', isrcItems.length);
+      html += isrcItems.map(renderFn).join('');
+    }
+    if (maintItems.length > 0 && aiState.cat === 'all') {
+      html += sep('🔧 ซ่อมบำรุง', '#fbbf24', maintItems.length);
+      html += maintItems.map(renderFn).join('');
+    }
+    html += containerClose;
+    return html;
+  };
 
   wrap.innerHTML = `
   <!-- LEFT SIDEBAR -->
@@ -2879,18 +2962,20 @@ function buildAllItemsUI() {
     <button class="ai-sb-btn ${aiState.cat==='all'?'active':''}" onclick="aiState.cat='all';buildAllItemsUI()">
       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
       ทั้งหมด
-      <span class="ai-sb-count">${catCounts['all']}</span>
+      <span class="ai-sb-count">${ITEMS.length}</span>
     </button>
 
-    ${['สำนักงาน','อุปโภค','บริโภค','ซ่อมบำรุง'].map(c => {
-      const cfg = AI_CAT_CFG[c];
-      const catEmojis = {'สำนักงาน':'🖥️','อุปโภค':'🧴','บริโภค':'☕','ซ่อมบำรุง':'🔧'};
-      return `<button class="ai-sb-btn ${aiState.cat===c?'active':''}" onclick="aiState.cat='${c}';buildAllItemsUI()">
-        <span style="font-size:15px;line-height:1">${catEmojis[c]||'📦'}</span>
-        ${c}
-        <span class="ai-sb-count">${catCounts[c]}</span>
-      </button>`;
-    }).join('')}
+    <button class="ai-sb-btn ${aiState.cat==='consumer'?'active':''}" onclick="aiState.cat='consumer';buildAllItemsUI()">
+      <span style="font-size:15px;line-height:1">🛒</span>
+      อุปโภคและบริโภค
+      <span class="ai-sb-count">${consumerCount}</span>
+    </button>
+
+    <button class="ai-sb-btn ${aiState.cat==='ซ่อมบำรุง'?'active':''}" onclick="aiState.cat='ซ่อมบำรุง';buildAllItemsUI()">
+      <span style="font-size:15px;line-height:1">🔧</span>
+      ซ่อมบำรุง
+      <span class="ai-sb-count">${maintenanceCount}</span>
+    </button>
 
     <div class="ai-sb-title" style="margin-top:8px">สถานะ</div>
     ${[['all','ทั้งหมด','○'],['ok','ปกติ','✓'],['low','ต่ำ','⚠'],['out','หมด','✕']].map(([v,l,ic])=>`
@@ -2911,11 +2996,11 @@ function buildAllItemsUI() {
 
       <!-- Sort -->
       <button class="ai-sort-btn" onclick="
-        const opts=['name','stock','low'];
+        const opts=['no','name','stock','low'];
         aiState.sort=opts[(opts.indexOf(aiState.sort)+1)%opts.length];
         buildAllItemsUI()">
         <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="9" y2="18"/></svg>
-        ${aiState.sort==='name'?'ชื่อ ↑':aiState.sort==='stock'?'สต็อก ↓':'ต่ำสุด ↑'}
+        ${aiState.sort==='no'?'ลำดับที่ ↑':aiState.sort==='name'?'ชื่อ ↑':aiState.sort==='stock'?'สต็อก ↓':'ต่ำสุด ↑'}
       </button>
 
       <!-- View toggle -->
@@ -2935,15 +3020,7 @@ function buildAllItemsUI() {
         <div class="ei" style="font-size:48px;opacity:.3">○</div>
         <p>ไม่พบสินค้าที่ค้นหา</p>
       </div>
-    ` : aiState.view === 'grid' ? `
-      <div class="ai-grid">
-        ${items.map(it => aiCard(it, bldg)).join('')}
-      </div>
-    ` : `
-      <div class="ai-list">
-        ${items.map(it => aiListRow(it, bldg)).join('')}
-      </div>
-    `}
+    ` : renderWithSeparators(aiState.view === 'grid')}
   </div>`;
 }
 
@@ -3289,7 +3366,7 @@ function animNum(id, target){
 /* ================================================================
    PAGE: STOCK  (Table + pill button filters)
 ================================================================ */
-let stFilter = {q:'',cat:'',bldg:'all',showOnly:'all'};
+let stFilter = {q:'',cat:'',bldg:'Ari Hills',showOnly:'all'};
 const CATS_STOCK = ['สำนักงาน','อุปโภค','บริโภค'];
 const CATS_MAINT = ['ซ่อมบำรุง'];
 const ST_PAGE = 20;
@@ -3313,8 +3390,8 @@ function renderStock(){
       <div style="display:flex;align-items:center;gap:6px;padding:4px 14px 4px 0;border-right:1px solid var(--border);margin-right:14px;flex-shrink:0">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
         <div style="display:flex;gap:4px" id="st-bldg-tabs">
-          ${['all',...BUILDINGS].map(b=>`<button class="btab ${stFilter.bldg===b?'active':''}"
-            onclick="stFilter.bldg='${b}';stPage=0;refreshStock()">${b==='all'?'ทั้งหมด':b}</button>`).join('')}
+          ${BUILDINGS.map(b=>`<button class="btab ${stFilter.bldg===b?'active':''}"
+            onclick="stFilter.bldg='${b}';stPage=0;refreshStock()">${b}</button>`).join('')}
         </div>
       </div>
 
@@ -3322,10 +3399,7 @@ function renderStock(){
       <div style="display:flex;align-items:center;gap:6px;padding:4px 14px 4px 0;border-right:1px solid var(--border);margin-right:14px;flex-shrink:0">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
         <div style="display:flex;gap:4px" id="st-cat-tabs">
-          <button class="btab ${stFilter.cat===''?'active':''}"
-            onclick="stFilter.cat='';stPage=0;refreshStock()">ทั้งหมด</button>
-          ${CATS_STOCK.map(c=>`<button class="btab ${stFilter.cat===c?'active':''}"
-            onclick="stFilter.cat='${c}';stPage=0;refreshStock()">${c}</button>`).join('')}
+          <button class="btab active">อุปโภคและบริโภค</button>
         </div>
       </div>
 
@@ -3573,7 +3647,7 @@ function refreshStock(){
 /* ================================================================
    PAGE: MAINTENANCE STOCK (สต็อก ส่วนกลาง)
 ================================================================ */
-let mFilter = {q:'',subcat:'',bldg:'all',showOnly:'all'};
+let mFilter = {q:'',subcat:'',bldg:'Ari Hills',showOnly:'all'};
 const MN_PAGE = 20;
 let mPage = 0;
 
@@ -3644,8 +3718,8 @@ function renderMaintenance(){
       <div style="display:flex;align-items:center;gap:6px;padding:4px 14px 4px 0;border-right:1px solid var(--border);margin-right:14px;flex-shrink:0">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
         <div style="display:flex;gap:4px" id="mn-bldg-tabs">
-          ${['all',...BUILDINGS].map(b=>`<button class="btab ${mFilter.bldg===b?'active':''}"
-            onclick="mFilter.bldg='${b}';mPage=0;refreshMaintenance()">${b==='all'?'ทั้งหมด':b}</button>`).join('')}
+          ${BUILDINGS.map(b=>`<button class="btab ${mFilter.bldg===b?'active':''}"
+            onclick="mFilter.bldg='${b}';mPage=0;refreshMaintenance()">${b}</button>`).join('')}
         </div>
       </div>
 
@@ -5050,18 +5124,23 @@ function saveSettings(){
     }
   });
   saveState();
-  // Push settings to GAS
+  // ── Push to GAS ──
   if(USE_GAS){
+    // 1. Push per-building min stock settings
     const settings = {};
-    ITEMS.forEach(it=>{ settings[it.id] = getMin(it.id); });
-    gasPost({ action:'updateSettings', settings });
-    if(sel === 'all'){
-      const prices = {};
-      ITEMS.filter(it=>it.cat!=='ซ่อมบำรุง').forEach(it=>{
-        const p = parseFloat(document.getElementById(`price-${it.id}`)?.value)||0;
-        if(p>0) prices[it.id] = p;
-      });
-      if(Object.keys(prices).length>0) gasPost({ action:'updatePrices', prices });
+    ITEMS.forEach(it=>{ settings[it.id] = getMin(it.id, sel); });
+    gasPost({ action:'updateSettings', settings, building: sel });
+
+    // 2. Push prices (always, regardless of which building tab is active)
+    const prices = {};
+    ITEMS.filter(it=>it.cat!=='ซ่อมบำรุง').forEach(it=>{
+      const inp = document.getElementById(`price-${it.id}`);
+      if(!inp) return;
+      const p = parseFloat(inp.value)||0;
+      if(p > 0) prices[it.id] = p;
+    });
+    if(Object.keys(prices).length > 0){
+      gasPost({ action:'updatePrices', month: mo, year: yr, prices });
     }
   }
   showToast('✅',`บันทึกขั้นต่ำ อาคาร ${sel} แล้ว`);
@@ -5122,24 +5201,74 @@ function refreshMonthly(){
                      'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
   const YEARS = Array.from({length:5},(_,i)=>year-2+i);
 
-  // คำนวณรายการที่ต้องสั่ง (stock < minStock) เฉพาะ consumer items
   const consumerItems = ITEMS.filter(it=>it.cat!=='ซ่อมบำรุง');
-  const orderList = consumerItems.map(it=>{
-    const total = BUILDINGS.reduce((s,b)=>s+getStock(it.id,b),0);
-    const min = getMin(it.id);
-    const orderQty = Math.max(0, min - total);
-    return {...it, currentStock:total, minStock:min, orderQty};
-  }).filter(it=>it.orderQty>0);
 
-  const allItems = consumerItems.map(it=>{
+  // build enriched items with stock info
+  const enrich = (items) => items.map(it=>{
     const total = BUILDINGS.reduce((s,b)=>s+getStock(it.id,b),0);
     const min = getMin(it.id);
-    const orderQty = Math.max(0, min - total);
-    return {...it, currentStock:total, minStock:min, orderQty};
+    return {...it, currentStock:total, minStock:min, orderQty:Math.max(0,min-total)};
   });
+
+  const allItems     = enrich(consumerItems);
+  const gnr3Items    = allItems.filter(it=>it.team!=='isourcing');
+  const isrcItems    = allItems.filter(it=>it.team==='isourcing');
+  const orderList    = allItems.filter(it=>it.orderQty>0);
+  const gnr3Order    = gnr3Items.filter(it=>it.orderQty>0);
+  const isrcOrder    = isrcItems.filter(it=>it.orderQty>0);
 
   const totalOrderItems = orderList.length;
   const totalOkItems    = allItems.filter(it=>it.orderQty===0).length;
+
+  // table row renderer
+  const orderRow = (it,idx) => {
+    const lvClr = it.currentStock<=0?'#fda4af':it.currentStock<it.minStock?'#fcd34d':'#6ee7b7';
+    return `<tr>
+      <td class="td-no">${it.no}</td>
+      <td class="td-name">${it.name}</td>
+      <td><span class="badge ${CAT_CLR[it.cat]}">${it.cat}</span></td>
+      <td style="color:var(--t2)">${it.unit}</td>
+      <td style="text-align:center;font-family:'Kanit',sans-serif;font-weight:600;color:${lvClr}">${it.currentStock}</td>
+      <td style="text-align:center;color:var(--t3);font-family:'Kanit',sans-serif">${it.minStock}</td>
+      <td style="text-align:center">
+        <span style="background:rgba(244,63,94,.15);color:#fda4af;border:1px solid rgba(244,63,94,.25);padding:3px 12px;border-radius:8px;font-family:'Kanit',sans-serif;font-weight:700">+ ${it.orderQty}</span>
+      </td>
+    </tr>`;
+  };
+
+  const allRow = (it) => {
+    const clr = it.orderQty>0?(it.currentStock<=0?'#fda4af':'#fcd34d'):'#6ee7b7';
+    return `<tr>
+      <td class="td-no">${it.no}</td>
+      <td class="td-name">${it.name}</td>
+      <td><span class="badge ${CAT_CLR[it.cat]}">${it.cat}</span></td>
+      <td style="color:var(--t2)">${it.unit}</td>
+      <td style="text-align:center;font-family:'Kanit',sans-serif;font-weight:700;color:${clr}">${it.currentStock}</td>
+      <td style="text-align:center;color:var(--t3);font-family:'Kanit',sans-serif">${it.minStock}</td>
+      <td style="text-align:center;font-family:'Kanit',sans-serif;font-weight:700;color:${it.orderQty>0?'#fda4af':'var(--t3)'}">
+        ${it.orderQty>0?'+ '+it.orderQty:'—'}
+      </td>
+    </tr>`;
+  };
+
+  const sectionTable = (rows, foot) => rows.length===0
+    ? `<div class="tbl-empty" style="padding:24px"><span style="font-size:24px">✅</span><p style="margin-top:8px;font-family:'Kanit',sans-serif;color:var(--t2)">สต็อกครบทุกรายการ</p></div>`
+    : `<div class="tbl-wrap"><table>
+        <thead><tr><th>#</th><th>รายการสินค้า</th><th>หมวด</th><th>หน่วย</th>
+          <th style="text-align:center">สต็อกรวม</th><th style="text-align:center">ขั้นต่ำ</th>
+          <th style="text-align:center;color:#fda4af">ต้องสั่ง</th></tr></thead>
+        <tbody>${rows.map(orderRow).join('')}</tbody>
+      </table></div>
+      <div class="tbl-foot"><span style="color:var(--t2)">${foot}</span></div>`;
+
+  const allSectionTable = (rows) => `<div class="tbl-wrap"><table>
+      <thead><tr><th>#</th><th>รายการ</th><th>หมวด</th><th>หน่วย</th>
+        <th style="text-align:center">คงเหลือ</th><th style="text-align:center">ขั้นต่ำ</th>
+        <th style="text-align:center">สั่ง</th></tr></thead>
+      <tbody>${rows.map(allRow).join('')}</tbody>
+    </table>
+    <div class="tbl-foot"><span>${rows.length} รายการ</span></div>
+  </div>`;
 
   const ct = document.getElementById('content');
   ct.innerHTML = `
@@ -5208,91 +5337,37 @@ function refreshMonthly(){
       </div>
     </div>
 
-    ${totalOrderItems===0 ? `
-    <div class="tbl-empty">
-      <div style="font-size:48px;margin-bottom:12px">✅</div>
-      <p style="font-family:'Kanit',sans-serif;font-size:15px;font-weight:600;color:var(--t1);margin-bottom:6px">สต็อกครบทุกรายการ!</p>
-      <p style="font-size:13px;color:var(--t2)">ไม่มีรายการที่ต้องสั่งซื้อเดือน${TH_MONTHS[month]} ${year+543}</p>
-    </div>` : `
-    <div class="tbl-wrap">
-      <table id="monthly-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>รายการสินค้า</th>
-            <th>หมวด</th>
-            <th>หน่วย</th>
-            <th style="text-align:center">สต็อกรวม</th>
-            <th style="text-align:center">ขั้นต่ำ</th>
-            <th style="text-align:center;color:#fda4af">ต้องสั่ง</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${orderList.map((it,idx)=>{
-            const lv = it.currentStock<=0?'หมด':it.currentStock<it.minStock?'ต่ำ':'ปกติ';
-            const lvClr = it.currentStock<=0?'#fda4af':it.currentStock<it.minStock?'#fcd34d':'#6ee7b7';
-            return `<tr>
-              <td class="td-no">${idx+1}</td>
-              <td class="td-name">${it.name}</td>
-              <td><span class="badge ${CAT_CLR[it.cat]}">${it.cat}</span></td>
-              <td style="color:var(--t2)">${it.unit}</td>
-              <td style="text-align:center;font-family:'Kanit',sans-serif;font-weight:600;color:${lvClr}">${it.currentStock}</td>
-              <td style="text-align:center;color:var(--t3);font-family:'Kanit',sans-serif">${it.minStock}</td>
-              <td style="text-align:center">
-                <span style="background:rgba(244,63,94,.15);color:#fda4af;border:1px solid rgba(244,63,94,.25);padding:3px 12px;border-radius:8px;font-family:'Kanit',sans-serif;font-weight:700">+ ${it.orderQty}</span>
-              </td>
-            </tr>`;
-          }).join('')}
-        </tbody>
-      </table>
+    <!-- ── ส่วน GNR3 (รายการ 1-33) ── -->
+    <div style="padding:10px 20px 4px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);background:rgba(99,102,241,.04)">
+      <span style="font-size:11px;font-family:'Kanit',sans-serif;font-weight:700;color:#a5b4fc;text-transform:uppercase;letter-spacing:.08em">📦 ทีม GNR3 · รายการ 1–33</span>
+      <span style="font-size:11px;color:var(--t3);margin-left:4px">(${gnr3Order.length} รายการต้องสั่ง)</span>
     </div>
-    <div class="tbl-foot">
-      <span style="color:var(--t2)">รายการที่ต้องสั่งซื้อ ${totalOrderItems} รายการ · เดือน${TH_MONTHS[month]} ${year+543}</span>
-    </div>`}
+    ${sectionTable(gnr3Order, `GNR3 · ${gnr3Order.length} รายการต้องสั่ง · เดือน${TH_MONTHS[month]} ${year+543}`)}
+
+    <!-- ── ส่วน isourcing (รายการ 34-38) ── -->
+    <div style="padding:10px 20px 4px;display:flex;align-items:center;gap:8px;border-top:2px solid var(--border);border-bottom:1px solid var(--border);background:rgba(245,158,11,.04)">
+      <span style="font-size:11px;font-family:'Kanit',sans-serif;font-weight:700;color:#fcd34d;text-transform:uppercase;letter-spacing:.08em">🏢 ทีม isourcing · รายการ 34–38</span>
+      <span style="font-size:11px;color:var(--t3);margin-left:4px">(${isrcOrder.length} รายการต้องสั่ง)</span>
+    </div>
+    ${sectionTable(isrcOrder, `isourcing · ${isrcOrder.length} รายการต้องสั่ง · เดือน${TH_MONTHS[month]} ${year+543}`)}
   </div>
 
-  <!-- All items summary -->
+  <!-- All items summary — split by team -->
   <div class="sec fade-in">
     <div class="sec-head">
       <span class="sec-title">รายการสต็อกทั้งหมด (${allItems.length} รายการ)</span>
       <span style="font-size:12px;color:var(--t2);margin-left:auto">เดือน${TH_MONTHS[month]} ${year+543}</span>
     </div>
-    ${window.innerWidth < 640 ?
-      `<div style="display:flex;flex-direction:column;gap:8px;padding:10px">
-        ${allItems.map(it=>{
-          const clr = it.orderQty>0?(it.currentStock<=0?'#fda4af':'#fcd34d'):'#6ee7b7';
-          const lbl = it.orderQty>0?(it.currentStock<=0?'หมด':'ต่ำ'):'ปกติ';
-          const bg  = it.orderQty>0?(it.currentStock<=0?'rgba(244,63,94,.12)':'rgba(245,158,11,.12)'):'rgba(16,185,129,.12)';
-          return `<div class="scard">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-              <div style="font-family:'Kanit',sans-serif;font-size:12px;font-weight:600;color:var(--t1)">${it.name}</div>
-              <span style="background:${bg};color:${clr};border-radius:8px;padding:2px 8px;font-size:11px;font-family:'Kanit',sans-serif;font-weight:600;flex-shrink:0">${lbl}</span>
-            </div>
-            <div class="scard-row"><span class="scard-key">คงเหลือ</span><span style="font-family:'Kanit',sans-serif;font-weight:700;color:${clr}">${it.currentStock} ${it.unit}</span></div>
-            <div class="scard-row"><span class="scard-key">ขั้นต่ำ</span><span style="color:var(--t3)">${it.minStock}</span></div>
-            ${it.orderQty>0?`<div class="scard-row"><span class="scard-key">ต้องสั่ง</span><span style="color:#fda4af;font-weight:700;font-family:'Kanit',sans-serif">+ ${it.orderQty} ${it.unit}</span></div>`:''}
-          </div>`;
-        }).join('')}
-      </div>`
-      : `<div class="tbl-wrap"><table>
-          <thead><tr><th>#</th><th>รายการ</th><th>หมวด</th><th>หน่วย</th><th style="text-align:center">คงเหลือ</th><th style="text-align:center">ขั้นต่ำ</th><th style="text-align:center">สั่ง</th></tr></thead>
-          <tbody>${allItems.map((it,idx)=>{
-            const clr = it.orderQty>0?(it.currentStock<=0?'#fda4af':'#fcd34d'):'#6ee7b7';
-            return `<tr>
-              <td class="td-no">${idx+1}</td>
-              <td class="td-name">${it.name}</td>
-              <td><span class="badge ${CAT_CLR[it.cat]}">${it.cat}</span></td>
-              <td style="color:var(--t2)">${it.unit}</td>
-              <td style="text-align:center;font-family:'Kanit',sans-serif;font-weight:700;color:${clr}">${it.currentStock}</td>
-              <td style="text-align:center;color:var(--t3);font-family:'Kanit',sans-serif">${it.minStock}</td>
-              <td style="text-align:center;font-family:'Kanit',sans-serif;font-weight:700;color:${it.orderQty>0?'#fda4af':'var(--t3)'}">
-                ${it.orderQty>0?'+ '+it.orderQty:'—'}
-              </td>
-            </tr>`;
-          }).join('')}</tbody>
-        </table>
-        <div class="tbl-foot"><span>${allItems.length} รายการ</span></div>
-      </div>`}
+
+    <div style="padding:8px 20px 4px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border);background:rgba(99,102,241,.04)">
+      <span style="font-size:11px;font-family:'Kanit',sans-serif;font-weight:700;color:#a5b4fc">📦 GNR3 (รายการ 1–33)</span>
+    </div>
+    ${allSectionTable(gnr3Items)}
+
+    <div style="padding:8px 20px 4px;display:flex;align-items:center;gap:6px;border-top:2px solid var(--border);border-bottom:1px solid var(--border);background:rgba(245,158,11,.04)">
+      <span style="font-size:11px;font-family:'Kanit',sans-serif;font-weight:700;color:#fcd34d">🏢 isourcing (รายการ 34–38)</span>
+    </div>
+    ${allSectionTable(isrcItems)}
   </div>`;
 }
 
@@ -5318,42 +5393,56 @@ function printMonthlyOrder(){
   const TH_MONTHS = ['','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
                      'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
   const consumerItems = ITEMS.filter(it=>it.cat!=='ซ่อมบำรุง');
-  const orderList = consumerItems.map(it=>{
+  const all = consumerItems.map(it=>{
     const total = BUILDINGS.reduce((s,b)=>s+getStock(it.id,b),0);
     const min = getMin(it.id);
     return {...it, currentStock:total, minStock:min, orderQty:Math.max(0,min-total)};
   }).filter(it=>it.orderQty>0);
+  const gnr3  = all.filter(it=>it.team!=='isourcing');
+  const isrc  = all.filter(it=>it.team==='isourcing');
+
+  const tblHtml = (rows, label) => rows.length===0
+    ? `<p style="color:#555;font-size:13px;padding:8px 0">✅ ไม่มีรายการต้องสั่ง</p>`
+    : `<table>
+        <thead><tr><th>#</th><th>รายการสินค้า</th><th>หน่วย</th><th class="num">คงเหลือ</th><th class="num">ขั้นต่ำ</th><th class="num">สั่งซื้อ</th></tr></thead>
+        <tbody>${rows.map(it=>`<tr>
+          <td>${it.no}</td><td>${it.name}</td><td>${it.unit}</td>
+          <td class="num">${it.currentStock}</td>
+          <td class="num">${it.minStock}</td>
+          <td class="num order">+ ${it.orderQty}</td>
+        </tr>`).join('')}</tbody>
+        <tfoot><tr><td colspan="5">รวม ${rows.length} รายการ</td><td class="num order">—</td></tr></tfoot>
+      </table>`;
 
   const html = `<!DOCTYPE html><html lang="th"><head>
     <meta charset="UTF-8"><title>สรุปรายการสั่งซื้อ ${TH_MONTHS[month]} ${year+543}</title>
     <style>
       body{font-family:'Sarabun',sans-serif;padding:24px;color:#111}
       h2{font-family:'Kanit',sans-serif;font-size:18px;margin-bottom:4px}
-      p{color:#666;font-size:13px;margin-bottom:16px}
-      table{width:100%;border-collapse:collapse;font-size:13px}
+      h3{font-family:'Kanit',sans-serif;font-size:14px;margin:18px 0 6px;padding:6px 10px;border-radius:6px}
+      .gnr3{background:#eef2ff;color:#3730a3}
+      .isrc{background:#fffbeb;color:#92400e}
+      p{color:#666;font-size:13px;margin-bottom:12px}
+      table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:4px}
       th{background:#1a1a2e;color:#fff;padding:8px 12px;text-align:left;font-family:'Kanit',sans-serif;font-size:12px}
       td{padding:7px 12px;border-bottom:1px solid #eee}
       .num{text-align:center;font-family:'Kanit',sans-serif;font-weight:700}
       .order{color:#e11d48;font-weight:700}
       tfoot td{background:#f9f9f9;font-weight:600;font-family:'Kanit',sans-serif}
+      .divider{border:none;border-top:2px solid #e5e7eb;margin:20px 0}
     </style>
   </head><body>
     <h2>ใบสรุปรายการสั่งซื้อ GNR3</h2>
     <p>เดือน${TH_MONTHS[month]} ${year+543} · วันที่พิมพ์: ${new Date().toLocaleDateString('th-TH')} · ผู้จัดทำ: Admin</p>
-    <table>
-      <thead><tr><th>#</th><th>รายการสินค้า</th><th>หน่วย</th><th class="num">คงเหลือ</th><th class="num">ขั้นต่ำ</th><th class="num">สั่งซื้อ</th></tr></thead>
-      <tbody>${orderList.map((it,i)=>`<tr>
-        <td>${i+1}</td><td>${it.name}</td><td>${it.unit}</td>
-        <td class="num">${it.currentStock}</td>
-        <td class="num">${it.minStock}</td>
-        <td class="num order">+ ${it.orderQty}</td>
-      </tr>`).join('')}</tbody>
-      <tfoot><tr><td colspan="5">รวม ${orderList.length} รายการ</td><td class="num order">—</td></tr></tfoot>
-    </table>
+    <h3 class="gnr3">📦 ทีม GNR3 · รายการ 1–33</h3>
+    ${tblHtml(gnr3,'gnr3')}
+    <hr class="divider">
+    <h3 class="isrc">🏢 ทีม isourcing · รายการ 34–38</h3>
+    ${tblHtml(isrc,'isrc')}
     <script>window.onload=()=>{window.print();window.close();}<\/script>
   </body></html>`;
 
-  const w = window.open('','_blank','width=800,height=600');
+  const w = window.open('','_blank','width=800,height=700');
   w.document.write(html);
   w.document.close();
 }
@@ -5488,6 +5577,7 @@ function savePriceModal(){
     : ITEMS.filter(it=>it.cat==='ซ่อมบำรุง');
 
   let changed = 0;
+  const prices = {}; // collect for GAS push
   items.forEach(it=>{
     const inp = document.getElementById(`price-inp-${it.id}`);
     if(!inp) return;
@@ -5500,11 +5590,18 @@ function savePriceModal(){
       if(!isNaN(price) && price>=0){
         if(!itemPrices[it.id]) itemPrices[it.id]={};
         itemPrices[it.id][`${year}_${month}`] = price;
+        prices[it.id] = price;
         changed++;
       }
     }
   });
   saveState();
+
+  // Push prices to GAS
+  if(USE_GAS && Object.keys(prices).length > 0){
+    gasPost({ action:'updatePrices', month, year, prices });
+  }
+
   showToast('✅',`บันทึกราคา ${changed} รายการแล้ว`);
   closeOverlay('ov-price');
   render(currentPage);
