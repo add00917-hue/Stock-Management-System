@@ -1867,7 +1867,8 @@ const ITEMS = [
 /* ================================================================
    STATE
 ================================================================ */
-let minStockOverrides = {}; // {itemId: number}
+let minStockOverrides = {}; // {itemId: number} — global default
+let minStockPerBldg = {};  // {bldg: {itemId: number}} — per-building overrides
 let transactions = [];
 let currentPage = 'dashboard';
 let globalBldg   = 'all';
@@ -1877,8 +1878,9 @@ let rejectTargetId = null;
 // If month not set, inherits from most recent previous month
 let itemPrices = {};
 
-const LS_TXN = 'gnr3_txn_v1';
-const LS_MIN = 'gnr3_min_v1';
+const LS_TXN   = 'gnr3_txn_v1';
+const LS_MIN   = 'gnr3_min_v1';
+const LS_MIN_BLDG = 'gnr3_min_bldg_v1';
 const LS_PRICE = 'gnr3_price_v1';
 
 function loadState(){
@@ -1886,18 +1888,34 @@ function loadState(){
   catch(e){ transactions = seedTransactions(); }
   try{ minStockOverrides = JSON.parse(localStorage.getItem(LS_MIN)||'{}'); }
   catch(e){ minStockOverrides = {}; }
+  try{ minStockPerBldg = JSON.parse(localStorage.getItem(LS_MIN_BLDG)||'{}'); }
+  catch(e){ minStockPerBldg = {}; }
   try{ itemPrices = JSON.parse(localStorage.getItem(LS_PRICE)||'{}'); }
   catch(e){ itemPrices = {}; }
 }
 function saveState(){
   localStorage.setItem(LS_TXN, JSON.stringify(transactions));
   localStorage.setItem(LS_MIN, JSON.stringify(minStockOverrides));
+  localStorage.setItem(LS_MIN_BLDG, JSON.stringify(minStockPerBldg));
   localStorage.setItem(LS_PRICE, JSON.stringify(itemPrices));
 }
 
-function getMin(itemId){
+// getMin(itemId, bldg?) — returns per-building min if bldg given, else global default
+function getMin(itemId, bldg){
   const it = ITEMS.find(x=>x.id===itemId);
+  if(bldg && bldg !== 'all'){
+    return (minStockPerBldg[bldg] && minStockPerBldg[bldg][itemId] !== undefined)
+      ? minStockPerBldg[bldg][itemId]
+      : (minStockOverrides[itemId] ?? it?.min ?? 0);
+  }
   return minStockOverrides[itemId] ?? it?.min ?? 0;
+}
+
+// setMinBldg — save per-building min
+function setMinBldg(bldg, itemId, val){
+  if(!minStockPerBldg[bldg]) minStockPerBldg[bldg] = {};
+  if(val === null || val === undefined) delete minStockPerBldg[bldg][itemId];
+  else minStockPerBldg[bldg][itemId] = val;
 }
 
 /* ── Price helpers ── */
@@ -2620,10 +2638,20 @@ function renderAdmin(){
     </div>
     <button class="btn btn-primary btn-sm" onclick="showLoginModal()" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Login</button>
   </div>` : `
-  <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:10px" class="fade-in">
+  <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap" class="fade-in">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     <div style="font-size:13px;color:#86efac;font-family:'Kanit',sans-serif;font-weight:500">เข้าสู่ระบบแล้ว · สามารถตั้งค่าสต็อกขั้นต่ำได้</div>
-    <button class="btn btn-ghost btn-sm" style="margin-left:auto;display:flex;align-items:center;gap:6px" onclick="doLogout()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> ออกจากระบบ</button>
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <a href="https://docs.google.com/spreadsheets/d/1SgtiSzgjgo3abIBD4EnWrTNG-e2Zobbbf5vJlyNkwjY/edit?usp=sharing"
+         target="_blank" rel="noopener"
+         style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;font-family:'Kanit',sans-serif;font-size:12px;font-weight:600;text-decoration:none;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.35);color:#6ee7b7;transition:all .2s"
+         onmouseover="this.style.background='rgba(16,185,129,.28)'" onmouseout="this.style.background='rgba(16,185,129,.15)'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Stock DB · Google Sheets
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+      <button class="btn btn-ghost btn-sm" style="display:flex;align-items:center;gap:6px" onclick="doLogout()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> ออกจากระบบ</button>
+    </div>
   </div>`}
 
   <!-- History table with single filter row -->
@@ -4808,7 +4836,12 @@ function refreshHistory(fromAdmin){
 /* ================================================================
    PAGE: SETTINGS (MIN STOCK)
 ================================================================ */
-function renderSettings(){
+/* ── Settings: which building is selected for min-stock editing ── */
+let _settingsBldg = 'all';
+
+function renderSettings(bldg){
+  if(bldg !== undefined) _settingsBldg = bldg;
+
   document.getElementById('topbar-actions').innerHTML=
     `<button class="btn btn-green" onclick="saveSettings()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
@@ -4819,8 +4852,26 @@ function renderSettings(){
   const yr  = now.getFullYear();
   const mo  = now.getMonth() + 1;
 
+  const sel = _settingsBldg; // 'all' or a specific building
   const consumerItems = ITEMS.filter(it => it.cat !== 'ซ่อมบำรุง');
   const maintItems    = ITEMS.filter(it => it.cat === 'ซ่อมบำรุง');
+
+  // Building tab bar HTML
+  const bldgTabs = `
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--bg-glass)">
+      <span style="font-size:11px;font-family:'Kanit',sans-serif;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-right:4px">🏢 อาคาร:</span>
+      <button class="btab ${sel==='all'?'active':''}" onclick="renderSettings('all')" title="ค่าเริ่มต้นทุกอาคาร">ค่าเริ่มต้น (ทุกอาคาร)</button>
+      ${BUILDINGS.map(b=>`<button class="btab ${sel===b?'active':''}" onclick="renderSettings('${b}')">${b}</button>`).join('')}
+      ${sel!=='all' ? `<span style="font-size:11px;color:var(--amber);font-family:'Kanit',sans-serif;margin-left:8px">⚠ กำลังแก้ขั้นต่ำเฉพาะอาคาร <strong>${sel}</strong> — หากไม่ระบุจะใช้ค่าเริ่มต้น</span>` : ''}
+    </div>`;
+
+  // Helper: get displayed min for an item given current selected building
+  const dispMin = (itemId) => {
+    if(sel === 'all') return getMin(itemId); // global default
+    return (minStockPerBldg[sel] && minStockPerBldg[sel][itemId] !== undefined)
+      ? minStockPerBldg[sel][itemId]
+      : ''; // blank = inherits default
+  };
 
   document.getElementById('content').innerHTML = `
   <!-- ══ อุปโภค บริโภค + ราคา ══ -->
@@ -4831,6 +4882,7 @@ function renderSettings(){
         <div style="font-size:12px;color:var(--t2);margin-top:2px">ราคาใช้คำนวณมูลค่าสต็อกและสรุปรายเดือน · เดือน ${mo}/${yr}</div>
       </div>
     </div>
+    ${bldgTabs}
     <div class="tbl-wrap"><table>
       <thead>
         <tr>
@@ -4838,31 +4890,43 @@ function renderSettings(){
           <th>ชื่อสินค้า</th>
           <th>หมวด</th>
           <th>หน่วย</th>
-          <th style="text-align:center;min-width:90px">ขั้นต่ำ</th>
+          <th style="text-align:center;min-width:110px">
+            ขั้นต่ำ${sel!=='all'?` <span style="font-size:9px;color:var(--amber)">(${sel})</span>`:''}
+            ${sel!=='all'?`<div style="font-size:9px;color:var(--t3);font-weight:400;margin-top:1px">ว่าง = ใช้ค่าเริ่มต้น (${''}</div>`:''}
+          </th>
+          ${sel==='all'?`
           <th style="text-align:center;min-width:110px">
             ราคา/หน่วย (฿)
             <div style="font-size:9px;font-weight:400;color:var(--t3);margin-top:1px">เดือน ${mo}/${yr}</div>
           </th>
-          <th style="text-align:center;min-width:100px">มูลค่ารวม</th>
+          <th style="text-align:center;min-width:100px">มูลค่ารวม</th>`:''}
         </tr>
       </thead>
       <tbody>
         ${consumerItems.map(it=>{
-          const cur   = BUILDINGS.reduce((s,b)=>s+getStock(it.id,b),0);
-          const min   = getMin(it.id);
+          const cur   = sel==='all'
+            ? BUILDINGS.reduce((s,b)=>s+getStock(it.id,b),0)
+            : getStock(it.id, sel);
+          const globalMin = getMin(it.id);
           const price = getCurrentPrice(it.id);
           const value = cur * price;
-          const lv    = stockLevel(cur,min);
+          const lv    = stockLevel(cur, getMin(it.id, sel==='all'?null:sel));
           const lvClr = lv==='ok'?'#6ee7b7':lv==='low'?'#fcd34d':'#fca5a5';
+          const dMin  = dispMin(it.id);
           return `<tr>
             <td class="td-no">${it.no}</td>
             <td class="td-name">${it.name}<small>${it.unit}</small></td>
             <td><span class="badge ${CAT_CLR[it.cat]}">${it.cat}</span></td>
             <td style="color:var(--t2);font-size:12px">${it.unit}</td>
             <td style="text-align:center">
-              <input type="number" class="finput" id="min-${it.id}" value="${min}" min="0"
-                style="width:80px;text-align:center;font-family:'Kanit',sans-serif;font-weight:600">
+              <input type="number" class="finput" id="min-${it.id}"
+                value="${dMin}"
+                placeholder="${sel!=='all'?globalMin:''}"
+                min="0"
+                style="width:88px;text-align:center;font-family:'Kanit',sans-serif;font-weight:600${dMin===''?';color:var(--t3)':''}">
+              ${sel!=='all' && dMin!=='' ? `<div style="font-size:9px;color:var(--t3);margin-top:2px">ค่าเริ่มต้น: ${globalMin}</div>` : ''}
             </td>
+            ${sel==='all'?`
             <td style="text-align:center">
               <div style="display:flex;align-items:center;gap:4px;justify-content:center">
                 <span style="font-size:12px;color:var(--t3)">฿</span>
@@ -4877,11 +4941,11 @@ function renderSettings(){
                 ? `<span style="font-family:'Kanit',sans-serif;font-weight:700;color:${lvClr}">฿${value.toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:0})}</span>
                    <div style="font-size:10px;color:var(--t3)">${cur} ${it.unit}</div>`
                 : `<span style="color:var(--t3);font-size:12px">ยังไม่ระบุ</span>`}
-            </td>
+            </td>`:''}
           </tr>`;
         }).join('')}
       </tbody>
-      <tfoot>
+      ${sel==='all'?`<tfoot>
         <tr style="border-top:2px solid var(--border-hi)">
           <td colspan="5" style="padding:10px 8px;font-family:'Kanit',sans-serif;font-weight:600;color:var(--t2)">มูลค่ารวม อุปโภค บริโภค</td>
           <td></td>
@@ -4897,36 +4961,43 @@ function renderSettings(){
             })()}
           </td>
         </tr>
-      </tfoot>
+      </tfoot>`:''}
     </table></div>
   </div>
 
   <!-- ══ ส่วนกลาง — ขั้นต่ำเท่านั้น ══ -->
   <div class="sec fade-in">
     <div class="sec-head">
-      <span class="sec-title">🔧 ส่วนกลาง — ขั้นต่ำ</span>
+      <span class="sec-title">🔧 ส่วนกลาง — ขั้นต่ำ${sel!=='all'?` (${sel})`:''}</span>
     </div>
     <div class="tbl-wrap"><table>
-      <thead><tr><th>#</th><th>ชื่ออุปกรณ์</th><th>ระบบ</th><th>หน่วย</th><th style="text-align:center">ขั้นต่ำ</th></tr></thead>
+      <thead><tr><th>#</th><th>ชื่ออุปกรณ์</th><th>ระบบ</th><th>หน่วย</th>
+        <th style="text-align:center">ขั้นต่ำ${sel!=='all'?` <span style="font-size:9px;color:var(--amber)">(${sel})</span>`:''}</th>
+      </tr></thead>
       <tbody>
-        ${maintItems.map(it=>`<tr>
+        ${maintItems.map(it=>{
+          const gMin = getMin(it.id);
+          const dMin = dispMin(it.id);
+          return `<tr>
           <td class="td-no">${it.no}</td>
           <td class="td-name">${it.name}</td>
           <td><span class="badge ${it.subcat==='ไฟฟ้า'?'b-yellow':'b-cyan'}">${SUBCAT_ICO[it.subcat]} ${it.subcat}</span></td>
           <td style="color:var(--t2);font-size:12px">${it.unit}</td>
           <td style="text-align:center">
-            <input type="number" class="finput" id="min-${it.id}" value="${getMin(it.id)}" min="0"
-              style="width:80px;text-align:center;font-family:'Kanit',sans-serif;font-weight:600">
+            <input type="number" class="finput" id="min-${it.id}"
+              value="${dMin}" placeholder="${sel!=='all'?gMin:''}" min="0"
+              style="width:88px;text-align:center;font-family:'Kanit',sans-serif;font-weight:600${dMin===''?';color:var(--t3)':''}">
+            ${sel!=='all' && dMin!=='' ? `<div style="font-size:9px;color:var(--t3);margin-top:2px">ค่าเริ่มต้น: ${gMin}</div>` : ''}
           </td>
-        </tr>`).join('')}
+        </tr>`;}).join('')}
       </tbody>
     </table></div>
   </div>
 
-  <div style="padding:0;display:flex;justify-content:flex-end">
+  <div style="padding:0;display:flex;justify-content:flex-end;gap:8px">
     <button class="btn btn-green" onclick="saveSettings()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-      บันทึกทั้งหมด
+      บันทึก${sel!=='all'?` (${sel})`:'ทั้งหมด'}
     </button>
   </div>`;
 }
@@ -4962,14 +5033,31 @@ function saveSettings(){
   const now = new Date();
   const yr  = now.getFullYear();
   const mo  = now.getMonth()+1;
+  const sel = _settingsBldg; // 'all' or a specific building
 
   ITEMS.forEach(it=>{
-    // min stock
-    const v = parseInt(document.getElementById(`min-${it.id}`)?.value)||0;
-    if(v !== it.min) minStockOverrides[it.id] = v;
-    else delete minStockOverrides[it.id];
-    // price (consumer only)
-    if(it.cat !== 'ซ่อมบำรุง'){
+    const inp = document.getElementById(`min-${it.id}`);
+    if(!inp) return;
+    const raw = inp.value.trim();
+
+    if(sel === 'all'){
+      // Save as global default
+      const v = raw === '' ? it.min : (parseInt(raw)||0);
+      if(v !== it.min) minStockOverrides[it.id] = v;
+      else delete minStockOverrides[it.id];
+    } else {
+      // Save per-building
+      if(raw === ''){
+        // blank = inherit from global default → remove per-building override
+        if(minStockPerBldg[sel]) delete minStockPerBldg[sel][it.id];
+      } else {
+        const v = parseInt(raw)||0;
+        setMinBldg(sel, it.id, v);
+      }
+    }
+
+    // price (consumer only, only shown in global/all view)
+    if(sel === 'all' && it.cat !== 'ซ่อมบำรุง'){
       const p = parseFloat(document.getElementById(`price-${it.id}`)?.value)||0;
       if(p > 0) setPrice(it.id, yr, mo, p);
     }
@@ -4980,15 +5068,18 @@ function saveSettings(){
     const settings = {};
     ITEMS.forEach(it=>{ settings[it.id] = getMin(it.id); });
     gasPost({ action:'updateSettings', settings });
-    // Push prices for consumer items
-    const prices = {};
-    ITEMS.filter(it=>it.cat!=='ซ่อมบำรุง').forEach(it=>{
-      const p = parseFloat(document.getElementById(`price-${it.id}`)?.value)||0;
-      if(p>0) prices[it.id] = p;
-    });
-    if(Object.keys(prices).length>0) gasPost({ action:'updatePrices', prices });
+    if(sel === 'all'){
+      const prices = {};
+      ITEMS.filter(it=>it.cat!=='ซ่อมบำรุง').forEach(it=>{
+        const p = parseFloat(document.getElementById(`price-${it.id}`)?.value)||0;
+        if(p>0) prices[it.id] = p;
+      });
+      if(Object.keys(prices).length>0) gasPost({ action:'updatePrices', prices });
+    }
   }
-  showToast('✅','บันทึกค่าตั้งสต็อกและราคาแล้ว');
+  const label = sel==='all' ? 'ค่าเริ่มต้น (ทุกอาคาร)' : `อาคาร ${sel}`;
+  showToast('✅',`บันทึกขั้นต่ำ ${label} แล้ว`);
+  render(currentPage); // re-render to update stock level indicators
 }
 
 /* ================================================================
