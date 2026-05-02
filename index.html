@@ -1270,26 +1270,32 @@ body{background:var(--bg);color:var(--t1);font-family:'Kanit',sans-serif;display
       <div class="ccard-head">
         <span class="ccard-title" id="mdtitle">รายการสั่งซื้อ</span>
         <span id="mon-bldg-label" style="font-size:10px;color:var(--t3);margin-left:6px"></span>
-        <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+        <div style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <div class="tbar" id="mon-cat-tabs">
             <div class="tab act" onclick="switchMonCat('consumer',this)">📦 อุปโภคบริโภค</div>
             <div class="tab" onclick="switchMonCat('maintenance',this)">🔧 ซ่อมบำรุง</div>
           </div>
-          <label style="font-size:10px;color:var(--t2);display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="mon-show-all" onchange="renderMonthlyOrder()"> ทั้งหมด</label>
+          <label style="font-size:10px;color:var(--t2);display:flex;align-items:center;gap:5px;cursor:pointer">
+            <input type="checkbox" id="mon-show-all" onchange="renderMonthlyOrder()" checked> แสดงทุกรายการ
+          </label>
           <span id="mon-total-cost" style="font-size:11px;font-weight:700;color:var(--lime)"></span>
+          <button class="btn btn-lime btn-sm" onclick="submitMonthlyOrder()" title="ส่งรายการสั่งซื้อไปเก็บใน SH_MONTHLY">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            ส่งขอจัดซื้อ
+          </button>
         </div>
       </div>
       <div style="overflow-x:auto">
-        <table class="tbl" style="min-width:620px">
+        <table class="tbl" style="min-width:680px;width:100%">
           <thead><tr>
-            <th style="width:28px">#</th>
+            <th style="width:36px;text-align:center">จำนวน</th>
             <th>รายการสินค้า</th>
-            <th style="text-align:center;width:60px">หน่วย</th>
-            <th style="text-align:right;width:90px">ราคา/หน่วย<br><span style="font-size:8px;color:var(--t3);font-weight:400">(คลิกแก้ไข)</span></th>
-            <th style="text-align:center;width:60px">คงเหลือ</th>
-            <th style="text-align:center;width:60px">ขั้นต่ำ<br><span style="font-size:8px;color:var(--t3);font-weight:400">(คลิกแก้ไข)</span></th>
-            <th style="text-align:center;width:80px;color:#fca5a5">ต้องสั่ง</th>
-            <th style="text-align:right;width:90px;color:var(--lime)">ราคารวม</th>
+            <th style="text-align:center;width:58px">หน่วย</th>
+            <th style="text-align:right;width:90px">ราคา/หน่วย</th>
+            <th style="text-align:center;width:64px">คงเหลือ</th>
+            <th style="text-align:center;width:60px">ขั้นต่ำ</th>
+            <th style="text-align:center;width:90px;color:#fca5a5">จำนวนที่ต้องการ</th>
+            <th style="text-align:right;width:96px;color:var(--lime)">ราคารวม</th>
           </tr></thead>
           <tbody id="mon-order-body"><tr><td colspan="8" style="text-align:center;padding:20px;color:var(--t3)">⏳ กำลังคำนวณ...</td></tr></tbody>
           <tfoot id="mon-order-foot"></tfoot>
@@ -2254,6 +2260,7 @@ function onPriceChange(itemId, val){
   const v = parseFloat(val)||0;
   if(!itemPrices[itemId]) itemPrices[itemId] = {};
   itemPrices[itemId].default = v;
+  saveState(); // บันทึกทันที ไม่ต้องรอปุ่ม
 }
 
 function loadExcelPrices(){
@@ -2325,16 +2332,6 @@ const THAI_MONTHS_SHORT = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','�
 const THAI_MONTHS_LONG  = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
 
 // ── ราคาต่อหน่วย in-memory (persist via itemPrices) ──
-function getPrice(itemId){
-  const now = new Date();
-  const key = `${now.getFullYear()}_${now.getMonth()+1}`;
-  return (itemPrices[itemId]?.[key]) || (itemPrices[itemId]?.default) || 0;
-}
-function setPrice(itemId, price){
-  if(!itemPrices[itemId]) itemPrices[itemId] = {};
-  itemPrices[itemId].default = Number(price)||0;
-  saveState();
-}
 
 // ── ขั้นต่ำ editable ──
 function setMinStock(itemId, min){
@@ -2518,39 +2515,51 @@ function renderMonthlyOrder(){
         <span class="bx ${bxClass}">${label}</span>
         <span style="font-size:10px;color:var(--lime);margin-left:8px">✅ ทุกรายการสต็อกเพียงพอ</span>
       </td></tr>`;
-    const sectionTotal = filtered.reduce((s,r)=>s+r.total,0);
-    const needRows     = filtered.filter(r=>r.needOrder);
+
+    const sectionTotal    = filtered.reduce((s,r)=>s+r.total, 0);
+    const sectionNeedCost = filtered.filter(r=>r.needOrder).reduce((s,r)=>s+r.total, 0);
+    const needRows        = filtered.filter(r=>r.needOrder);
+
+    // Section header row
     let html = `<tr style="background:var(--panel3)"><td colspan="8" style="padding:7px 12px">
       <div style="display:flex;align-items:center;gap:8px">
         <span class="bx ${bxClass}">${label}</span>
-        ${needRows.length>0 ? `<span style="font-size:9.5px;color:#fca5a5">ต้องสั่ง ${needRows.length} รายการ</span>` : '<span style="font-size:9.5px;color:var(--lime)">✅ สต็อกพอ</span>'}
-        <span style="margin-left:auto;font-size:10px;font-weight:700;color:var(--lime)">฿${sectionTotal.toLocaleString()}</span>
+        <span style="font-size:9.5px;color:${needRows.length>0?'#fca5a5':'var(--lime)'}">
+          ${needRows.length>0 ? `ต้องสั่ง ${needRows.length} รายการ` : '✅ สต็อกพอ'}
+        </span>
+        ${sectionNeedCost>0 ? `<span style="margin-left:auto;font-size:10.5px;font-weight:700;color:var(--lime)">฿${sectionNeedCost.toLocaleString()}</span>` : ''}
       </div>
     </td></tr>`;
-    html += filtered.map(r=>{
-      const cl = {ok:'lok',low:'llow',out:'lout'}[r.lv]||'lok';
+
+    // Data rows
+    html += filtered.map((r,idx)=>{
+      const cl        = {ok:'lok',low:'llow',out:'lout'}[r.lv]||'lok';
       const orderCell = r.needOrder
         ? `<span style="color:#fca5a5;font-weight:800;font-family:'IBM Plex Mono',monospace">+${r.orderQty}</span>`
         : `<span style="color:var(--t3)">—</span>`;
-      const costCell = r.needOrder && r.price>0
-        ? `<span style="color:var(--lime);font-weight:700">฿${r.total.toLocaleString()}</span>`
-        : `<span style="color:var(--t3)">—</span>`;
-      // editable price
-      const priceCell = `<span onclick="editPrice('${r.it.id}',this)" style="cursor:pointer;padding:2px 5px;border-radius:5px;font-family:'IBM Plex Mono',monospace;font-size:11px;${r.price?'color:var(--t1)':'color:var(--t3)'}" title="คลิกเพื่อแก้ไขราคา">${r.price||'กรอก'}</span>`;
-      // editable min
-      const minCell = `<span onclick="editMin('${r.it.id}',this)" style="cursor:pointer;padding:2px 5px;border-radius:5px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--t2)" title="คลิกเพื่อแก้ไขขั้นต่ำ">${r.minQty}</span>`;
+      // ราคา/หน่วย: แสดงเสมอ, ถ้าไม่มีให้คลิกกรอก
+      const priceCell = r.price>0
+        ? `<span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600">${r.price.toLocaleString()}</span>`
+        : `<span onclick="editPrice('${r.it.id}',this)" style="cursor:pointer;font-size:10px;color:var(--t3);text-decoration:underline dotted" title="คลิกกรอกราคา">—</span>`;
+      // ราคารวม: แสดงเสมอถ้ามีราคา
+      const costCell = r.price>0 && r.orderQty>0
+        ? `<span style="color:var(--lime);font-weight:700;font-family:'IBM Plex Mono',monospace">฿${r.total.toLocaleString()}</span>`
+        : r.price>0 && r.orderQty===0
+        ? `<span style="color:var(--t3);font-size:10px">—</span>`
+        : `<span onclick="editPrice('${r.it.id}',this)" style="cursor:pointer;font-size:9.5px;color:var(--t3);text-decoration:underline dotted">กรอกราคา</span>`;
       const rowBg = r.needOrder ? 'background:rgba(248,113,113,.04)' : '';
       return `<tr style="${rowBg}">
-        <td style="color:var(--t3);font-weight:600">${r.it.no}</td>
-        <td style="font-size:11.5px">${r.it.name}</td>
+        <td style="text-align:center;color:var(--t3);font-weight:600;font-size:11px">${r.it.no}</td>
+        <td style="font-size:11.5px;font-weight:${r.needOrder?700:400}">${r.it.name}</td>
         <td style="text-align:center;color:var(--t3)">${r.it.unit}</td>
         <td style="text-align:right">${priceCell}</td>
         <td style="text-align:center"><span class="${cl}">${r.stockQty}</span></td>
-        <td style="text-align:center">${minCell}</td>
+        <td style="text-align:center;font-family:'IBM Plex Mono',monospace;color:var(--t2)">${r.minQty}</td>
         <td style="text-align:center">${orderCell}</td>
         <td style="text-align:right">${costCell}</td>
       </tr>`;
     }).join('');
+
     return html;
   };
 
@@ -2570,11 +2579,25 @@ function renderMonthlyOrder(){
   tbody.innerHTML = monBodyHtml;
 
   const grandTotal = totalCostGnr3 + totalCostIso;
-  tfoot.innerHTML = `<tr>
-    <td colspan="6" style="font-weight:800;font-size:12px">รวมทั้งหมด</td>
-    <td style="text-align:center;font-weight:800;color:#fca5a5">${needCount} รายการ</td>
-    <td style="text-align:right;font-weight:800;color:var(--lime)">฿${grandTotal.toLocaleString()}</td>
-  </tr>`;
+  const sec1Label  = isConsumerMon ? 'อุปโภคบริโภค' : 'ไฟฟ้า';
+  const sec2Label  = isConsumerMon ? 'isourcing' : 'ประปา';
+  tfoot.innerHTML = `
+    ${totalCostGnr3>0||totalCostIso>0 ? `
+    <tr style="background:var(--panel2);border-top:1px solid var(--bhi)">
+      <td colspan="6" style="padding:7px 12px;font-size:10.5px;color:var(--t3)">${sec1Label}</td>
+      <td style="text-align:center;font-weight:700;color:#fca5a5">${gnr3Rows.filter(r=>r.needOrder).length} รายการ</td>
+      <td style="text-align:right;font-weight:700;color:var(--purple2)">฿${totalCostGnr3.toLocaleString()}</td>
+    </tr>
+    <tr style="background:var(--panel2)">
+      <td colspan="6" style="padding:7px 12px;font-size:10.5px;color:var(--t3)">${sec2Label}</td>
+      <td style="text-align:center;font-weight:700;color:#fca5a5">${isoRows.filter(r=>r.needOrder).length} รายการ</td>
+      <td style="text-align:right;font-weight:700;color:var(--lime)">฿${totalCostIso.toLocaleString()}</td>
+    </tr>` : ''}
+    <tr style="background:var(--panel3);border-top:2px solid var(--bhi)">
+      <td colspan="6" style="padding:9px 12px;font-weight:800;font-size:13px">รวมทั้งหมด</td>
+      <td style="text-align:center;font-weight:800;color:#fca5a5;font-size:13px">${needCount} รายการ</td>
+      <td style="text-align:right;font-weight:900;color:var(--lime);font-size:14px;font-family:'IBM Plex Mono',monospace">฿${grandTotal.toLocaleString()}</td>
+    </tr>`;
 
   // Update KPI cards + hbars
   const kn  = document.getElementById('mon-kpi-need');
@@ -2838,6 +2861,45 @@ function renderCatSummary(){
     </div>`;
   }).join('');
 }
+async function submitMonthlyOrder(){
+  const bldgs   = _monBldg==='all' ? BUILDINGS : [_monBldg];
+  const month   = (_monMonth ?? new Date().getMonth()) + 1;
+  const year    = _monYear;
+  const mName   = THAI_MONTHS_LONG[month-1];
+  const bldgTxt = _monBldg==='all' ? 'ทุกอาคาร' : _monBldg;
+  const isConsumerMon = (typeof _monCat==='undefined')||_monCat==='consumer';
+  const itemsForMon = isConsumerMon
+    ? ITEMS.filter(it => it.team==='gnr3'||it.team==='isourcing')
+    : ITEMS.filter(it => it.cat==='ซ่อมบำรุง');
+
+  const orderItems = itemsForMon.map(it=>{
+    let stockQty=0, minQty=0;
+    bldgs.forEach(b=>{ stockQty+=getStock(it.id,b); minQty+=getMin(it.id,b); });
+    const orderQty = Math.max(0, minQty-stockQty);
+    const price    = getPrice(it.id);
+    return { itemId:it.id, itemName:it.name, unit:it.unit,
+      currentStock:stockQty, minStock:minQty,
+      orderQty, price, total:orderQty*price, team:it.team||'maintenance' };
+  });
+
+  const total     = orderItems.reduce((s,r)=>s+r.total, 0);
+  const needCount = orderItems.filter(r=>r.orderQty>0).length;
+  const be        = year + 543;
+
+  if(!confirm(`ส่งรายการสั่งซื้อ ${mName} ${be} (${bldgTxt})\n• ${itemsForMon.length} รายการ · ต้องสั่ง ${needCount} รายการ\n• รวม ฿${total.toLocaleString()}\n\nบันทึกลง SH_MONTHLY?`)) return;
+
+  showToast('⏳','กำลังส่งข้อมูล...');
+  try{
+    await gasPost({ action:'saveMonthlyOrder', month, year, building:_monBldg,
+      items:orderItems, createdBy:currentUser?.display||'Admin' });
+    showToast('✅',`ส่งรายการ ${mName} ${be} สำเร็จ`);
+  } catch(e){
+    showToast('⚠️','GAS offline — บันทึก local แทน');
+    localStorage.setItem(`monthly_${year}_${month}_${_monBldg}`,
+      JSON.stringify({month,year,building:_monBldg,items:orderItems,savedAt:new Date().toISOString()}));
+  }
+}
+
 function exportMonthlyGNR3(){
   const lines = [`รายการสั่งซื้อ อุปโภคบริโภค (1-33)`,`รายการ\tชื่อสินค้า\tหน่วย\tราคา/หน่วย\tจำนวนที่ต้องการ\tราคารวม`];
   const bldgs = _monBldg==='all' ? BUILDINGS : [_monBldg];
@@ -3527,34 +3589,42 @@ function setMinBldg(bldg, itemId, val){
 
 /* ── Price helpers ── */
 // Get price for itemId at given year/month (inherits forward from last set month)
-function getPrice(itemId, year, month){
-  const key = `${itemId}`;
-  const prices = itemPrices[key] || {};
-  // look backwards from given month to find latest set price
-  for(let m = month; m >= 1; m--){
+function getPrice(itemId){
+  const now  = new Date();
+  const year = now.getFullYear();
+  const mon  = now.getMonth() + 1;
+  const prices = itemPrices[itemId] || {};
+
+  // 1. ลองเดือนปัจจุบันก่อน
+  const curKey = `${year}_${mon}`;
+  if(prices[curKey] !== undefined && prices[curKey] > 0) return prices[curKey];
+
+  // 2. ลอง default (บันทึกจาก Admin Panel)
+  if(prices.default !== undefined && prices.default > 0) return prices.default;
+
+  // 3. ลองย้อนหลัง 12 เดือน
+  for(let m = mon-1; m >= 1; m--){
     const k = `${year}_${m}`;
-    if(prices[k] !== undefined) return prices[k];
+    if(prices[k] > 0) return prices[k];
   }
-  // try previous years
-  for(let y = year-1; y >= 2020; y--){
-    for(let m = 12; m >= 1; m--){
-      const k = `${y}_${m}`;
-      if(prices[k] !== undefined) return prices[k];
-    }
+  for(let m = 12; m >= 1; m--){
+    const k = `${year-1}_${m}`;
+    if(prices[k] > 0) return prices[k];
   }
   return 0;
 }
 
-function setPrice(itemId, year, month, price){
+function setPrice(itemId, price){
   if(!itemPrices[itemId]) itemPrices[itemId] = {};
-  itemPrices[itemId][`${year}_${month}`] = price;
+  // บันทึกทั้ง default และ current month
+  const now = new Date();
+  const key = `${now.getFullYear()}_${now.getMonth()+1}`;
+  itemPrices[itemId].default = Number(price) || 0;
+  itemPrices[itemId][key]    = Number(price) || 0;
   saveState();
 }
 
-function getCurrentPrice(itemId){
-  const now = new Date();
-  return getPrice(itemId, now.getFullYear(), now.getMonth()+1);
-}
+function getCurrentPrice(itemId){ return getPrice(itemId); }
 
 
 /* ================================================================
@@ -3740,18 +3810,31 @@ async function syncFromGAS() {
     try {
       const rp = await gasGet({ action: 'getPrices' });
       if (rp?.ok && rp.prices && typeof rp.prices === 'object') {
+        const now = new Date();
+        const curKey = `${now.getFullYear()}_${now.getMonth()+1}`;
         Object.entries(rp.prices).forEach(([itemId, monthPrices]) => {
+          if (!itemPrices[itemId]) itemPrices[itemId] = {};
           if (typeof monthPrices === 'object') {
-            if (!itemPrices[itemId]) itemPrices[itemId] = {};
+            // เก็บทุก month key
             Object.assign(itemPrices[itemId], monthPrices);
-          } else if (typeof monthPrices === 'number') {
-            const now = new Date();
-            const k = `${now.getFullYear()}_${now.getMonth()+1}`;
-            if (!itemPrices[itemId]) itemPrices[itemId] = {};
-            itemPrices[itemId][k] = monthPrices;
+            // ตั้ง default = ราคาเดือนปัจจุบัน หรือล่าสุดที่มี
+            const curVal = monthPrices[curKey];
+            if(curVal > 0){
+              itemPrices[itemId].default = curVal;
+            } else {
+              // หาล่าสุด
+              const latest = Object.entries(monthPrices)
+                .filter(([k,v]) => /^\d+_\d+$/.test(k) && v > 0)
+                .sort(([a],[b]) => b.localeCompare(a))[0];
+              if(latest) itemPrices[itemId].default = latest[1];
+            }
+          } else if (typeof monthPrices === 'number' && monthPrices > 0) {
+            itemPrices[itemId][curKey]  = monthPrices;
+            itemPrices[itemId].default  = monthPrices;
           }
         });
-        console.log('GAS prices synced');
+        saveState();
+        console.log(`GAS prices synced: ${Object.keys(rp.prices).length} items`);
       }
     } catch(ep) { console.log('getPrices:', ep?.message || ep); }
 
