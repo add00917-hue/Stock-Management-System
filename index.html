@@ -121,6 +121,9 @@
 
 /* sidebar */
 [data-theme="light"] .sb { background:var(--panel); border-color:var(--border); }
+[data-theme="light"] #sb-search-input { color:var(--t1); }
+[data-theme="light"] #sb-search-input::placeholder { color:var(--t3); }
+[data-theme="light"] #top-date-txt { color:var(--t2); }
 [data-theme="light"] .sb-brand-icon { background:#4f46e5; box-shadow:0 4px 14px rgba(79,70,229,.22); }
 [data-theme="light"] .sb-brand-icon svg { stroke:#fff; }
 [data-theme="light"] .sb-brand-text { color:var(--t1); }
@@ -365,10 +368,9 @@ body{background:var(--bg);color:var(--t1);font-family:'Kanit',sans-serif;display
 
 /* ══ TOPBAR ════════════════════════════════════════ */
 .topbar{
-  height:58px;background:var(--panel);
+  height:46px;background:var(--panel);
   border-bottom:1px solid var(--border);
-  display:flex;align-items:center;padding:0 24px;gap:14px;flex-shrink:0;
-  backdrop-filter:blur(12px);
+  display:flex;align-items:center;padding:0 18px;gap:12px;flex-shrink:0;
   box-shadow:0 1px 0 var(--border);
 }
 .top-title{font-size:15px;font-weight:800;letter-spacing:-.01em}
@@ -745,6 +747,31 @@ body{background:var(--bg);color:var(--t1);font-family:'Kanit',sans-serif;display
     <div class="sb-brand-text">ระบบจัดการสต๊อก<small>Stock Management System</small><small class="ver">v3.0 · GNR3</small></div>
   </div>
 
+  <!-- Search in sidebar -->
+  <div style="padding:8px 10px 4px">
+    <div style="display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:7px 12px;transition:border-color .15s"
+      onclick="document.getElementById('sb-search-input').focus()"
+      onmouseover="this.style.borderColor='var(--bhi)'"
+      onmouseout="this.style.borderColor='var(--border)'">
+      <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:var(--t3);fill:none;stroke-width:2;flex-shrink:0"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="sb-search-input" type="text" placeholder="ค้นหาสินค้า..."
+        style="background:none;border:none;outline:none;color:var(--t1);font-family:'Kanit',sans-serif;font-size:11px;width:100%;caret-color:var(--lime)"
+        oninput="handleSbSearch(this.value)">
+    </div>
+  </div>
+
+  <!-- Date in sidebar -->
+  <div style="margin:0 10px 6px;padding:6px 12px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;gap:7px">
+    <div style="width:6px;height:6px;border-radius:50%;background:var(--lime);flex-shrink:0;animation:pulse-ring 2.5s ease-out infinite"></div>
+    <span id="top-date-txt" style="font-size:10.5px;color:var(--t2);flex:1">—</span>
+  </div>
+
+  <!-- Current page indicator -->
+  <div style="margin:0 10px 4px;padding:5px 12px;display:flex;align-items:center;gap:7px">
+    <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="var(--t3)" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    <span id="tpt" style="font-size:10.5px;font-weight:700;color:var(--t2);letter-spacing:.01em">Dashboard</span>
+  </div>
+
   <!-- OMS link — สไตล์เดียวกับ sidebar -->
   <a href="https://add00917-hue.github.io/GNR3-Building-MS/" onclick="location.href=this.href;return false;" style="text-decoration:none;margin:8px 8px 2px;display:block">
     <div style="
@@ -804,6 +831,18 @@ body{background:var(--bg);color:var(--t1);font-family:'Kanit',sans-serif;display
   <div class="sb-gap"></div>
 
   <!-- User row (shown when logged in) -->
+  <!-- Member button in sidebar -->
+  <div id="sb-member-btn" onclick="currentUser?go('admin'):showLogin()"
+    style="margin:2px 10px 4px;padding:8px 12px;border-radius:10px;display:flex;align-items:center;gap:9px;cursor:pointer;background:var(--panel2);border:1px solid var(--border);transition:all .15s"
+    onmouseover="this.style.borderColor='var(--bhi)'" onmouseout="this.style.borderColor='var(--border)'">
+    <div id="top-member-av" style="width:28px;height:28px;border-radius:50%;background:var(--lime);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#111;flex-shrink:0">?</div>
+    <div style="flex:1;min-width:0">
+      <div id="top-member-name" style="font-size:11.5px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">เข้าสู่ระบบ</div>
+      <div style="font-size:9px;color:var(--t3)">คลิกเพื่อจัดการ</div>
+    </div>
+    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="var(--t3)" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+  </div>
+
   <div class="sb-user-row" id="sb-user-row" style="display:none" onclick="go('admin')">
     <div class="sb-avatar" id="sb-av" style="width:28px;height:28px;font-size:11px">?</div>
     <div style="flex:1;min-width:0">
@@ -844,35 +883,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Kanit',sans-serif;display
 
 <!-- ═══ MAIN ═══ -->
 <div class="main">
-<!-- TOPBAR -->
-<div class="topbar">
-  <span class="top-title" id="tpt">สต็อกสินค้า GNR3</span>
-
-  <div class="search-pill">
-    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <span>ค้นหาสินค้า...</span>
-  </div>
-
-  <div class="top-r">
-    <div class="top-date">
-      <div class="dot-lime"></div>
-      <span id="top-date-txt">30 เมษายน 2569</span>
-      <svg viewBox="0 0 24 24" width="12" height="12"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    </div>
-    <div class="top-icon">
-      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-    </div>
-    <div class="top-icon">
-      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      <div class="rdot"></div>
-    </div>
-    <div class="top-member" id="top-member-btn" onclick="showLogin()">
-      <div class="top-member-av" id="top-member-av">?</div>
-      <span id="top-member-name">เข้าสู่ระบบ</span>
-      <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    </div>
-  </div>
-</div>
+<!-- TOPBAR REMOVED — ชื่อหน้า + notifications ย้ายเข้า sidebar แล้ว -->
 
 <div class="ct">
 
@@ -1888,7 +1899,9 @@ function go(id){
   document.querySelectorAll('.sbi').forEach(s=>s.classList.remove('act'));
   const pg=document.getElementById('p-'+id);
   if(pg){pg.classList.add('act');void pg.offsetWidth;}
-  document.getElementById('tpt').textContent=PT[id]||'GNR3 Stock';
+  // ── อัปเดตชื่อหน้าใน sidebar (แทน topbar) ──
+  const tpt = document.getElementById('tpt');
+  if(tpt) tpt.textContent = PT[id]||'GNR3 Stock';
   const idx=PM[id];
   if(idx!==undefined) document.querySelectorAll('.sbi')[idx].classList.add('act');
   // ── scroll ขึ้นบนทุกครั้งที่เปลี่ยนหน้า ──
@@ -4887,15 +4900,31 @@ document.addEventListener('DOMContentLoaded', async function(){
     }
   }, 300); // รอให้ DOM render ก่อน 300ms แล้วค่อย sync
 
-  // ── 6. วันที่ปัจจุบัน ──
-  const dateEl = document.getElementById('top-date-txt');
-  if(dateEl){
-    const now = new Date();
-    const be  = now.getFullYear() + 543;
+  // ── 6. วันที่ปัจจุบัน — อัปเดตทุกนาที ──
+  // ── Sidebar search handler ──
+  window.handleSbSearch = function(q){
+    const kw = q.toLowerCase().trim();
+    if(!kw){ return; }
+    if(typeof currentPage !== 'undefined'){
+      if(currentPage==='imp'){ filterImpItems(kw); return; }
+    }
+    go('imp'); setTimeout(()=>filterImpItems(kw), 100);
+  };
+
+  function updateDateDisplay(){
+    const el = document.getElementById('top-date-txt');
+    if(!el) return;
+    const now  = new Date();
+    const be   = now.getFullYear() + 543;
     const months = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
                     'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
-    dateEl.textContent = `${now.getDate()} ${months[now.getMonth()]} ${be}`;
+    const days   = ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
+    const hh = String(now.getHours()).padStart(2,'0');
+    const mm = String(now.getMinutes()).padStart(2,'0');
+    el.textContent = `${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]} ${be}  ${hh}:${mm}`;
   }
+  updateDateDisplay();
+  setInterval(updateDateDisplay, 60000); // อัปเดตทุก 1 นาที
 });
 
 </script>
