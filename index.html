@@ -45,45 +45,260 @@
   --glow-purple: 0 0 20px rgba(136,117,245,.22);
 }
 
-/* ══ LIGHT MODE — Clean Professional ══ */
+/* ══ LIGHT MODE — Crextio-inspired ══
+   หลักการ:
+   · Sidebar: ขาวสะอาด sidebar ซ้ายสีขาว
+   · Content BG: gradient cream → indigo tint (เหมือน yellow area ใน Crextio)
+   · Cards: ขาวบริสุทธิ์ลอยเหนือ gradient + shadow นุ่ม
+   · Text: ดำเข้ม #111 สำหรับ heading, #555 body
+   · Accent: Indigo #4f46e5 (professional กว่า yellow สำหรับ stock system)
+══════════════════════════════════════════════════════ */
 [data-theme="light"] {
-  --bg:     #f0f2f9;
-  --panel:  #ffffff;
-  --panel2: #f5f6fc;
-  --panel3: #eaecf6;
+  /* backgrounds */
+  --bg:     #f2f3f7;          /* content area — ถูก override ด้วย gradient */
+  --panel:  #ffffff;          /* card / sidebar */
+  --panel2: #f8f8fb;
+  --panel3: #f0f1f6;
 
+  /* accent */
   --lime:   #4f46e5;
   --lime2:  #4338ca;
-  --lime-d: rgba(79,70,229,.07);
-  --lime-b: rgba(79,70,229,.18);
+  --lime-d: rgba(79,70,229,.08);
+  --lime-b: rgba(79,70,229,.22);
 
   --purple: #7c3aed;
   --purple2:#6d28d9;
-  --pur-d:  rgba(124,58,237,.07);
-  --pur-b:  rgba(124,58,237,.18);
+  --pur-d:  rgba(124,58,237,.08);
+  --pur-b:  rgba(124,58,237,.20);
 
   --grn: #16a34a;
   --amb: #d97706;
-  --red: #e11d48;
+  --red: #dc2626;
   --sky: #0284c7;
 
-  --t1: #0f1729;
-  --t2: #2d3a5e;
-  --t3: #64748b;
+  /* typography — pure black like Crextio */
+  --t1: #111111;
+  --t2: #555555;
+  --t3: #999999;
 
-  --border: rgba(0,0,0,.07);
-  --bhi:    rgba(0,0,0,.12);
+  /* borders — ultra subtle */
+  --border: rgba(0,0,0,.06);
+  --bhi:    rgba(0,0,0,.11);
 
-  --card-shadow: 0 2px 12px rgba(15,23,41,.08);
-  --glow-lime:   0 4px 20px rgba(79,70,229,.15);
+  /* shadows — Crextio soft floating */
+  --card-shadow: 0 1px 3px rgba(0,0,0,.05), 0 6px 20px rgba(0,0,0,.06);
+  --glow-lime:   0 4px 20px rgba(79,70,229,.18);
   --glow-purple: 0 4px 20px rgba(124,58,237,.15);
 }
 
-/* ── Light mode base ── */
+/* ═══════════════════════════════════════════════════
+   LIGHT MODE — Crextio-style Component Overrides
+═══════════════════════════════════════════════════ */
+/* Status */
 [data-theme="light"] .lok  { color:#15803d !important; }
 [data-theme="light"] .llow { color:#b45309 !important; }
-[data-theme="light"] .lout { color:#be123c !important; }
+[data-theme="light"] .lout { color:#dc2626 !important; }
 [data-theme="light"] body  { background:var(--bg); color:var(--t1); }
+
+/* ── Sidebar — ขาวสะอาด เหมือน Crextio ── */
+[data-theme="light"] .sb {
+  background:#ffffff;
+  border-right:1px solid rgba(0,0,0,.07);
+  box-shadow:2px 0 12px rgba(0,0,0,.04);
+}
+[data-theme="light"] .sb-brand { border-bottom:1px solid rgba(0,0,0,.07); }
+[data-theme="light"] .sb-brand-icon {
+  background:#4f46e5;
+  box-shadow:0 4px 12px rgba(79,70,229,.25);
+}
+[data-theme="light"] .sb-brand-icon svg { stroke:#fff; }
+[data-theme="light"] .sb-brand-text { color:#111; }
+[data-theme="light"] .sb-brand-text small { color:#999; }
+[data-theme="light"] .sb-sec { color:#bbb; letter-spacing:.09em; }
+
+/* Menu items — Crextio style: ตัวหนังสือเข้ม hover subtle */
+[data-theme="light"] .sbi {
+  color:#555; font-size:12px; font-weight:500;
+  border-radius:var(--rs); margin:1px 8px;
+}
+[data-theme="light"] .sbi:hover {
+  background:rgba(79,70,229,.06); color:#111;
+}
+[data-theme="light"] .sbi.act {
+  background:linear-gradient(135deg,rgba(79,70,229,.1),rgba(124,58,237,.08));
+  color:#4f46e5 !important; font-weight:700;
+  box-shadow:0 2px 8px rgba(79,70,229,.12);
+}
+[data-theme="light"] .sbi.act svg { stroke:#4f46e5; }
+[data-theme="light"] .sbi-dot { background:#dc2626; }
+[data-theme="light"] .sb-sec { color:#bbb; }
+
+/* Member / GS status */
+[data-theme="light"] #sb-member-btn { background:#f8f8fb; border-color:rgba(0,0,0,.07); }
+[data-theme="light"] #sb-member-btn:hover { background:#f0f1f6; }
+[data-theme="light"] #gs-status-card { background:#f8f8fb; border-color:rgba(0,0,0,.07); }
+[data-theme="light"] #gs-status-card:hover { background:#f0f1f6; }
+
+/* Toggle */
+[data-theme="light"] .toggle-pill { background:#ddd; }
+[data-theme="light"] .toggle-pill.on { background:#4f46e5; }
+[data-theme="light"] .toggle-knob { background:#fff; }
+[data-theme="light"] .sb-theme-toggle { border-color:rgba(0,0,0,.09); color:#555; }
+[data-theme="light"] .sb-theme-toggle:hover { color:#111; }
+
+/* ── Content area — Crextio gradient BG ── */
+/* ── Light mode background: warm cream + yellow glow (Crextio light style) ── */
+[data-theme="light"] .ct {
+  background:
+    radial-gradient(ellipse 60% 55% at 100% 0%,   rgba(253,224,71,.30) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 40% at 100% 100%,  rgba(251,191,36,.18) 0%, transparent 50%),
+    radial-gradient(ellipse 35% 30% at 55%  0%,    rgba(254,240,138,.20) 0%, transparent 45%),
+    linear-gradient(160deg, #fafaf5 0%, #f7f6ef 45%, #f3f2e8 100%);
+}
+
+/* ── Cards — floating white Crextio style ── */
+[data-theme="light"] .tcard {
+  background:#ffffff;
+  border:1px solid rgba(0,0,0,.06);
+  box-shadow:0 1px 3px rgba(0,0,0,.04), 0 6px 20px rgba(0,0,0,.06);
+}
+[data-theme="light"] .tcard:hover {
+  border-color:rgba(79,70,229,.18);
+  box-shadow:0 4px 24px rgba(0,0,0,.1);
+  transform:translateY(-2px);
+}
+[data-theme="light"] .tcard-label { color:#999; font-size:11px; font-weight:600; letter-spacing:.03em; }
+[data-theme="light"] .tcard-val   { color:#111; font-weight:900; }
+[data-theme="light"] .tcard-cat   { color:#999; }
+
+[data-theme="light"] .ccard {
+  background:#ffffff;
+  border:1px solid rgba(0,0,0,.06);
+  box-shadow:0 1px 3px rgba(0,0,0,.04), 0 6px 20px rgba(0,0,0,.05);
+}
+[data-theme="light"] .ccard:hover { border-color:rgba(0,0,0,.1); }
+[data-theme="light"] .ccard-head { background:#fafafa; border-bottom:1px solid rgba(0,0,0,.06); }
+[data-theme="light"] .ccard-title { color:#111; font-weight:800; font-size:13px; }
+
+[data-theme="light"] .table-card {
+  background:#ffffff;
+  border:1px solid rgba(0,0,0,.06);
+  box-shadow:0 1px 3px rgba(0,0,0,.04), 0 6px 20px rgba(0,0,0,.05);
+}
+
+/* ── hbars / mbars ── */
+[data-theme="light"] .hbar-wrap { background:#efefef; }
+[data-theme="light"] .mbar { background:#efefef; }
+[data-theme="light"] .pbar { background:#efefef; }
+
+/* ── Tables ── */
+[data-theme="light"] .tbl th {
+  color:#999; background:#fafafa; font-weight:700; font-size:9px; letter-spacing:.07em;
+  border-bottom:1px solid rgba(0,0,0,.06);
+}
+[data-theme="light"] .tbl td { color:#555; border-color:rgba(0,0,0,.05); }
+[data-theme="light"] .tbl td strong { color:#111; }
+[data-theme="light"] .tbl tr:hover td { background:rgba(79,70,229,.025); }
+[data-theme="light"] .tn { color:#111; font-weight:700; }
+[data-theme="light"] .lok { color:#15803d !important; }
+[data-theme="light"] .llow { color:#b45309 !important; }
+[data-theme="light"] .lout { color:#dc2626 !important; }
+
+/* ytbl */
+[data-theme="light"] .ytbl th { background:#fafafa; color:#999; border-color:rgba(0,0,0,.06); font-size:9px; }
+[data-theme="light"] .ytbl td { border-color:rgba(0,0,0,.05); color:#555; }
+[data-theme="light"] .ytbl tfoot td { background:#f5f5f2; border-color:rgba(0,0,0,.1); color:#111; font-weight:800; }
+[data-theme="light"] .ytbl .yn { color:#111; font-weight:600; }
+
+/* ── Buttons ── */
+[data-theme="light"] .btn-lime {
+  background:#4f46e5; color:#fff;
+  box-shadow:0 2px 8px rgba(79,70,229,.22);
+}
+[data-theme="light"] .btn-lime:hover {
+  background:#4338ca; box-shadow:0 4px 16px rgba(79,70,229,.3);
+  transform:translateY(-1px);
+}
+[data-theme="light"] .btn-ghost { background:rgba(0,0,0,.04); color:#555; border-color:rgba(0,0,0,.12); }
+[data-theme="light"] .btn-ghost:hover { background:rgba(0,0,0,.07); color:#111; }
+[data-theme="light"] .btn-grn { background:rgba(22,163,74,.08); color:#15803d; border-color:rgba(22,163,74,.2); }
+[data-theme="light"] .btn-red { background:rgba(220,38,38,.07); color:#dc2626; border-color:rgba(220,38,38,.18); }
+
+/* ── Tabs ── */
+[data-theme="light"] .tbar { background:rgba(0,0,0,.05); border-radius:20px; }
+[data-theme="light"] .tab { color:#888; }
+[data-theme="light"] .tab.act { background:#fff; color:#111; font-weight:700; box-shadow:0 1px 6px rgba(0,0,0,.1); }
+[data-theme="light"] .btab { color:#888; border-color:rgba(0,0,0,.12); }
+[data-theme="light"] .btab:hover { border-color:rgba(0,0,0,.2); color:#555; }
+[data-theme="light"] .btab.act { background:rgba(79,70,229,.08); border-color:rgba(79,70,229,.28); color:#4f46e5; font-weight:700; }
+
+/* ── Badges ── */
+[data-theme="light"] .bx { color:#555; border-color:rgba(0,0,0,.1); }
+[data-theme="light"] .bx-ok  { background:rgba(22,163,74,.08);  color:#15803d; border-color:rgba(22,163,74,.2); }
+[data-theme="light"] .bx-low { background:rgba(217,119,6,.08);  color:#b45309; border-color:rgba(217,119,6,.2); }
+[data-theme="light"] .bx-out { background:rgba(220,38,38,.08);  color:#dc2626; border-color:rgba(220,38,38,.2); }
+[data-theme="light"] .bx-lime{ background:rgba(79,70,229,.08);  color:#4f46e5; border-color:rgba(79,70,229,.2); }
+[data-theme="light"] .bx-pur { background:rgba(124,58,237,.08); color:#7c3aed; border-color:rgba(124,58,237,.2); }
+
+/* ── Forms ── */
+[data-theme="light"] .finput {
+  background:#fff; border-color:rgba(0,0,0,.12); color:#111;
+}
+[data-theme="light"] .finput::placeholder { color:#bbb; }
+[data-theme="light"] .finput:focus { border-color:#4f46e5; box-shadow:0 0 0 3px rgba(79,70,229,.1); }
+
+/* ── Item rows (imp page) ── */
+[data-theme="light"] .irow { background:#fff; border-color:rgba(0,0,0,.07); color:#111; }
+[data-theme="light"] .irow:hover { background:#f8f8fb; border-color:rgba(0,0,0,.12); }
+[data-theme="light"] .irow.sel { background:rgba(79,70,229,.07); border-color:rgba(79,70,229,.3); }
+[data-theme="light"] .irow-done { border-color:rgba(22,163,74,.2) !important; }
+
+/* ── Month grid ── */
+[data-theme="light"] .mc { background:#fff; border-color:rgba(0,0,0,.08); box-shadow:0 1px 4px rgba(0,0,0,.04); }
+[data-theme="light"] .mc:hover { border-color:rgba(79,70,229,.28); }
+[data-theme="light"] .mc-n { color:#999; }
+[data-theme="light"] .mc-v { color:#111; font-weight:800; }
+[data-theme="light"] .mc.act { background:rgba(79,70,229,.07); border-color:rgba(79,70,229,.35); }
+[data-theme="light"] .mc.act .mc-v { color:#4f46e5; }
+[data-theme="light"] .mc.dim { opacity:.3; }
+
+/* ── Admin ── */
+[data-theme="light"] .ucard { background:#fafafa; border-color:rgba(0,0,0,.07); }
+[data-theme="light"] .admin-tab { color:#888; }
+[data-theme="light"] .admin-tab.act { background:#fff; color:#111; border:1px solid rgba(0,0,0,.08); box-shadow:0 2px 8px rgba(0,0,0,.06); }
+[data-theme="light"] .admin-item-table th { background:#fafafa; color:#999; border-color:rgba(0,0,0,.07); }
+[data-theme="light"] .admin-item-table td { color:#555; border-color:rgba(0,0,0,.05); }
+[data-theme="light"] .admin-item-table tr:hover td { background:#f8f8fb; }
+[data-theme="light"] .admin-item-table input[type=number] { background:#fff; border-color:rgba(0,0,0,.12); color:#111; }
+[data-theme="light"] .admin-cat-divider td { background:#f5f5f2; color:#999; }
+
+/* ── Login ── */
+[data-theme="light"] .login-box { background:#fff; border:1px solid rgba(0,0,0,.07); box-shadow:0 8px 40px rgba(0,0,0,.12); }
+
+/* ── Section banners ── */
+[data-theme="light"] .sec-banner-icon {
+  background:rgba(79,70,229,.08); border-color:rgba(79,70,229,.18);
+}
+[data-theme="light"] .sec-banner-icon svg { stroke:#4f46e5; }
+[data-theme="light"] .sec-banner-title {
+  color:#111 !important;
+  background:none !important;
+  -webkit-text-fill-color:#111 !important;
+  font-weight:900;
+}
+
+/* ── tcard accent variants ── */
+[data-theme="light"] .tcard-purple { border-color:rgba(79,70,229,.2) !important; background:linear-gradient(145deg,#fff,rgba(79,70,229,.04)) !important; }
+[data-theme="light"] .tcard-lime   { border-color:rgba(22,163,74,.18) !important; background:linear-gradient(145deg,#fff,rgba(22,163,74,.04)) !important; }
+[data-theme="light"] .tcard-red    { border-color:rgba(220,38,38,.18) !important; background:linear-gradient(145deg,#fff,rgba(220,38,38,.04)) !important; }
+
+/* ── tdiv ── */
+[data-theme="light"] .tdiv { background:#fafafa; border-color:rgba(0,0,0,.07); }
+
+/* ── misc ── */
+[data-theme="light"] canvas { filter:none; }
+[data-theme="light"] .tcard:hover { box-shadow:0 4px 24px rgba(0,0,0,.1); }
+[data-theme="light"] .tcard-val[style*="--lime"] { color:#4f46e5 !important; }
 
 /* ── Light mode typography fixes ── */
 [data-theme="light"] .top-title       { color:#0f1729; }
@@ -121,8 +336,6 @@
 
 /* sidebar */
 [data-theme="light"] .sb { background:var(--panel); border-color:var(--border); }
-[data-theme="light"] #sb-search-input { color:var(--t1); }
-[data-theme="light"] #sb-search-input::placeholder { color:var(--t3); }
 [data-theme="light"] #top-date-txt { color:var(--t2); }
 [data-theme="light"] .sb-brand-icon { background:#4f46e5; box-shadow:0 4px 14px rgba(79,70,229,.22); }
 [data-theme="light"] .sb-brand-icon svg { stroke:#fff; }
@@ -156,7 +369,7 @@
 [data-theme="light"] .top-member:hover { background:var(--panel2); }
 
 /* content area */
-[data-theme="light"] .ct { background:var(--bg); }
+
 [data-theme="light"] .sec-banner-title { color:var(--t1); font-size:18px; }
 [data-theme="light"] .sec-banner-icon { background:var(--panel3); border-color:var(--border); }
 [data-theme="light"] .sec-banner-icon svg { stroke:#4f46e5; }
@@ -411,6 +624,14 @@ body{background:var(--bg);color:var(--t1);font-family:'Kanit',sans-serif;display
 
 /* ══ CONTENT ════════════════════════════════════════ */
 .ct{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px;align-items:stretch}
+/* ── Dark mode background: Crextio-style deep + lime glow ── */
+.ct {
+  background:
+    radial-gradient(ellipse 55% 45% at 95% 5%,  rgba(197,241,53,.07) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 35% at 5%  95%, rgba(136,117,245,.06) 0%, transparent 50%),
+    radial-gradient(ellipse 30% 25% at 50% 0%,  rgba(197,241,53,.04) 0%, transparent 40%),
+    linear-gradient(160deg, #0f1117 0%, #111320 50%, #0f1117 100%);
+}
 .ct::-webkit-scrollbar{width:4px}
 .ct::-webkit-scrollbar-thumb{background:var(--panel3);border-radius:3px;transition:background .2s}
 .ct::-webkit-scrollbar-thumb:hover{background:var(--bhi)}
@@ -747,31 +968,8 @@ body{background:var(--bg);color:var(--t1);font-family:'Kanit',sans-serif;display
     <div class="sb-brand-text">ระบบจัดการสต๊อก<small>Stock Management System</small><small class="ver">v3.0 · GNR3</small></div>
   </div>
 
-  <!-- Search in sidebar -->
-  <div style="padding:8px 10px 4px">
-    <div style="display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:7px 12px;transition:border-color .15s"
-      onclick="document.getElementById('sb-search-input').focus()"
-      onmouseover="this.style.borderColor='var(--bhi)'"
-      onmouseout="this.style.borderColor='var(--border)'">
-      <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:var(--t3);fill:none;stroke-width:2;flex-shrink:0"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input id="sb-search-input" type="text" placeholder="ค้นหาสินค้า..."
-        style="background:none;border:none;outline:none;color:var(--t1);font-family:'Kanit',sans-serif;font-size:11px;width:100%;caret-color:var(--lime)"
-        oninput="handleSbSearch(this.value)">
-    </div>
-  </div>
-
-  <!-- Date in sidebar -->
-  <div style="margin:0 10px 6px;padding:6px 12px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;gap:7px">
-    <div style="width:6px;height:6px;border-radius:50%;background:var(--lime);flex-shrink:0;animation:pulse-ring 2.5s ease-out infinite"></div>
-    <span id="top-date-txt" style="font-size:10.5px;color:var(--t2);flex:1">—</span>
-  </div>
-
-  <!-- Current page indicator -->
-  <div style="margin:0 10px 4px;padding:5px 12px;display:flex;align-items:center;gap:7px">
-    <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="var(--t3)" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-    <span id="tpt" style="font-size:10.5px;font-weight:700;color:var(--t2);letter-spacing:.01em">Dashboard</span>
-  </div>
-
+  <!-- hidden tpt for go() compatibility -->
+  <span id="tpt" style="display:none"></span>
   <!-- OMS link — สไตล์เดียวกับ sidebar -->
   <a href="https://add00917-hue.github.io/GNR3-Building-MS/" onclick="location.href=this.href;return false;" style="text-decoration:none;margin:8px 8px 2px;display:block">
     <div style="
@@ -897,7 +1095,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Kanit',sans-serif;display
     <div class="sec-banner-icon" style="background:var(--panel2)"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--lime)" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg></div>
     <span class="sec-banner-title">Dashboard</span>
     <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-      <div class="top-date"><div class="dot-lime"></div>เมษายน 2569</div>
+      <div class="top-date"><div class="dot-lime"></div><span id="dash-date-txt">—</span></div>
       <div class="top-member" onclick="go('admin')" style="background:var(--panel2);border:1px solid var(--border);color:var(--t1)">
         <div class="top-member-av" id="dash-av" style="background:var(--lime);color:#111">?</div>
         <span id="dash-name">เลือกผู้ใช้</span>
@@ -1324,8 +1522,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Kanit',sans-serif;display
     </div>
     <!-- building tabs -->
     <div class="tbar" id="mon-bldg-tabs">
-      <div class="tab act" onclick="switchMonBldg('all',this)">ทุกอาคาร</div>
-      <div class="tab" onclick="switchMonBldg('Ari Hills',this)">Ari Hills</div>
+      <div class="tab act" onclick="switchMonBldg('Ari Hills',this)">Ari Hills</div>
       <div class="tab" onclick="switchMonBldg('KSL',this)">KSL</div>
       <div class="tab" onclick="switchMonBldg('ESV',this)">ESV</div>
       <div class="tab" onclick="switchMonBldg('BTS',this)">BTS</div>
@@ -1387,68 +1584,93 @@ body{background:var(--bg);color:var(--t1);font-family:'Kanit',sans-serif;display
   </div>
 
   <!-- ── VIEW: ภาพรวมทั้งปี ── -->
-  <div id="mon-yearly-view" style="display:none;flex-direction:column;gap:12px;width:100%">
-    <!-- chart + stats side by side -->
-    <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:12px;align-items:start;width:100%">
-      <!-- Left column: chart + ด่วน + หมวดหมู่ -->
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <!-- Trend chart -->
-        <div class="ccard"><div class="ccard-head"><span class="ccard-title">Trend รายการต้องสั่ง</span></div>
-          <div class="ccard-body"><canvas id="tChart" style="max-height:160px;width:100%"></canvas>
-            <div style="display:flex;gap:10px;margin-top:9px;justify-content:center">
-              <div style="display:flex;align-items:center;gap:4px"><div style="width:8px;height:8px;border-radius:2px;background:var(--purple)"></div><span style="font-size:9.5px;color:var(--t3)">อุปโภคบริโภค</span></div>
-              <div style="display:flex;align-items:center;gap:4px"><div style="width:8px;height:8px;border-radius:2px;background:var(--lime)"></div><span style="font-size:9.5px;color:var(--t3)">isourcing</span></div>
-            </div>
-          </div>
-        </div>
+  <div id="mon-yearly-view" style="display:none;flex-direction:column;gap:14px;width:100%">
 
-        <!-- รายการต้องสั่งตอนนี้ -->
-        <div class="ccard">
-          <div class="ccard-head" style="padding:11px 14px 8px">
-            <span class="ccard-title">🚨 ต้องสั่งซื้อตอนนี้</span>
-            <span id="urgent-count" style="font-size:9.5px;color:#fca5a5;margin-left:8px"></span>
-            <span style="font-size:9px;color:var(--t3);margin-left:auto">คลิกแถวเพื่อเบิก/สั่ง</span>
+    <!-- ── ROW 1: Trend chart (full width) ── -->
+    <div class="ccard" style="width:100%">
+      <div class="ccard-head">
+        <span class="ccard-title">📈 Trend รายการต้องสั่ง รายเดือน</span>
+        <div style="display:flex;gap:14px;margin-left:auto;align-items:center">
+          <div style="display:flex;align-items:center;gap:5px">
+            <div style="width:10px;height:10px;border-radius:3px;background:var(--purple)"></div>
+            <span style="font-size:10px;color:var(--t2)">อุปโภคบริโภค</span>
           </div>
-          <div id="urgent-list" style="padding:0 14px 12px;display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto">
-            <div style="text-align:center;padding:14px;color:var(--t3);font-size:10.5px">⏳ กำลังโหลด...</div>
-          </div>
-        </div>
-
-        <!-- สถานะแยกหมวด -->
-        <div class="ccard">
-          <div class="ccard-head" style="padding:11px 14px 8px">
-            <span class="ccard-title">📂 สถานะแยกหมวด</span>
-          </div>
-          <div id="cat-summary" style="padding:8px 14px 12px;display:grid;grid-template-columns:1fr 1fr;gap:7px">
-            <div style="text-align:center;padding:10px;color:var(--t3);font-size:10px;grid-column:span 2">⏳</div>
+          <div style="display:flex;align-items:center;gap:5px">
+            <div style="width:10px;height:10px;border-radius:3px;background:var(--lime)"></div>
+            <span style="font-size:10px;color:var(--t2)">isourcing</span>
           </div>
         </div>
       </div>
-      <!-- Mini stats panel -->
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div class="ccard" style="padding:14px 16px">
-          <div style="font-size:11px;font-weight:700;margin-bottom:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.05em">สรุปปี YTD</div>
-          <div id="ytd-stats" style="display:flex;flex-direction:column;gap:7px">
-            <div style="text-align:center;color:var(--t3);font-size:10px">⏳ กำลังคำนวณ...</div>
-          </div>
+      <div style="padding:16px 18px">
+        <canvas id="tChart" style="height:200px;width:100%"></canvas>
+      </div>
+    </div>
+
+    <!-- ── ROW 2: สรุป YTD + อาคาร + หมวด (3 คอลัมน์) ── -->
+    <div style="display:grid;grid-template-columns:1fr 1.4fr 1.4fr;gap:12px;width:100%">
+
+      <!-- Col 1: สรุปปี YTD -->
+      <div class="ccard" style="padding:16px 18px">
+        <div style="font-size:11px;font-weight:800;margin-bottom:12px;color:var(--t1);display:flex;align-items:center;gap:7px">
+          <div style="width:4px;height:16px;border-radius:2px;background:var(--lime);flex-shrink:0"></div>
+          สรุปปี YTD
         </div>
-        <div class="ccard" style="padding:14px 16px">
-          <div style="font-size:11px;font-weight:700;margin-bottom:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.05em">อาคารในระบบ</div>
-          <div id="ytd-bldgs" style="display:flex;flex-direction:column;gap:5px"></div>
+        <div id="ytd-stats" style="display:flex;flex-direction:column;gap:7px">
+          <div style="text-align:center;color:var(--t3);font-size:10px">⏳</div>
+        </div>
+      </div>
+
+      <!-- Col 2: อาคารในระบบ + สถานะหมวด (รวมกัน) -->
+      <div class="ccard" style="padding:16px 18px">
+        <div style="font-size:11px;font-weight:800;margin-bottom:12px;color:var(--t1);display:flex;align-items:center;gap:7px">
+          <div style="width:4px;height:16px;border-radius:2px;background:var(--purple);flex-shrink:0"></div>
+          สถานะสต็อกแยกอาคาร
+        </div>
+        <div id="ytd-bldgs" style="display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+
+      <!-- Col 3: สถานะแยกหมวด -->
+      <div class="ccard" style="padding:16px 18px">
+        <div style="font-size:11px;font-weight:800;margin-bottom:12px;color:var(--t1);display:flex;align-items:center;gap:7px">
+          <div style="width:4px;height:16px;border-radius:2px;background:var(--sky);flex-shrink:0"></div>
+          สถานะแยกหมวดสินค้า
+        </div>
+        <div id="cat-summary" style="display:flex;flex-direction:column;gap:6px">
+          <div style="text-align:center;color:var(--t3);font-size:10px">⏳</div>
         </div>
       </div>
     </div>
-    <!-- ตารางปีเต็มความกว้าง -->
-    <div class="table-card" style="width:100%">
-      <div class="ccard-head"><span class="ccard-title" id="ytitle">ภาพรวมทั้งปี 2569</span><span style="font-size:9.5px;color:var(--t3);margin-left:auto">ต้องสั่ง · ค่าใช้จ่าย · แยกทีม</span></div>
+
+    <!-- ── ROW 3: ตารางภาพรวมทั้งปี (full width) ── -->
+    <div style="width:100%;background:var(--panel);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--card-shadow)">
+      <div style="padding:14px 18px;background:linear-gradient(135deg,var(--pur-d),var(--lime-d));border-bottom:2px solid var(--bhi);display:flex;align-items:center;gap:10px">
+        <span class="ccard-title" id="ytitle" style="font-size:14px;font-weight:800">ภาพรวมทั้งปี 2569</span>
+        <span style="font-size:10px;color:var(--t3)">ต้องสั่ง · ค่าใช้จ่าย · แยกทีม</span>
+      </div>
       <div style="overflow-x:auto"><table class="ytbl" style="width:100%">
         <thead>
-          <tr><th rowspan="2">เดือน</th><th colspan="2" style="text-align:center;border-left:1px solid var(--border)">ต้องสั่ง</th><th colspan="2" style="text-align:center;border-left:1px solid var(--border)">ค่าใช้จ่าย (฿)</th><th rowspan="2" class="yn" style="border-left:1px solid var(--bhi)">รวม</th><th rowspan="2" style="border-left:1px solid var(--border)">สถานะ</th></tr>
-          <tr><th class="yn" style="border-left:1px solid var(--border);color:var(--purple2)">อุปโภคบริโภค</th><th class="yn" style="color:var(--lime)">isourcing</th><th class="yn" style="border-left:1px solid var(--border);color:var(--purple2)">อุปโภคบริโภค</th><th class="yn" style="color:var(--lime)">isourcing</th></tr>
+          <tr>
+            <th rowspan="2" style="font-size:10px;padding:10px 14px;background:var(--panel2)">เดือน</th>
+            <th colspan="2" style="text-align:center;border-left:2px solid var(--pur-b);background:var(--pur-d);color:var(--purple2);padding:8px 14px;font-size:10px">📦 ต้องสั่ง</th>
+            <th colspan="2" style="text-align:center;border-left:2px solid var(--lime-b);background:var(--lime-d);color:var(--lime);padding:8px 14px;font-size:10px">💰 ค่าใช้จ่าย (฿)</th>
+            <th rowspan="2" class="yn" style="border-left:2px solid var(--bhi);background:var(--panel3);padding:10px 14px;font-size:10px">รวม</th>
+            <th rowspan="2" style="border-left:1px solid var(--border);background:var(--panel2);padding:10px 14px;font-size:10px">สถานะ</th>
+          </tr>
+          <tr>
+            <th class="yn" style="border-left:2px solid var(--pur-b);background:var(--pur-d);color:var(--purple2);padding:8px 10px;font-size:9px">อุปโภคบริโภค</th>
+            <th class="yn" style="background:var(--pur-d);color:var(--purple2);padding:8px 10px;font-size:9px">isourcing</th>
+            <th class="yn" style="border-left:2px solid var(--lime-b);background:var(--lime-d);color:var(--lime);padding:8px 10px;font-size:9px">อุปโภคบริโภค</th>
+            <th class="yn" style="background:var(--lime-d);color:var(--lime);padding:8px 10px;font-size:9px">isourcing</th>
+          </tr>
         </thead>
-        <tbody id="ytbody"></tbody><tfoot id="ytfoot"></tfoot>
+        <tbody id="ytbody"></tbody>
+        <tfoot id="ytfoot"></tfoot>
       </table></div>
     </div>
+
+    <!-- hidden stubs for renderUrgentList/renderCatSummary compat -->
+    <div id="urgent-list" style="display:none"></div>
+    <span id="urgent-count" style="display:none"></span>
   </div>
 
 
@@ -1635,7 +1857,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Kanit',sans-serif;display
       <!-- Month selector -->
       <div style="display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:5px 12px">
         <button onclick="changeMonth(-1)" style="background:none;border:none;color:var(--t2);cursor:pointer;font-size:16px;line-height:1;padding:0 2px">‹</button>
-        <span id="del-month-label" style="font-size:12px;font-weight:600;color:var(--t1);min-width:100px;text-align:center">เมษายน 2569</span>
+        <span id="del-month-label" style="font-size:12px;font-weight:600;color:var(--t1);min-width:100px;text-align:center">—</span>
         <button onclick="changeMonth(1)" style="background:none;border:none;color:var(--t2);cursor:pointer;font-size:16px;line-height:1;padding:0 2px">›</button>
       </div>
       <button class="btn btn-lime btn-sm" onclick="openAddBldgModal()">
@@ -2428,15 +2650,20 @@ function setMinStock(itemId, min){
 function initMonthlyPage(){
   const now = new Date();
   _monYear  = now.getFullYear();
-  _monMonth = now.getMonth(); // 0-indexed
+  _monMonth = now.getMonth();
+  // default building = Ari Hills (ไม่มี ทุกอาคาร แล้ว)
+  if(_monBldg==='all') _monBldg = 'Ari Hills';
+  document.querySelectorAll('#mon-bldg-tabs .tab').forEach(t=>t.classList.remove('act'));
+  const bldgIdx = ['Ari Hills','KSL','ESV','BTS'].indexOf(_monBldg);
+  const bldgTabs = document.querySelectorAll('#mon-bldg-tabs .tab');
+  if(bldgTabs[bldgIdx>=0?bldgIdx:0]) bldgTabs[bldgIdx>=0?bldgIdx:0].classList.add('act');
   buildMGrid();
-  // default: yearly view — force full width
+  // default: yearly view
   const yv = document.getElementById('mon-yearly-view');
-  if(yv){ yv.style.display='flex'; yv.style.flexDirection='column'; yv.style.gap='12px'; yv.style.width='100%'; }
+  if(yv){ yv.style.display='flex'; yv.style.flexDirection='column'; yv.style.gap='14px'; yv.style.width='100%'; }
   const mv = document.getElementById('mon-monthly-view');
   if(mv){ mv.style.display='none'; }
   _monView = 'yearly';
-  // sync active tab
   document.querySelectorAll('#mon-view-tabs .tab').forEach((t,i)=>t.classList.toggle('act',i===1));
   buildYTable();
   setTimeout(initTChart,80);
@@ -2924,22 +3151,31 @@ function renderCatSummary(){
 
   const colors={'สำนักงาน':'var(--sky)','อุปโภค':'var(--purple2)','บริโภค':'var(--amb)','isourcing':'var(--lime)','อื่นๆ':'var(--t2)'};
   el.innerHTML = Object.entries(cats).map(([cat,d])=>{
-    const okPct=Math.round(d.ok/d.total*100);
-    const col = colors[cat]||'var(--t2)';
-    return `<div style="background:var(--panel2);border-radius:9px;border:1px solid var(--border);padding:9px 10px">
+    const okPct = Math.round(d.ok/d.total*100);
+    const col   = colors[cat]||'var(--t2)';
+    const barOk = Math.round(d.ok/d.total*100);
+    const barLow= Math.round(d.low/d.total*100);
+    const barOut= 100-barOk-barLow;
+    return `<div style="padding:8px 10px;background:var(--panel2);border-radius:9px;border:1px solid var(--border)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
-        <span style="font-size:10.5px;font-weight:700;color:${col}">${cat}</span>
-        <span style="font-size:9px;color:var(--t3)">${okPct}% ปกติ</span>
+        <span style="font-size:11px;font-weight:700;color:${col}">${cat}</span>
+        <span style="font-size:9.5px;font-weight:600;color:${okPct>80?'#4ade80':okPct>50?'#fbbf24':'#f87171'}">${okPct}%</span>
       </div>
-      <div style="display:flex;gap:2px;height:4px;border-radius:2px;overflow:hidden;margin-bottom:5px">
-        <div style="flex:${d.ok};background:#4ade80;min-width:${d.ok?2:0}px"></div>
-        <div style="flex:${d.low};background:#fbbf24;min-width:${d.low?2:0}px"></div>
-        <div style="flex:${d.out};background:#f87171;min-width:${d.out?2:0}px"></div>
+      <div style="display:flex;gap:1px;height:5px;border-radius:3px;overflow:hidden;margin-bottom:5px">
+        <div style="width:${barOk}%;background:linear-gradient(90deg,#4ade80,#22c55e)"></div>
+        <div style="width:${barLow}%;background:#fbbf24"></div>
+        <div style="width:${barOut}%;background:#f87171"></div>
       </div>
-      <div style="display:flex;gap:6px">
-        <span style="font-size:8.5px;color:#86efac">✓${d.ok}</span>
-        <span style="font-size:8.5px;color:#fde68a">⚠${d.low}</span>
-        <span style="font-size:8.5px;color:#fca5a5">✕${d.out}</span>
+      <div style="display:flex;gap:8px">
+        <span style="font-size:9px;color:#86efac;display:flex;align-items:center;gap:2px">
+          <span style="width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block"></span>${d.ok}
+        </span>
+        <span style="font-size:9px;color:#fde68a;display:flex;align-items:center;gap:2px">
+          <span style="width:6px;height:6px;border-radius:50%;background:#fbbf24;display:inline-block"></span>${d.low}
+        </span>
+        <span style="font-size:9px;color:#fca5a5;display:flex;align-items:center;gap:2px">
+          <span style="width:6px;height:6px;border-radius:50%;background:#f87171;display:inline-block"></span>${d.out}
+        </span>
         <span style="font-size:8.5px;color:var(--t3);margin-left:auto">${d.total} รายการ</span>
       </div>
     </div>`;
@@ -3088,13 +3324,110 @@ function initDashCharts(){
 }
 
 function initTChart(){
-  const el=document.getElementById('tChart');if(!el)return;if(tcC)tcC.destroy();
-  const c1=_isDark?'rgba(136,117,245,.78)':'rgba(79,70,229,.72)';
-  const c2=_isDark?'rgba(197,241,53,.75)':'rgba(22,163,74,.68)';
-  tcC=new Chart(el,{type:'bar',data:{labels:['พ.ย.','ธ.ค.','ม.ค.','ก.พ.','มี.ค.','เม.ย.'],datasets:[
-    {label:'GNR3',data:[14,12,11,8,6,9],backgroundColor:c1,borderRadius:7,borderSkipped:false},
-    {label:'isourcing',data:[4,4,3,2,2,3],backgroundColor:c2,borderRadius:7,borderSkipped:false},
-  ]},options:{...CO_BASE(),scales:{x:{grid:{color:getGridColor()},ticks:{color:getTickColor(),font:{family:'Kanit',size:9}}},y:{grid:{color:getGridColor()},ticks:{color:getTickColor(),font:{family:'IBM Plex Mono',size:9},stepSize:5},beginAtZero:true}}}});
+  const canvas = document.getElementById('tChart');
+  if(!canvas) return;
+  canvas.style.height = '200px';
+  if(tcC){ tcC.destroy(); tcC=null; }
+
+  // ── สร้าง labels 12 เดือนของปีที่เลือก ──
+  const year    = _monYear;
+  const bldgs   = _monBldg==='all' ? BUILDINGS : [_monBldg];
+  const gnr3Data= [], isoData= [], labels= [];
+  const isConsumerMon = (typeof _monCat==='undefined')||_monCat==='consumer';
+
+  for(let m=0; m<12; m++){
+    labels.push(THAI_MONTHS_SHORT[m]);
+    let g=0, i=0;
+    ITEMS.filter(it=>it.team==='gnr3').forEach(it=>{
+      let stock=0, min=0;
+      bldgs.forEach(b=>{ stock+=getStock(it.id,b); min+=getMin(it.id,b); });
+      if(Math.max(0,min-stock)>0) g++;
+    });
+    ITEMS.filter(it=>it.team==='isourcing').forEach(it=>{
+      let stock=0, min=0;
+      bldgs.forEach(b=>{ stock+=getStock(it.id,b); min+=getMin(it.id,b); });
+      if(Math.max(0,min-stock)>0) i++;
+    });
+    gnr3Data.push(g);
+    isoData.push(i);
+  }
+
+  const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+  const gridC  = isDark ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.06)';
+  const tickC  = isDark ? '#4a5278' : '#64748b';
+  const maxV   = Math.max(...gnr3Data, ...isoData, 1);
+  const now    = new Date();
+  const curM   = (year===now.getFullYear()) ? now.getMonth() : -1;
+
+  tcC = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets:[
+        { label:'อุปโภคบริโภค', data:gnr3Data,
+          backgroundColor: gnr3Data.map((_,i)=>
+            i===curM ? 'rgba(136,117,245,.95)' : 'rgba(136,117,245,.45)'),
+          borderColor:'rgba(136,117,245,.9)',
+          borderWidth:1, borderRadius:6, borderSkipped:false,
+          barPercentage:.45, categoryPercentage:.8 },
+        { label:'isourcing', data:isoData,
+          backgroundColor: isoData.map((_,i)=>
+            i===curM ? 'rgba(197,241,53,.95)' : 'rgba(197,241,53,.4)'),
+          borderColor:'rgba(197,241,53,.85)',
+          borderWidth:1, borderRadius:6, borderSkipped:false,
+          barPercentage:.45, categoryPercentage:.8 },
+      ]
+    },
+    plugins: [],
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      layout:{ padding:{ top:22 } },
+      plugins:{
+        legend:{ display:false },
+        tooltip:{
+          backgroundColor: isDark?'rgba(26,29,46,.96)':'rgba(255,255,255,.98)',
+          titleColor: isDark?'#eef0f8':'#0f1729',
+          bodyColor:  isDark?'#8891b4':'#374151',
+          borderColor:isDark?'rgba(255,255,255,.1)':'rgba(0,0,0,.08)',
+          borderWidth:1, padding:10, cornerRadius:10,
+          callbacks:{
+            title: items=>`${items[0].label} ${year+543}`,
+            label: c=>`${c.dataset.label}: ${c.parsed.y} รายการ`
+          }
+        },
+      },
+      scales:{
+        x:{ grid:{color:gridC,drawBorder:false},
+            ticks:{color:tickC,font:{family:'Kanit',size:10},maxRotation:0},
+          },
+        y:{ grid:{color:gridC,drawBorder:false},
+            ticks:{color:tickC,font:{family:'IBM Plex Mono',size:9},stepSize:1},
+            suggestedMax: maxV + Math.ceil(maxV*.25) + 1,
+            min:0 }
+      },
+      animation:{ duration:500, easing:'easeOutQuart',
+        onComplete: function(){
+          // วาด value labels บน bar
+          const chart = this;
+          const ctx2 = chart.ctx;
+          ctx2.save();
+          chart.data.datasets.forEach((dataset,di)=>{
+            const meta = chart.getDatasetMeta(di);
+            meta.data.forEach((bar,i)=>{
+              const val = dataset.data[i];
+              if(val <= 0) return;
+              ctx2.font = `700 9px 'IBM Plex Mono', monospace`;
+              ctx2.fillStyle = isDark ? '#8891b4' : '#64748b';
+              ctx2.textAlign = 'center';
+              ctx2.textBaseline = 'bottom';
+              ctx2.fillText(val, bar.x, bar.y - 3);
+            });
+          });
+          ctx2.restore();
+        }
+      }
+    }
+  });
 }
 
 // ════════════════════════════════════════════════
@@ -4912,16 +5245,16 @@ document.addEventListener('DOMContentLoaded', async function(){
   };
 
   function updateDateDisplay(){
-    const el = document.getElementById('top-date-txt');
-    if(!el) return;
     const now  = new Date();
     const be   = now.getFullYear() + 543;
     const months = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
                     'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
-    const days   = ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
-    const hh = String(now.getHours()).padStart(2,'0');
-    const mm = String(now.getMinutes()).padStart(2,'0');
-    el.textContent = `${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]} ${be}  ${hh}:${mm}`;
+    const dateStr = `${now.getDate()} ${months[now.getMonth()]} ${be}`;
+    // อัปเดตทุก element ที่แสดงวันที่
+    ['top-date-txt','dash-date-txt'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.textContent = dateStr;
+    });
   }
   updateDateDisplay();
   setInterval(updateDateDisplay, 60000); // อัปเดตทุก 1 นาที
