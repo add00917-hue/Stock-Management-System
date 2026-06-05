@@ -230,6 +230,7 @@
   }
   .oms-home-btn:hover { background: var(--primary-ink); transform: translateY(-1px); }
   .oms-home-btn .oms-ic { font-size: 16px; line-height: 1; }
+  .nav-oms { margin-right: 8px; flex-shrink: 0; }
   .mob-oms-btn {
     width: 34px; height: 34px; flex-shrink: 0;
     display: grid; place-items: center;
@@ -1674,7 +1675,7 @@
       <div class="login-error" id="loginError"></div>
       <button class="btn btn-primary login-btn" onclick="doLogin()">เข้าสู่ระบบ</button>
     </div>
-    <div class="login-hint">Admin: addi · ponk &nbsp;|&nbsp; ผู้ใช้งาน: pop</div>
+    <div class="login-hint">เข้าสู่ระบบด้วยบัญชีที่ได้รับมอบหมาย · ตรวจสอบผ่าน Google Sheets</div>
   </div>
 </div>
 
@@ -1715,6 +1716,10 @@
     </div>
 
     <nav class="nav-tabs" id="navTabs">
+      <a class="oms-home-btn nav-oms" href="https://add00917-hue.github.io/GNR3-Building-MS/" title="กลับหน้าหลัก OMS GNR3">
+        <span class="oms-ic">⌂</span>
+        <span class="oms-label">OMS GNR3</span>
+      </a>
       <button class="nav-tab active" data-tab="dashboard">📊 Dashboard</button>
       <button class="nav-tab" data-tab="items">📦 รายการสินค้า</button>
       <button class="nav-tab" data-tab="monthly">📅 รายเดือน</button>
@@ -1724,10 +1729,6 @@
     </nav>
 
     <div class="top-actions">
-      <a class="oms-home-btn" href="https://add00917-hue.github.io/GNR3-Building-MS/" title="กลับหน้าหลัก OMS GNR3">
-        <span class="oms-ic">⌂</span>
-        <span class="oms-label">OMS GNR3</span>
-      </a>
       <span class="conn-badge offline" id="gasStatusBadge" onclick="pullFromCloud()" title="คลิกเพื่อซิงค์ข้อมูลจาก Google Sheets">
         <span class="conn-dot"></span>
         <span class="conn-text">กำลังเชื่อมต่อ…</span>
@@ -2759,12 +2760,8 @@ function pushToCloud(action, payload, okMsg) {
 
 
 /* ==================== AUTH / LOGIN ==================== */
-// ผู้ใช้ระบบ (role: 'admin' ทำได้ทุกอย่าง · 'user' เบิกได้อย่างเดียว)
-const USERS = [
-  { username: 'addi', password: 'addi123', name: 'ADDI', role: 'admin', avatar: 'AD' },
-  { username: 'ponk', password: 'ponk123', name: 'PONK', role: 'admin', avatar: 'PK' },
-  { username: 'pop',  password: 'pop123',  name: 'POP',  role: 'user',  avatar: 'PP' },
-];
+// ผู้ใช้/รหัสผ่านอยู่บน Google Sheet (sheet Admin) — ตรวจสอบผ่าน action verifyLogin
+// ไม่เก็บรหัสผ่านในหน้าเว็บอีกต่อไป
 const SESSION_KEY = 'stock_mgmt_session';
 let currentUser = null;
 let pendingAction = null;   // งานที่รอทำหลัง login สำเร็จ
@@ -2823,23 +2820,54 @@ function closeLogin() {
   pendingAction = null;
 }
 
-function doLogin() {
+async function doLogin() {
   const u = (document.getElementById('loginUser').value || '').trim().toLowerCase();
   const p = document.getElementById('loginPass').value || '';
   const err = document.getElementById('loginError');
-  const found = USERS.find(x => x.username === u && x.password === p);
-  if (!found) {
+  const btn = document.querySelector('.login-btn');
+  if (!u || !p) { err.style.color = 'var(--danger)'; err.textContent = '⚠️ กรุณากรอกชื่อผู้ใช้งานและรหัสผ่าน'; return; }
+
+  err.style.color = 'var(--ink-soft)';
+  err.textContent = '⏳ กำลังตรวจสอบ…';
+  if (btn) btn.disabled = true;
+
+  try {
+    if (!gasOnline) {
+      // ลอง ping ก่อน เผื่อยังไม่ได้เชื่อม
+      await gasPing();
+    }
+    if (!gasOnline) throw new Error('offline');
+    // เรียก verifyLogin ตรงๆ (ไม่ผ่าน gasGet เพราะ field error ที่นี่หมายถึงรหัสผิด ไม่ใช่ error การเชื่อมต่อ)
+    const qs = new URLSearchParams({ action: 'verifyLogin', username: u, password: p }).toString();
+    const res = await fetch(GAS_URL + '?' + qs, { method: 'GET', redirect: 'follow' });
+    const r = await res.json();
+    if (!r.ok) {
+      err.style.color = 'var(--danger)';
+      err.textContent = '⚠️ ' + (r.error || 'เข้าสู่ระบบไม่สำเร็จ');
+      if (btn) btn.disabled = false;
+      return;
+    }
+    onLoginSuccess(r.user);
+  } catch (e) {
     err.style.color = 'var(--danger)';
-    err.textContent = '⚠️ ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง';
-    return;
+    err.textContent = '🔴 เชื่อมต่อ Google Sheets ไม่ได้ ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต';
+    if (btn) btn.disabled = false;
   }
-  currentUser = { username: found.username, name: found.name, role: found.role, avatar: found.avatar };
+}
+
+function onLoginSuccess(user) {
+  currentUser = {
+    username: user.username, name: user.name, role: user.role,
+    avatar: user.avatar || String(user.name || '').substring(0,2).toUpperCase(),
+  };
   try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentUser)); } catch(e){}
   applyUserToUI();
-  document.getElementById('loginOverlay').classList.add('hidden');
+  const ov = document.getElementById('loginOverlay');
+  ov.classList.add('hidden');
   document.getElementById('loginPass').value = '';
   document.getElementById('loginUser').value = '';
-  toast(`เข้าสู่ระบบในชื่อ ${currentUser.name} (${ROLE_LABEL[currentUser.role]})`);
+  const btn = document.querySelector('.login-btn'); if (btn) btn.disabled = false;
+  toast(`เข้าสู่ระบบในชื่อ ${currentUser.name} (${ROLE_LABEL[currentUser.role] || currentUser.role})`);
 
   // ทำงานที่ค้างไว้ต่อ (ถ้ามี และมีสิทธิ์)
   if (pendingAction) {
@@ -2894,18 +2922,15 @@ function doLogout() {
   try { sessionStorage.removeItem(SESSION_KEY); } catch(e){}
   applyUserToUI();
   toast('ออกจากระบบแล้ว');
-  // ถ้ากำลังอยู่หน้า admin ให้เด้งกลับ dashboard
   const adminActive = document.getElementById('page-admin')?.classList.contains('active');
   if (adminActive) setTab('dashboard');
 }
 
-// ตรวจ session เดิม — ถ้ามีให้คงสถานะ login ไว้ (แต่ไม่บังคับ)
+// คงสถานะ login จาก session เดิม (ไม่บังคับ login)
 function initAuth() {
   try {
     const s = JSON.parse(sessionStorage.getItem(SESSION_KEY));
-    if (s && s.username && USERS.some(u => u.username === s.username && u.role === s.role)) {
-      currentUser = s;
-    }
+    if (s && s.username && s.role) currentUser = s;
   } catch(e){}
   applyUserToUI();
 }
