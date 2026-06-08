@@ -884,6 +884,69 @@
     grid-template-columns: 1fr 1fr;
     gap: 20px;
   }
+  /* QR withdrawal section */
+  .tab-badge {
+    display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px;
+    background: var(--danger); color: #fff; border-radius: 999px; font-size: 11px; font-weight: 700;
+    margin-left: 2px; vertical-align: middle;
+  }
+  .approve-stats { display: flex; gap: 16px; margin-bottom: 20px; }
+  .ap-stat {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg);
+    padding: 18px 28px; text-align: center;
+  }
+  .ap-stat .ap-num { font-family: var(--font-display); font-size: 32px; font-weight: 800; color: var(--accent-ink); }
+  .ap-stat .ap-lbl { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .req-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg);
+    margin-bottom: 16px; overflow: hidden;
+  }
+  .req-card .rc-head {
+    padding: 16px 20px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    border-bottom: 1px solid var(--line); background: var(--bg-grain);
+  }
+  .req-card .rc-bld {
+    font-family: var(--font-display); font-size: 17px; font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .req-card .rc-meta { font-size: 12.5px; color: var(--ink-mute); }
+  .req-card .rc-meta b { color: var(--ink-soft); }
+  .req-card .rc-actions { margin-left: auto; display: flex; gap: 8px; }
+  .req-card .rc-body { padding: 8px 20px 16px; }
+  .req-floor-group { margin-top: 12px; }
+  .req-floor-group .rfg-title {
+    font-size: 13px; font-weight: 700; color: var(--primary-ink);
+    padding: 6px 0; border-bottom: 1px dashed var(--line); margin-bottom: 4px;
+  }
+  .req-line { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13.5px; }
+  .req-line .rl-qty { font-weight: 700; }
+  .req-id-tag { font-family: var(--font-mono); font-size: 11px; color: var(--ink-mute); background: var(--grain); padding: 2px 8px; border-radius: 6px; }
+
+  /* QR withdrawal section (admin) */
+  .qr-head { margin-bottom: 16px; }
+  .qr-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .qr-url-input, .floor-input {
+    width: 100%; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 10px;
+    font-family: inherit; font-size: 13px; background: var(--bg-grain); color: var(--ink); resize: vertical;
+  }
+  .qr-url-input:focus, .floor-input:focus { outline: none; border-color: var(--primary); background: var(--surface); }
+  .qr-box {
+    margin: 16px auto; width: 220px; height: 220px; background: #fff; border: 1px solid var(--line);
+    border-radius: 12px; display: grid; place-items: center; text-align: center; overflow: hidden;
+  }
+  .qr-box img, .qr-box canvas { width: 200px; height: 200px; }
+  .qr-actions { display: flex; gap: 8px; justify-content: center; }
+  .floor-bld-pill {
+    padding: 6px 13px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    color: var(--ink-soft); background: var(--surface); border: 1px solid var(--line); cursor: pointer;
+  }
+  .floor-bld-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .floor-preview { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .floor-preview .fp-chip {
+    padding: 4px 10px; border-radius: 7px; background: var(--primary-soft); color: var(--primary-ink);
+    font-size: 13px; font-weight: 700;
+  }
+  @media (max-width: 860px) { .qr-layout { grid-template-columns: 1fr; } }
   .admin-card {
     background: var(--surface);
     border: 1px solid var(--line);
@@ -1725,6 +1788,7 @@
       <button class="nav-tab" data-tab="monthly">📅 รายเดือน</button>
       <button class="nav-tab" data-tab="acct">🧾 สรุปจัดซื้อ</button>
       <button class="nav-tab" data-tab="isourcing">🛒 รายการเพิ่มเติม</button>
+      <button class="nav-tab" data-tab="approve" data-perm="adminPage">✅ อนุมัติเบิก <span class="tab-badge" id="approveTabBadge" style="display:none">0</span></button>
       <button class="nav-tab" data-tab="admin">⚙️ Admin</button>
     </nav>
 
@@ -2092,6 +2156,28 @@
     <div id="isOrderHistory"></div>
   </section>
 
+  <!-- ==================== APPROVE WITHDRAWALS ==================== -->
+  <section class="page" id="page-approve">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title"><span class="small">อนุมัติคำขอเบิก · APPROVE REQUESTS</span>อนุมัติการเบิกของ</h1>
+        <p class="page-sub">ตรวจสอบและอนุมัติคำขอเบิกที่ส่งมาจากหน้า QR — เมื่ออนุมัติระบบจะตัดสต๊อกและบันทึกการเบิกให้อัตโนมัติ</p>
+      </div>
+      <button class="btn btn-ghost" onclick="loadPendingWithdrawals(true)">🔄 รีเฟรช</button>
+    </div>
+
+    <div class="approve-stats">
+      <div class="ap-stat">
+        <div class="ap-num" id="apPendingCount">0</div>
+        <div class="ap-lbl">คำขอรออนุมัติ</div>
+      </div>
+    </div>
+
+    <div id="approveList">
+      <div class="empty-state" style="padding:50px; text-align:center; color:var(--ink-mute)">กำลังโหลด…</div>
+    </div>
+  </section>
+
   <!-- ==================== ADMIN ==================== -->
   <section class="page" id="page-admin">
     <div class="page-header">
@@ -2169,6 +2255,45 @@
         <h3>ตั้งค่าราคาสินค้า <span class="text-mute" style="font-size:13px; font-weight:500">· ใช้ร่วมทุกอาคาร</span></h3>
         <p>แก้ไขราคาต่อหน่วยของสินค้า (ใช้ร่วมกันทุกอาคาร) ราคาใหม่จะมีผลกับการสั่งซื้อครั้งถัดไป ใบสั่งซื้อเดิมที่บันทึกไว้แล้วจะคงราคา ณ วันที่สั่งไว้ ไม่เปลี่ยนตาม</p>
         <button class="btn btn-primary">ตั้งค่าราคา →</button>
+      </div>
+    </div>
+
+    <!-- ==================== ระบบเบิกของผ่าน QR ==================== -->
+    <div class="qr-section">
+      <div class="qr-head">
+        <div>
+          <h3 style="font-family:var(--font-display); font-size:18px; font-weight:700; display:flex; align-items:center; gap:10px">
+            <span style="font-size:22px">📱</span> ระบบเบิกของผ่าน QR Code
+          </h3>
+          <p class="text-sm text-mute" style="margin-top:4px">สร้าง/พิมพ์ QR Code ติดไว้ตามจุดต่างๆ ให้พนักงานสแกนเพื่อขอเบิกของ — แยกจากระบบหลัก ไม่กระทบข้อมูล</p>
+        </div>
+      </div>
+
+      <div class="qr-layout">
+        <!-- QR generator -->
+        <div class="card card-pad qr-gen">
+          <h4 style="font-weight:700; margin-bottom:4px">QR Code หน้าเบิกของ</h4>
+          <p class="text-sm text-mute" style="margin-bottom:14px">สแกนแล้วเปิดหน้า "เบิกของอุปโภคบริโภค สำนักงาน NTL"</p>
+          <label class="text-sm" style="font-weight:600; display:block; margin-bottom:6px">URL หน้าเบิกของ (withdraw.html)</label>
+          <input type="text" id="qrUrlInput" class="qr-url-input" placeholder="https://your-site/withdraw.html"
+            oninput="renderQR()">
+          <div class="qr-box" id="qrBox"><div class="text-mute" style="padding:40px">ใส่ URL เพื่อสร้าง QR</div></div>
+          <div class="qr-actions">
+            <button class="btn btn-ghost btn-sm" onclick="printQR()">🖨️ พิมพ์ QR</button>
+            <button class="btn btn-ghost btn-sm" onclick="copyQRUrl()">🔗 คัดลอกลิงก์</button>
+          </div>
+        </div>
+
+        <!-- Floor management -->
+        <div class="card card-pad" data-perm="building">
+          <h4 style="font-weight:700; margin-bottom:4px">🏢 จัดการชั้นของอาคาร</h4>
+          <p class="text-sm text-mute" style="margin-bottom:14px">กำหนดชั้นที่เบิกของได้ของแต่ละอาคาร (ใช้แสดงในหน้าเบิก) — รองรับชั้นแบบ 12A</p>
+          <div class="floor-bld-pills" id="floorBldPills" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px"></div>
+          <label class="text-sm" style="font-weight:600; display:block; margin-bottom:6px">ชั้น (คั่นด้วยจุลภาค , )</label>
+          <textarea id="floorInput" class="floor-input" rows="2" placeholder="9, 10, 11, 12, 12A, 14"></textarea>
+          <div class="floor-preview" id="floorPreview"></div>
+          <button class="btn btn-primary btn-sm" onclick="saveFloorsToCloud()" style="margin-top:10px">✓ บันทึกชั้น</button>
+        </div>
       </div>
     </div>
 
@@ -2759,6 +2884,214 @@ function pushToCloud(action, payload, okMsg) {
 }
 
 
+/* ==================== QR WITHDRAWAL MANAGEMENT ==================== */
+let floorEditBuilding = null;
+let cloudFloors = {};   // { building: ['9','10',...] } จาก Sheet
+
+function defaultWithdrawUrl() {
+  // URL หน้าเบิกของบน GitHub Pages
+  return 'https://add00917-hue.github.io/GNR3-Stock/withdraw.html';
+}
+
+function renderQR() {
+  const inp = document.getElementById('qrUrlInput');
+  const url = inp ? inp.value.trim() : '';
+  const box = document.getElementById('qrBox');
+  if (!box) return;
+  if (!url) { box.innerHTML = '<div class="text-mute" style="padding:40px">ใส่ URL เพื่อสร้าง QR</div>'; return; }
+  const src = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=10&data=' + encodeURIComponent(url);
+  box.innerHTML = '<img src="' + src + '" alt="QR Code หน้าเบิกของ" crossorigin="anonymous">';
+}
+
+function copyQRUrl() {
+  const url = document.getElementById('qrUrlInput').value.trim();
+  if (!url) { toast('ยังไม่มี URL', 'warn'); return; }
+  navigator.clipboard.writeText(url).then(() => toast('คัดลอกลิงก์แล้ว'));
+}
+
+function printQR() {
+  const url = document.getElementById('qrUrlInput').value.trim();
+  if (!url) { toast('ใส่ URL ก่อนพิมพ์', 'warn'); return; }
+  const src = 'https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=20&data=' + encodeURIComponent(url);
+  const w = window.open('', '_blank');
+  w.document.write(
+    '<html><head><title>QR เบิกของ — สำนักงาน NTL</title>' +
+    '<style>body{font-family:\'IBM Plex Sans Thai\',sans-serif;text-align:center;padding:40px;color:#1A1B22}' +
+    '.frame{border:3px solid #1F3D2B;border-radius:20px;padding:32px;max-width:420px;margin:0 auto}' +
+    'h1{font-size:22px;color:#1F3D2B;margin:0 0 4px}.sub{color:#888;font-size:14px;margin-bottom:20px}' +
+    'img{width:320px;height:320px}.foot{margin-top:18px;font-size:15px;font-weight:700}' +
+    '.hint{font-size:13px;color:#666;margin-top:6px}</style></head>' +
+    '<body onload="window.print()"><div class="frame"><h1>📦 เบิกของอุปโภคบริโภค</h1>' +
+    '<div class="sub">สำนักงาน NTL · บริการกลาง 3</div>' +
+    '<img src="' + src + '" alt="QR"><div class="foot">สแกนเพื่อขอเบิกของ</div>' +
+    '<div class="hint">Scan to request supplies</div></div></body></html>');
+  w.document.close();
+}
+
+function renderFloorBldPills() {
+  const el = document.getElementById('floorBldPills');
+  if (!el) return;
+  if (!floorEditBuilding) floorEditBuilding = state.buildings[0];
+  el.innerHTML = state.buildings.map(b => {
+    const cnt = (cloudFloors[b] || []).length;
+    const bEnc = b.replace(/'/g, "\\'");
+    return `<button class="floor-bld-pill ${b===floorEditBuilding?'active':''}" onclick="switchFloorBuilding('${bEnc}')">${b}${cnt?` (${cnt})`:''}</button>`;
+  }).join('');
+}
+function switchFloorBuilding(b) {
+  floorEditBuilding = b;
+  document.getElementById('floorInput').value = (cloudFloors[b] || []).join(', ');
+  renderFloorBldPills();
+  renderFloorPreview();
+}
+function renderFloorPreview() {
+  const raw = document.getElementById('floorInput').value || '';
+  const floors = raw.split(',').map(s => s.trim()).filter(Boolean);
+  document.getElementById('floorPreview').innerHTML = floors.map(f => `<span class="fp-chip">${f}</span>`).join('');
+}
+
+async function loadFloors() {
+  try {
+    if (gasOnline) {
+      const r = await gasGet('getFloors', {});
+      if (r.ok && Array.isArray(r.floors)) {
+        cloudFloors = {};
+        r.floors.forEach(f => {
+          if (!cloudFloors[f.building_name]) cloudFloors[f.building_name] = [];
+          cloudFloors[f.building_name].push(String(f.floor));
+        });
+      }
+    }
+  } catch(e){}
+  floorEditBuilding = state.buildings[0];
+  const inp = document.getElementById('floorInput');
+  if (inp) inp.value = (cloudFloors[floorEditBuilding] || []).join(', ');
+  renderFloorBldPills();
+  renderFloorPreview();
+}
+
+function saveFloorsToCloud() {
+  requireAuth('building', async () => {
+    const raw = document.getElementById('floorInput').value || '';
+    const floors = raw.split(',').map(s => s.trim()).filter(Boolean);
+    cloudFloors[floorEditBuilding] = floors;
+    renderFloorBldPills();
+    if (!gasOnline) { toast('ออฟไลน์ — บันทึกชั้นไม่ได้ (ต้องเชื่อม Google Sheets)', 'warn'); return; }
+    try {
+      const r = await gasPost('saveFloors', { building: floorEditBuilding, floors });
+      if (r.ok) toast(`บันทึกชั้นอาคาร ${floorEditBuilding} แล้ว (${floors.length} ชั้น)`);
+      else throw new Error(r.error || 'fail');
+    } catch(e) { toast('บันทึกชั้นไม่สำเร็จ: ' + e.message, 'warn'); }
+  });
+}
+
+function initQrSection() {
+  const inp = document.getElementById('qrUrlInput');
+  if (inp && !inp.value) { inp.value = defaultWithdrawUrl(); renderQR(); }
+  const fi = document.getElementById('floorInput');
+  if (fi) fi.addEventListener('input', renderFloorPreview);
+  loadFloors();
+}
+
+/* ==================== APPROVE WITHDRAWALS ==================== */
+let pendingWithdrawals = [];
+
+async function loadPendingWithdrawals(showToast) {
+  if (!gasOnline) {
+    const el = document.getElementById('approveList');
+    if (el) el.innerHTML = '<div class="empty-state" style="padding:50px; text-align:center; color:var(--ink-mute)">🔴 ออฟไลน์ — ต้องเชื่อม Google Sheets เพื่อดูคำขอเบิก</div>';
+    updateApproveBadge(0);
+    return;
+  }
+  try {
+    const r = await gasGet('getPendingWithdrawals', {});
+    if (!r.ok) throw new Error('fail');
+    pendingWithdrawals = r.pending || [];
+    renderApproveList();
+    updateApproveBadge(pendingWithdrawals.length);
+    if (showToast) toast(`มีคำขอรออนุมัติ ${pendingWithdrawals.length} รายการ`);
+  } catch (e) {
+    const el = document.getElementById('approveList');
+    if (el) el.innerHTML = '<div class="empty-state" style="padding:50px; text-align:center; color:var(--ink-mute)">โหลดคำขอไม่สำเร็จ</div>';
+  }
+}
+
+function updateApproveBadge(n) {
+  const badge = document.getElementById('approveTabBadge');
+  if (badge) { badge.textContent = n; badge.style.display = n > 0 ? 'inline-grid' : 'none'; }
+  const cnt = document.getElementById('apPendingCount');
+  if (cnt) cnt.textContent = n;
+}
+
+function renderApproveList() {
+  const el = document.getElementById('approveList');
+  if (!el) return;
+  if (pendingWithdrawals.length === 0) {
+    el.innerHTML = '<div class="empty-state" style="padding:50px; text-align:center; color:var(--ink-mute)">✓ ไม่มีคำขอรออนุมัติ</div>';
+    return;
+  }
+  el.innerHTML = pendingWithdrawals.map(req => {
+    // group lines by floor
+    const byFloor = {};
+    req.lines.forEach(l => { if (!byFloor[l.floor]) byFloor[l.floor] = []; byFloor[l.floor].push(l); });
+    const totalQty = req.lines.reduce((s, l) => s + l.qty, 0);
+    const dateStr = req.request_date || (req.created_at ? String(req.created_at).slice(0, 10) : '');
+    const floorsHtml = Object.keys(byFloor).map(fl => `
+      <div class="req-floor-group">
+        <div class="rfg-title">ชั้น ${fl} · ${byFloor[fl].length} รายการ</div>
+        ${byFloor[fl].map(l => `<div class="req-line"><span>${l.item_name}</span><span class="rl-qty">${l.qty} ${l.unit}</span></div>`).join('')}
+      </div>`).join('');
+    const rid = req.request_id.replace(/'/g, "\\'");
+    return `
+      <div class="req-card" id="req-${req.request_id}">
+        <div class="rc-head">
+          <div>
+            <div class="rc-bld">🏢 ${req.building_name}</div>
+            <div class="rc-meta">ผู้เบิก <b>${req.requester || '—'}</b> · วันที่ ${dateStr} · ${req.lines.length} รายการ ${totalQty} หน่วย</div>
+          </div>
+          <span class="req-id-tag">${req.request_id}</span>
+          <div class="rc-actions">
+            <button class="btn btn-ghost btn-sm" onclick="rejectReq('${rid}')">✕ ปฏิเสธ</button>
+            <button class="btn btn-accent btn-sm" onclick="approveReq('${rid}')">✓ อนุมัติ &amp; ตัดสต๊อก</button>
+          </div>
+        </div>
+        <div class="rc-body">${floorsHtml}</div>
+      </div>`;
+  }).join('');
+}
+
+async function approveReq(reqId) {
+  if (!isAdmin()) { toast('เฉพาะ Admin เท่านั้น', 'warn'); return; }
+  if (!confirm('อนุมัติคำขอนี้? ระบบจะตัดสต๊อกและบันทึกการเบิกทันที')) return;
+  try {
+    const r = await gasPost('approveWithdraw', { request_id: reqId, approver: currentUser ? currentUser.name : 'ADMIN' });
+    if (!r.ok) throw new Error(r.error || 'fail');
+    toast(`อนุมัติแล้ว · ตัดสต๊อก ${r.approved_lines} รายการ (${r.building})`);
+    const card = document.getElementById('req-' + reqId);
+    if (card) card.remove();
+    pendingWithdrawals = pendingWithdrawals.filter(x => x.request_id !== reqId);
+    updateApproveBadge(pendingWithdrawals.length);
+    if (pendingWithdrawals.length === 0) renderApproveList();
+    // sync stock back from cloud
+    pullFromCloud();
+  } catch (e) { toast('อนุมัติไม่สำเร็จ: ' + e.message, 'warn'); }
+}
+
+async function rejectReq(reqId) {
+  if (!isAdmin()) { toast('เฉพาะ Admin เท่านั้น', 'warn'); return; }
+  if (!confirm('ปฏิเสธคำขอนี้? (ไม่ตัดสต๊อก)')) return;
+  try {
+    const r = await gasPost('rejectWithdraw', { request_id: reqId });
+    if (!r.ok) throw new Error(r.error || 'fail');
+    toast('ปฏิเสธคำขอแล้ว');
+    const card = document.getElementById('req-' + reqId);
+    if (card) card.remove();
+    pendingWithdrawals = pendingWithdrawals.filter(x => x.request_id !== reqId);
+    updateApproveBadge(pendingWithdrawals.length);
+    if (pendingWithdrawals.length === 0) renderApproveList();
+  } catch (e) { toast('ปฏิเสธไม่สำเร็จ: ' + e.message, 'warn'); }
+}
+
 /* ==================== AUTH / LOGIN ==================== */
 // ผู้ใช้/รหัสผ่านอยู่บน Google Sheet (sheet Admin) — ตรวจสอบผ่าน action verifyLogin
 // ไม่เก็บรหัสผ่านในหน้าเว็บอีกต่อไป
@@ -2868,6 +3201,7 @@ function onLoginSuccess(user) {
   document.getElementById('loginUser').value = '';
   const btn = document.querySelector('.login-btn'); if (btn) btn.disabled = false;
   toast(`เข้าสู่ระบบในชื่อ ${currentUser.name} (${ROLE_LABEL[currentUser.role] || currentUser.role})`);
+  if (isAdmin() && gasOnline) loadPendingWithdrawals();
 
   // ทำงานที่ค้างไว้ต่อ (ถ้ามี และมีสิทธิ์)
   if (pendingAction) {
@@ -3000,13 +3334,13 @@ function toast(msg, kind='ok') {
 
 /* ==================== TAB SWITCHING ==================== */
 function setTab(tab) {
-  // หน้า Admin ต้องเป็น admin เท่านั้น
-  if (tab === 'admin' && !isAdmin()) {
+  // หน้า Admin + อนุมัติ ต้องเป็น admin เท่านั้น
+  if ((tab === 'admin' || tab === 'approve') && !isAdmin()) {
     if (!isLoggedIn()) {
-      pendingAction = { permKey: 'adminPage', cb: () => setTab('admin') };
-      openLogin('หน้า Admin สำหรับผู้ดูแลระบบ — กรุณาเข้าสู่ระบบ');
+      pendingAction = { permKey: 'adminPage', cb: () => setTab(tab) };
+      openLogin('หน้านี้สำหรับผู้ดูแลระบบ — กรุณาเข้าสู่ระบบ');
     } else {
-      toast('หน้า Admin เข้าได้เฉพาะผู้ดูแลระบบ (Admin)', 'warn');
+      toast('เข้าได้เฉพาะผู้ดูแลระบบ (Admin)', 'warn');
     }
     return;
   }
@@ -3017,7 +3351,8 @@ function setTab(tab) {
   if (tab === 'monthly') renderMonthly();
   if (tab === 'acct') renderOrderSummary('accounting');
   if (tab === 'isourcing') renderOrderSummary('isourcing');
-  if (tab === 'admin') { renderLog(); renderGsContent(); renderBuildingList(); }
+  if (tab === 'approve') loadPendingWithdrawals();
+  if (tab === 'admin') { renderLog(); renderGsContent(); renderBuildingList(); initQrSection(); }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 document.querySelectorAll('.nav-tab').forEach(btn => btn.addEventListener('click', () => setTab(btn.dataset.tab)));
@@ -5219,6 +5554,8 @@ safeInit();
   const ok = await gasPing();
   if (ok) {
     await pullFromCloud();   // Google Sheet เป็นหลัก: โหลดข้อมูลจริงมาแสดง
+    // ถ้า login เป็น admin อยู่แล้ว ให้ดึงจำนวนคำขอรออนุมัติมาแสดงบน badge
+    if (isAdmin()) loadPendingWithdrawals();
   }
 })();
 
