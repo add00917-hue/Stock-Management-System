@@ -1366,7 +1366,7 @@
     color: var(--primary); font-size: 18px; font-weight: 700; flex-shrink: 0;
   }
 
-  /* Settings list (MinStock / Price) */
+  /* Settings list (Safety Stock / Price) */
   .ms-bld-pill {
     display: inline-flex; align-items: center; gap: 5px;
     padding: 6px 13px; border-radius: 8px;
@@ -1852,10 +1852,10 @@
       </div>
       <div class="card">
         <div class="card-header">
-          <div class="card-title"><span class="dot" style="background:var(--warn)"></span>รายการต่ำกว่า Min แต่ละอาคาร</div>
+          <div class="card-title"><span class="dot" style="background:var(--warn)"></span>รายการต่ำกว่า Safety Stock แต่ละอาคาร</div>
         </div>
         <div class="chart-wrap" style="height:300px">
-          <canvas id="bldLowChart" role="img" aria-label="แผนภูมิรายการต่ำกว่าขั้นต่ำแต่ละอาคาร"></canvas>
+          <canvas id="bldLowChart" role="img" aria-label="แผนภูมิรายการต่ำกว่า Safety Stock แต่ละอาคาร"></canvas>
         </div>
       </div>
     </div>
@@ -1886,7 +1886,7 @@
       <div class="stat s-warn">
         <div class="stat-bg-ornament"></div>
         <div class="stat-icon">⚠️</div>
-        <div class="stat-label">ต่ำกว่า MinStock</div>
+        <div class="stat-label">ต่ำกว่า Safety Stock</div>
         <div class="stat-value" id="statLow">0<span class="unit">รายการ</span></div>
         <div class="stat-trend down">ต้องสั่งซื้อเพิ่มโดยด่วน</div>
       </div>
@@ -1946,7 +1946,7 @@
         <button class="filter-chip active" data-filter="all" onclick="setFilter('all')">ทั้งหมด</button>
         <button class="filter-chip" data-filter="accounting" onclick="setFilter('accounting')">จัดซื้อ</button>
         <button class="filter-chip" data-filter="isourcing" onclick="setFilter('isourcing')">รายการเพิ่มเติม</button>
-        <button class="filter-chip" data-filter="low" onclick="setFilter('low')">ต่ำกว่า Min</button>
+        <button class="filter-chip" data-filter="low" onclick="setFilter('low')">ต่ำกว่า Safety Stock</button>
       </div>
       <div style="overflow-x: auto;">
         <table>
@@ -1956,7 +1956,7 @@
               <th>รายการสินค้า</th>
               <th class="center">หน่วย</th>
               <th class="num">ราคา/หน่วย</th>
-              <th class="num">Min</th>
+              <th class="num">Safety Stock</th>
               <th class="num">คงเหลือ</th>
               <th class="num">มูลค่า</th>
               <th class="center">สถานะ</th>
@@ -1972,7 +1972,7 @@
           <div class="t-item"><span class="l">คงเหลือรวม</span><span class="v" id="ftStock">0</span></div>
           <div class="t-item"><span class="l">มูลค่ารวม</span><span class="v">฿<span id="ftValue">0</span></span></div>
           <div class="t-item"><span class="l">ต้องสั่งเพิ่ม (มูลค่า)</span><span class="v accent">฿<span id="ftReorder">0</span></span></div>
-          <div class="t-item"><span class="l">ต่ำกว่า Min</span><span class="v danger" id="ftLow">0</span></div>
+          <div class="t-item"><span class="l">ต่ำกว่า Safety Stock</span><span class="v danger" id="ftLow">0</span></div>
         </div>
         <div class="text-sm text-mute">แสดง <span id="ftShow">0</span> จาก 38 รายการ</div>
       </div>
@@ -1997,7 +1997,7 @@
       <div class="bcb-spacer"></div>
       <div class="bcb-stat"><div class="l">มูลค่าคงคลัง</div><div class="v" id="ctxBannerMonthlyValue">฿0</div></div>
       <div class="bcb-divider"></div>
-      <div class="bcb-stat"><div class="l">ต่ำกว่า Min</div><div class="v danger" id="ctxBannerMonthlyLow">0 รายการ</div></div>
+      <div class="bcb-stat"><div class="l">ต่ำกว่า Safety Stock</div><div class="v danger" id="ctxBannerMonthlyLow">0 รายการ</div></div>
     </div>
 
     <div class="month-bar" id="monthBarMonthly"></div>
@@ -2055,7 +2055,7 @@
     <div class="page-header">
       <div>
         <h1 class="page-title"><span class="small">สรุปการสั่งซื้อ · PROCUREMENT</span>สรุปรายการสั่งซื้อ — จัดซื้อ</h1>
-        <p class="page-sub">รายการที่ 1–33 สั่งซื้อโดยจัดซื้อ แสดงรายการที่ต่ำกว่า MinStock พร้อมยอดที่ต้องสั่งเพิ่มอัตโนมัติ</p>
+        <p class="page-sub">รายการที่ 1–33 สั่งซื้อโดยจัดซื้อ แสดงรายการที่ต่ำกว่า Safety Stock พร้อมยอดที่ต้องสั่งเพิ่มอัตโนมัติ</p>
       </div>
       <div class="row" style="gap:10px; flex-wrap:wrap">
         <div class="inpage-bld-group" id="inpageBldAcct"></div>
@@ -2108,7 +2108,7 @@
     <div class="page-header">
       <div>
         <h1 class="page-title"><span class="small">สรุปการสั่งซื้อ · PROCUREMENT</span>สรุปรายการสั่งซื้อ — รายการเพิ่มเติม</h1>
-        <p class="page-sub">รายการที่ 34–38 เป็นรายการเพิ่มเติมที่ต้องสั่งแยก แสดงเฉพาะรายการที่ต่ำกว่า MinStock</p>
+        <p class="page-sub">รายการที่ 34–38 เป็นรายการเพิ่มเติมที่ต้องสั่งแยก แสดงเฉพาะรายการที่ต่ำกว่า Safety Stock</p>
       </div>
       <div class="row" style="gap:10px; flex-wrap:wrap">
         <div class="inpage-bld-group" id="inpageBldIsourcing"></div>
@@ -2243,11 +2243,11 @@
         <div class="bld-list" id="buildingList"></div>
       </div>
 
-      <div class="admin-card" style="border-top:3px solid var(--accent)" data-perm="minstock" onclick="gatedMinStock()">
+      <div class="admin-card" style="border-top:3px solid var(--accent)" data-perm="safetystock" onclick="gatedSafetyStock()">
         <div class="a-icon">📊</div>
-        <h3>ตั้งค่า MinStock รายอาคาร</h3>
-        <p>กำหนดจุดสั่งซื้อขั้นต่ำ (MinStock) ของแต่ละสินค้า แยกตามอาคาร เมื่อคงเหลือต่ำกว่าค่านี้ ระบบจะแจ้งเตือนและคำนวณยอดสั่งซื้อให้อัตโนมัติ</p>
-        <button class="btn btn-accent">ตั้งค่า MinStock →</button>
+        <h3>ตั้งค่า Safety Stock รายอาคาร</h3>
+        <p>กำหนดจุดสั่งซื้อขั้นต่ำ (Safety Stock) ของแต่ละสินค้า แยกตามอาคาร เมื่อคงเหลือต่ำกว่าค่านี้ ระบบจะแจ้งเตือนและคำนวณยอดสั่งซื้อให้อัตโนมัติ</p>
+        <button class="btn btn-accent">ตั้งค่า Safety Stock →</button>
       </div>
 
       <div class="admin-card" style="border-top:3px solid var(--primary)" data-perm="price" onclick="gatedPrice()">
@@ -2371,7 +2371,7 @@
         <div class="detail-field"><div class="dl">หน่วย</div><div class="dv" id="dtUnit">—</div></div>
         <div class="detail-field"><div class="dl">ราคาต่อหน่วย</div><div class="dv" id="dtPrice">—</div></div>
         <div class="detail-field"><div class="dl">คงเหลือ</div><div class="dv lg" id="dtStock">—</div></div>
-        <div class="detail-field"><div class="dl">MinStock</div><div class="dv lg" id="dtMin">—</div></div>
+        <div class="detail-field"><div class="dl">Safety Stock</div><div class="dv lg" id="dtSafety">—</div></div>
         <div class="detail-field"><div class="dl">มูลค่าคงคลัง</div><div class="dv" id="dtValue">—</div></div>
         <div class="detail-field"><div class="dl">สั่งซื้อโดย</div><div class="dv" id="dtOrderer">—</div></div>
         <div class="detail-field full"><div class="dl">สถานะ</div><div id="dtStatus"></div></div>
@@ -2516,34 +2516,34 @@
   </div>
 </div>
 
-<!-- ==================== MINSTOCK SETTINGS MODAL ==================== -->
-<div class="modal-overlay" id="modalMinStock" onclick="if(event.target===this)closeModal('modalMinStock')">
+<!-- ==================== SAFETY STOCK SETTINGS MODAL ==================== -->
+<div class="modal-overlay" id="modalSafetyStock" onclick="if(event.target===this)closeModal('modalSafetyStock')">
   <div class="modal wide">
     <div class="modal-head">
       <div>
-        <div class="mt">📊 ตั้งค่า MinStock — <span id="minStockBldName" style="color:var(--accent-ink)">—</span></div>
-        <div class="ms">กำหนดจุดสั่งซื้อขั้นต่ำของแต่ละสินค้า เฉพาะอาคารนี้ · ค่าที่แก้ไขจะมีผลกับการแจ้งเตือนและการคำนวณยอดสั่งซื้อทันที</div>
+        <div class="mt">📊 ตั้งค่า Safety Stock — <span id="safetyStockBldName" style="color:var(--accent-ink)">—</span></div>
+        <div class="ms">กำหนดค่า Safety Stock ของแต่ละสินค้า เฉพาะอาคารนี้ · ค่าที่แก้ไขจะมีผลกับการแจ้งเตือนและการคำนวณยอดสั่งซื้อทันที</div>
       </div>
-      <button class="modal-close" onclick="closeModal('modalMinStock')">✕</button>
+      <button class="modal-close" onclick="closeModal('modalSafetyStock')">✕</button>
     </div>
     <div class="modal-body">
       <div class="ms-bld-row" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; background:var(--accent-soft); border:1px solid var(--accent-soft); border-radius:12px; padding:10px 14px; margin-bottom:16px">
         <span style="font-weight:700; color:var(--accent-ink); font-size:13px; white-space:nowrap">🏢 เลือกอาคาร</span>
-        <div id="minStockBldPills" style="display:flex; gap:6px; flex-wrap:wrap; flex:1"></div>
+        <div id="safetyStockBldPills" style="display:flex; gap:6px; flex-wrap:wrap; flex:1"></div>
       </div>
       <div class="row mb-16" style="flex-wrap:wrap; gap:10px; align-items:center">
         <div class="search-box" style="flex:1; min-width:200px">
           <span>🔍</span>
-          <input type="text" id="minStockSearch" placeholder="ค้นหาสินค้า…" oninput="renderMinStockList()">
+          <input type="text" id="safetyStockSearch" placeholder="ค้นหาสินค้า…" oninput="renderSafetyStockList()">
         </div>
-        <button class="btn btn-sm btn-ghost" onclick="resetMinStockToDefault()">↺ คืนค่าเริ่มต้นทั้งหมด</button>
+        <button class="btn btn-sm btn-ghost" onclick="resetSafetyStockToDefault()">↺ คืนค่าเริ่มต้นทั้งหมด</button>
       </div>
-      <div id="minStockList" class="settings-list"></div>
+      <div id="safetyStockList" class="settings-list"></div>
     </div>
     <div class="modal-foot">
       <div style="flex:1; font-size:12.5px; color:var(--ink-mute)">ตัวเลขสีส้ม = ค่าที่ถูกแก้ไขจากค่าเริ่มต้น</div>
-      <button class="btn btn-ghost" onclick="closeModal('modalMinStock')">ปิด</button>
-      <button class="btn btn-accent" onclick="saveMinStockSettings()">✓ บันทึก MinStock</button>
+      <button class="btn btn-ghost" onclick="closeModal('modalSafetyStock')">ปิด</button>
+      <button class="btn btn-accent" onclick="saveSafetyStockSettings()">✓ บันทึก Safety Stock</button>
     </div>
   </div>
 </div>
@@ -2691,7 +2691,7 @@ function defaultState() {
     monthly: {},       // monthly[building][YYYY-MM][itemId] = {in, out}
     orders: {},        // orders[building][YYYY-MM][by] = { ts, items[], total }
     prices: {},        // prices[itemId] = current price override (global, all buildings)
-    minStock: {},      // minStock[building][itemId] = min override (per building)
+    safetyStock: {},      // safetyStock[building][itemId] = safety stock override (per building)
     priceHistory: {},  // priceHistory[itemId] = [{ price, prev, ts, effFrom }]
     currentMonth: new Date().getMonth() + 1, // 1-12
     currentYear: new Date().getFullYear(),
@@ -2705,7 +2705,7 @@ function loadState() {
     if (s && s.stock && s.buildings) {
       // backfill new fields for older saved states
       if (!s.prices) s.prices = {};
-      if (!s.minStock) s.minStock = {};
+      if (!s.safetyStock) s.safetyStock = {};
       if (!s.priceHistory) s.priceHistory = {};
       // normalize stock & monthly to whole numbers (items are countable)
       if (!s._intMigrated) {
@@ -2848,14 +2848,14 @@ function applyCloudData(r) {
     });
     state.prices = prices;
   }
-  // minstock per building
-  if (Array.isArray(r.minstock)) {
+  // safetystock per building
+  if (Array.isArray(r.safetystock)) {
     const ms = {};
-    r.minstock.forEach(m => {
+    r.safetystock.forEach(m => {
       if (!ms[m.building_name]) ms[m.building_name] = {};
-      ms[m.building_name][m.item_id] = Number(m.min_stock);
+      ms[m.building_name][m.item_id] = Number(m.safety_stock);
     });
-    state.minStock = ms;
+    state.safetyStock = ms;
   }
   // stock current per building
   if (Array.isArray(r.stock)) {
@@ -3106,7 +3106,7 @@ const PERMISSIONS = {
   stockOut:   'any',     // เบิก — user ทำได้
   stockIn:    'admin',   // นำเข้า — admin เท่านั้น
   order:      'admin',   // จัดทำใบสั่งซื้อ
-  minstock:   'admin',   // ตั้งค่า MinStock
+  safetystock:   'admin',   // ตั้งค่า Safety Stock
   price:      'admin',   // ตั้งค่าราคา
   building:   'admin',   // จัดการอาคาร
   manageUser: 'admin',   // จัดการผู้ใช้
@@ -3136,7 +3136,7 @@ function requireAuth(permKey, cb) {
 function gatedStockIn()  { requireAuth('stockIn',  () => openModal('modalStockIn')); }
 function gatedStockOut() { requireAuth('stockOut', () => openModal('modalStockOut')); }
 function gatedOrder(by)  { requireAuth('order',    () => openOrderModal(by)); }
-function gatedMinStock() { requireAuth('minstock', () => openMinStockSettings()); }
+function gatedSafetyStock() { requireAuth('safetystock', () => openSafetyStockSettings()); }
 function gatedPrice()    { requireAuth('price',    () => openPriceSettings()); }
 function gatedAddBuilding() { requireAuth('building', () => addBuilding()); }
 
@@ -3294,10 +3294,10 @@ function itemPrice(id) {
   if (state.prices && state.prices[id] != null) return state.prices[id];
   return ITEM_MAP[id] ? ITEM_MAP[id].price : 0;
 }
-// Current effective MinStock for a building (per-building override, else base min)
-function itemMin(id, building) {
+// Current effective Safety Stock for a building (per-building override, else base value)
+function itemSafety(id, building) {
   const b = building || state.currentBuilding;
-  if (state.minStock && state.minStock[b] && state.minStock[b][id] != null) return state.minStock[b][id];
+  if (state.safetyStock && state.safetyStock[b] && state.safetyStock[b][id] != null) return state.safetyStock[b][id];
   return ITEM_MAP[id] ? ITEM_MAP[id].min : 0;
 }
 // Has the price been overridden from the original base price?
@@ -3314,12 +3314,12 @@ const fmtQty = (n) => Math.round(Number(n) || 0).toLocaleString('th-TH');
 
 function statusOf(item) {
   const q = curStock()[item.id] || 0;
-  if (q <= 0) return { key: "danger", label: "หมดสต๊อก", reorderQty: itemMin(item.id) };
-  if (q < itemMin(item.id)) return { key: "danger", label: "ต่ำกว่าขั้นต่ำ", reorderQty: round2(itemMin(item.id) - q) };
-  if (q < itemMin(item.id) * 1.5) return { key: "warn", label: "ใกล้ขั้นต่ำ", reorderQty: 0 };
+  if (q <= 0) return { key: "danger", label: "หมดสต๊อก", reorderQty: itemSafety(item.id) };
+  if (q < itemSafety(item.id)) return { key: "danger", label: "ต่ำกว่า Safety Stock", reorderQty: round2(itemSafety(item.id) - q) };
+  if (q < itemSafety(item.id) * 1.5) return { key: "warn", label: "ใกล้ขั้นต่ำ", reorderQty: 0 };
   return { key: "ok", label: "เพียงพอ", reorderQty: 0 };
 }
-function reorderQty(item) { const q = curStock()[item.id] || 0; return q < itemMin(item.id) ? Math.ceil(itemMin(item.id) - q) : 0; }
+function reorderQty(item) { const q = curStock()[item.id] || 0; return q < itemSafety(item.id) ? Math.ceil(itemSafety(item.id) - q) : 0; }
 function valueOf(item) { return (curStock()[item.id] || 0) * itemPrice(item.id); }
 function reorderValue(item) { return reorderQty(item) * itemPrice(item.id); }
 
@@ -3402,7 +3402,7 @@ function renderMobBuildingList() {
     const isActive = b === state.currentBuilding;
     const st = state.stock[b] || {};
     let lowCount = 0, totalVal = 0;
-    ITEMS.forEach(it => { const q = st[it.id] || 0; totalVal += q * itemPrice(it.id); if (q < itemMin(it.id)) lowCount++; });
+    ITEMS.forEach(it => { const q = st[it.id] || 0; totalVal += q * itemPrice(it.id); if (q < itemSafety(it.id)) lowCount++; });
     const bEnc = b.replace(/'/g, "\\'");
     return `
       <div class="mob-bld-row ${isActive ? 'active' : ''}" onclick="switchBuilding('${bEnc}')">
@@ -3411,7 +3411,7 @@ function renderMobBuildingList() {
           <div class="mbr-name">${b}</div>
           <div class="mbr-meta">มูลค่า ฿${fmtInt(totalVal)} · ${ITEMS.length} รายการ</div>
         </div>
-        ${lowCount > 0 ? `<span class="mbr-low">${lowCount} ต่ำกว่า Min</span>` : ''}
+        ${lowCount > 0 ? `<span class="mbr-low">${lowCount} ต่ำกว่า Safety Stock</span>` : ''}
         ${isActive ? '<span class="mbr-check">✓</span>' : ''}
       </div>
     `;
@@ -3427,14 +3427,14 @@ function renderBuildingList() {
     // count low-stock items in this building
     const st = state.stock[b] || {};
     let lowCount = 0;
-    ITEMS.forEach(it => { if ((st[it.id] || 0) < itemMin(it.id)) lowCount++; });
+    ITEMS.forEach(it => { if ((st[it.id] || 0) < itemSafety(it.id)) lowCount++; });
     const canDelete = state.buildings.length > 1;
     return `
       <div class="bld-item ${isCurrent ? 'is-current' : ''}">
         <div class="bld-mark">🏢</div>
         <div class="bld-info">
           <div class="bn">${b} ${isCurrent ? '<span class="badge badge-ok" style="margin-left:4px">กำลังใช้งาน</span>' : ''}</div>
-          <div class="bm">${ITEMS.length} รายการ · ต่ำกว่า Min ${lowCount} รายการ</div>
+          <div class="bm">${ITEMS.length} รายการ · ต่ำกว่า Safety Stock ${lowCount} รายการ</div>
         </div>
         ${isCurrent ? '' : `<button class="bld-use" onclick="switchBuilding('${b.replace(/'/g,"\\'")}')">ใช้งาน</button>`}
         ${canDelete ? `<button class="bld-del" title="ลบอาคาร" onclick="deleteBuilding('${b.replace(/'/g,"\\'")}')">✕</button>` : ''}
@@ -3460,7 +3460,7 @@ function renderInPageBuildingSelectors() {
         const isActive = b === state.currentBuilding;
         const st = state.stock[b] || {};
         let lowCount = 0;
-        ITEMS.forEach(it => { if ((st[it.id] || 0) < itemMin(it.id)) lowCount++; });
+        ITEMS.forEach(it => { if ((st[it.id] || 0) < itemSafety(it.id)) lowCount++; });
         const bEnc = b.replace(/'/g, "\\'");
         return `<button class="inpage-bld-btn ${isActive ? 'active' : ''}" onclick="switchBuilding('${bEnc}')">${b}${lowCount > 0 ? ` <span class="ibg-low">${lowCount}</span>` : ''}</button>`;
       }).join('');
@@ -3477,12 +3477,12 @@ function updateCtxBanner(type) {
   ITEMS.forEach(it => {
     const q = st[it.id] || 0;
     totalValue += q * itemPrice(it.id);
-    if (q < itemMin(it.id)) lowCount++;
+    if (q < itemSafety(it.id)) lowCount++;
   });
-  const acctLow = acctItems.filter(it => (st[it.id] || 0) < itemMin(it.id)).length;
-  const isLow   = isItems.filter(it  => (st[it.id] || 0) < itemMin(it.id)).length;
-  const acctReorderVal = acctItems.reduce((s, it) => { const q = st[it.id]||0; return q < itemMin(it.id) ? s + (itemMin(it.id) - q) * itemPrice(it.id) : s; }, 0);
-  const isReorderVal   = isItems.reduce((s, it)   => { const q = st[it.id]||0; return q < itemMin(it.id) ? s + (itemMin(it.id) - q) * itemPrice(it.id) : s; }, 0);
+  const acctLow = acctItems.filter(it => (st[it.id] || 0) < itemSafety(it.id)).length;
+  const isLow   = isItems.filter(it  => (st[it.id] || 0) < itemSafety(it.id)).length;
+  const acctReorderVal = acctItems.reduce((s, it) => { const q = st[it.id]||0; return q < itemSafety(it.id) ? s + (itemSafety(it.id) - q) * itemPrice(it.id) : s; }, 0);
+  const isReorderVal   = isItems.reduce((s, it)   => { const q = st[it.id]||0; return q < itemSafety(it.id) ? s + (itemSafety(it.id) - q) * itemPrice(it.id) : s; }, 0);
 
   if (type === 'monthly') {
     const nameEl = document.getElementById('ctxBannerMonthlyName');
@@ -3545,58 +3545,58 @@ function deleteBuilding(name) {
 }
 
 /* ==================== MINSTOCK SETTINGS ==================== */
-let minStockDraft = {};  // { itemId: min } for the building currently being edited
-let minStockEditBuilding = null;  // which building the modal is editing
-let minStockDirty = false;        // unsaved changes flag
+let safetyStockDraft = {};  // { itemId: min } for the building currently being edited
+let safetyStockEditBuilding = null;  // which building the modal is editing
+let safetyStockDirty = false;        // unsaved changes flag
 
-function openMinStockSettings() {
-  minStockEditBuilding = state.currentBuilding;
-  loadMinStockDraft(minStockEditBuilding);
-  document.getElementById('minStockSearch').value = '';
-  renderMinStockBldPills();
-  renderMinStockList();
-  openModal('modalMinStock');
+function openSafetyStockSettings() {
+  safetyStockEditBuilding = state.currentBuilding;
+  loadSafetyStockDraft(safetyStockEditBuilding);
+  document.getElementById('safetyStockSearch').value = '';
+  renderSafetyStockBldPills();
+  renderSafetyStockList();
+  openModal('modalSafetyStock');
 }
 
-function loadMinStockDraft(building) {
-  minStockEditBuilding = building;
-  minStockDraft = {};
-  ITEMS.forEach(it => { minStockDraft[it.id] = itemMin(it.id, building); });
-  minStockDirty = false;
-  const nameEl = document.getElementById('minStockBldName');
+function loadSafetyStockDraft(building) {
+  safetyStockEditBuilding = building;
+  safetyStockDraft = {};
+  ITEMS.forEach(it => { safetyStockDraft[it.id] = itemSafety(it.id, building); });
+  safetyStockDirty = false;
+  const nameEl = document.getElementById('safetyStockBldName');
   if (nameEl) nameEl.textContent = building;
 }
 
-function renderMinStockBldPills() {
-  const el = document.getElementById('minStockBldPills');
+function renderSafetyStockBldPills() {
+  const el = document.getElementById('safetyStockBldPills');
   if (!el) return;
   el.innerHTML = state.buildings.map(b => {
-    const active = b === minStockEditBuilding;
+    const active = b === safetyStockEditBuilding;
     // count items that have a custom min override for this building
-    const ov = state.minStock[b] ? Object.keys(state.minStock[b]).length : 0;
+    const ov = state.safetyStock[b] ? Object.keys(state.safetyStock[b]).length : 0;
     const bEnc = b.replace(/'/g, "\\'");
-    return `<button class="ms-bld-pill ${active ? 'active' : ''}" onclick="switchMinStockBuilding('${bEnc}')">${b}${ov > 0 ? ` <span class="ms-ov">${ov}</span>` : ''}</button>`;
+    return `<button class="ms-bld-pill ${active ? 'active' : ''}" onclick="switchSafetyStockBuilding('${bEnc}')">${b}${ov > 0 ? ` <span class="ms-ov">${ov}</span>` : ''}</button>`;
   }).join('');
 }
 
-function switchMinStockBuilding(building) {
-  if (building === minStockEditBuilding) return;
-  if (minStockDirty) {
-    if (!confirm(`มีการแก้ไข MinStock ของอาคาร "${minStockEditBuilding}" ที่ยังไม่บันทึก\nต้องการสลับไปอาคาร "${building}" โดยไม่บันทึกหรือไม่?`)) return;
+function switchSafetyStockBuilding(building) {
+  if (building === safetyStockEditBuilding) return;
+  if (safetyStockDirty) {
+    if (!confirm(`มีการแก้ไข Safety Stock ของอาคาร "${safetyStockEditBuilding}" ที่ยังไม่บันทึก\nต้องการสลับไปอาคาร "${building}" โดยไม่บันทึกหรือไม่?`)) return;
   }
-  loadMinStockDraft(building);
-  renderMinStockBldPills();
-  renderMinStockList();
+  loadSafetyStockDraft(building);
+  renderSafetyStockBldPills();
+  renderSafetyStockList();
 }
 
-function renderMinStockList() {
-  const el = document.getElementById('minStockList');
-  const q = (document.getElementById('minStockSearch').value || '').toLowerCase();
+function renderSafetyStockList() {
+  const el = document.getElementById('safetyStockList');
+  const q = (document.getElementById('safetyStockSearch').value || '').toLowerCase();
   let items = ITEMS;
   if (q) items = items.filter(i => i.name.toLowerCase().includes(q));
   el.innerHTML = items.map(it => {
     const base = ITEM_MAP[it.id].min;
-    const cur = minStockDraft[it.id] != null ? minStockDraft[it.id] : base;
+    const cur = safetyStockDraft[it.id] != null ? safetyStockDraft[it.id] : base;
     const changed = Number(cur) !== Number(base);
     return `
       <div class="set-row ${changed ? 'changed' : ''}" id="msrow-${it.id}">
@@ -3607,54 +3607,54 @@ function renderMinStockList() {
         </div>
         <div class="sr-input-wrap">
           <input type="number" class="sr-input" min="0" step="1" inputmode="numeric" pattern="[0-9]*" value="${cur}"
-            onfocus="this.select()" onkeydown="blockDecimalKey(event)" oninput="sanitizeIntInput(this); updateMinStockDraft(${it.id}, this.value)">
+            onfocus="this.select()" onkeydown="blockDecimalKey(event)" oninput="sanitizeIntInput(this); updateSafetyStockDraft(${it.id}, this.value)">
           <span class="sr-unit">${it.unit}</span>
         </div>
       </div>`;
   }).join('');
 }
 
-function updateMinStockDraft(id, val) {
+function updateSafetyStockDraft(id, val) {
   const n = parseInt(val, 10);
-  minStockDraft[id] = (isNaN(n) || n < 0) ? 0 : n;
-  minStockDirty = true;
+  safetyStockDraft[id] = (isNaN(n) || n < 0) ? 0 : n;
+  safetyStockDirty = true;
   // live toggle of changed style
   const base = ITEM_MAP[id].min;
   const row = document.getElementById('msrow-' + id);
-  if (row) row.classList.toggle('changed', Number(minStockDraft[id]) !== Number(base));
+  if (row) row.classList.toggle('changed', Number(safetyStockDraft[id]) !== Number(base));
 }
 
-function resetMinStockToDefault() {
-  if (!confirm(`คืนค่า MinStock ทั้งหมดของอาคาร "${minStockEditBuilding}" กลับเป็นค่าเริ่มต้น?`)) return;
-  ITEMS.forEach(it => { minStockDraft[it.id] = ITEM_MAP[it.id].min; });
-  minStockDirty = true;
-  renderMinStockList();
+function resetSafetyStockToDefault() {
+  if (!confirm(`คืนค่า Safety Stock ทั้งหมดของอาคาร "${safetyStockEditBuilding}" กลับเป็นค่าเริ่มต้น?`)) return;
+  ITEMS.forEach(it => { safetyStockDraft[it.id] = ITEM_MAP[it.id].min; });
+  safetyStockDirty = true;
+  renderSafetyStockList();
   toast('คืนค่าเริ่มต้นแล้ว (ยังไม่บันทึก)');
 }
 
-function saveMinStockSettings() {
-  const b = minStockEditBuilding || state.currentBuilding;
-  if (!state.minStock[b]) state.minStock[b] = {};
+function saveSafetyStockSettings() {
+  const b = safetyStockEditBuilding || state.currentBuilding;
+  if (!state.safetyStock[b]) state.safetyStock[b] = {};
   let changeCount = 0;
   const cloudItems = [];
   ITEMS.forEach(it => {
     const base = ITEM_MAP[it.id].min;
-    const v = minStockDraft[it.id];
+    const v = safetyStockDraft[it.id];
     if (Number(v) === Number(base)) {
-      delete state.minStock[b][it.id];   // same as base → no override stored
+      delete state.safetyStock[b][it.id];   // same as base → no override stored
     } else {
-      state.minStock[b][it.id] = v;
+      state.safetyStock[b][it.id] = v;
       changeCount++;
     }
     // ส่งทุกค่าขึ้น Sheet (รวมที่กลับเป็น base ด้วย เพื่อให้ Sheet ตรงกับหน้าจอ)
-    cloudItems.push({ item_id: it.id, min_stock: Number(v) });
+    cloudItems.push({ item_id: it.id, safety_stock: Number(v) });
   });
   saveState();
-  // ── ส่ง MinStock รายอาคารขึ้น Google Sheets ──
-  pushToCloud('saveMinStock', { building: b, updated_by: 'ADDI', items: cloudItems });
-  minStockDirty = false;
-  renderMinStockBldPills();  // refresh override counts on pills
-  toast(`บันทึก MinStock อาคาร ${b} แล้ว · มีการกำหนดเอง ${changeCount} รายการ`);
+  // ── ส่ง Safety Stock รายอาคารขึ้น Google Sheets ──
+  pushToCloud('saveSafetyStock', { building: b, updated_by: 'ADDI', items: cloudItems });
+  safetyStockDirty = false;
+  renderSafetyStockBldPills();  // refresh override counts on pills
+  toast(`บันทึก Safety Stock อาคาร ${b} แล้ว · มีการกำหนดเอง ${changeCount} รายการ`);
   // refresh dependent views
   renderDashboard(); renderItemsTable(); renderMonthly();
   renderOrderSummary('accounting'); renderOrderSummary('isourcing');
@@ -3835,7 +3835,7 @@ function renderDashboard() {
   } else {
     ITEMS.forEach(it => {
       totalValue += valueOf(it);
-      if ((curStock()[it.id] || 0) < itemMin(it.id)) { lowCount++; reorderTotal += reorderValue(it); }
+      if ((curStock()[it.id] || 0) < itemSafety(it.id)) { lowCount++; reorderTotal += reorderValue(it); }
     });
     document.getElementById('statTotal').innerHTML = ITEMS.length + '<span class="unit">รายการ</span>';
   }
@@ -3862,7 +3862,7 @@ function buildingSummary(b) {
     const q = st[it.id] || 0;
     totalStock += q;
     totalValue += q * itemPrice(it.id);
-    if (q < itemMin(it.id)) { lowCount++; reorderValueTotal += round2(itemMin(it.id) - q) * itemPrice(it.id); }
+    if (q < itemSafety(it.id)) { lowCount++; reorderValueTotal += round2(itemSafety(it.id) - q) * itemPrice(it.id); }
   });
   return { totalValue, lowCount, reorderValueTotal, totalStock };
 }
@@ -3915,7 +3915,7 @@ function renderBuildingOverview() {
       </div>
       <div class="bld-ov-stats">
         <div class="bld-ov-stat"><div class="l">มูลค่ารวม</div><div class="v">฿${fmtInt(agg.totalValue)}</div></div>
-        <div class="bld-ov-stat"><div class="l">ต่ำกว่า Min</div><div class="v ${agg.totalLow>0?'danger':''}">${agg.totalLow}</div></div>
+        <div class="bld-ov-stat"><div class="l">ต่ำกว่า Safety Stock</div><div class="v ${agg.totalLow>0?'danger':''}">${agg.totalLow}</div></div>
         <div class="bld-ov-stat"><div class="l">ต้องสั่ง (มูลค่า)</div><div class="v accent">฿${fmtInt(agg.totalReorder)}</div></div>
         <div class="bld-ov-stat"><div class="l">คงเหลือรวม</div><div class="v">${fmtInt(agg.totalStock)}</div></div>
       </div>
@@ -3934,7 +3934,7 @@ function renderBuildingOverview() {
         </div>
         <div class="bld-ov-stats">
           <div class="bld-ov-stat"><div class="l">มูลค่าคงคลัง</div><div class="v">฿${fmtInt(s.totalValue)}</div></div>
-          <div class="bld-ov-stat"><div class="l">ต่ำกว่า Min</div><div class="v ${s.lowCount>0?'danger':''}">${s.lowCount}</div></div>
+          <div class="bld-ov-stat"><div class="l">ต่ำกว่า Safety Stock</div><div class="v ${s.lowCount>0?'danger':''}">${s.lowCount}</div></div>
           <div class="bld-ov-stat"><div class="l">ต้องสั่ง (มูลค่า)</div><div class="v accent">฿${fmtInt(s.reorderValueTotal)}</div></div>
           <div class="bld-ov-stat"><div class="l">คงเหลือรวม</div><div class="v">${fmtInt(s.totalStock)}</div></div>
         </div>
@@ -4122,7 +4122,7 @@ function renderAlertList() {
       const st = state.stock[b] || {};
       ITEMS.forEach(it => {
         const q = st[it.id] || 0;
-        const min = itemMin(it.id, b);
+        const min = itemSafety(it.id, b);
         if (q < min) {
           rows.push({ ...it, b, q, min, need: Math.ceil(min - q), severity: q <= 0 ? 'danger' : (q < min ? 'danger' : 'warn') });
         }
@@ -4138,9 +4138,9 @@ function renderAlertList() {
         <div class="alert-icon">${String(r.id).padStart(2,'0')}</div>
         <div class="alert-info">
           <div class="n">${r.name} <span class="badge badge-info" style="font-size:9px; padding:1px 6px; margin-left:4px">${r.b}</span></div>
-          <div class="m">คงเหลือ ${fmtQty(r.q)} ${r.unit} · Min ${r.min} · ต้องเพิ่ม <strong style="color:var(--accent)">${fmtQty(r.need)}</strong> ${r.unit}</div>
+          <div class="m">คงเหลือ ${fmtQty(r.q)} ${r.unit} · Safety Stock ${r.min} · ต้องเพิ่ม <strong style="color:var(--accent)">${fmtQty(r.need)}</strong> ${r.unit}</div>
         </div>
-        <div class="alert-action">${r.q <= 0 ? 'หมดสต๊อก' : 'ต่ำกว่าขั้นต่ำ'}</div>
+        <div class="alert-action">${r.q <= 0 ? 'หมดสต๊อก' : 'ต่ำกว่า Safety Stock'}</div>
       </div>
     `).join('');
     return;
@@ -4157,7 +4157,7 @@ function renderAlertList() {
       <div class="alert-icon">${String(it.id).padStart(2,'0')}</div>
       <div class="alert-info">
         <div class="n">${it.name}</div>
-        <div class="m">คงเหลือ ${fmtQty(it.q)} ${it.unit} · Min ${itemMin(it.id)} · ต้องเพิ่ม <strong style="color:var(--accent)">${fmtQty(it.s.reorderQty)}</strong> ${it.unit}</div>
+        <div class="m">คงเหลือ ${fmtQty(it.q)} ${it.unit} · Safety Stock ${itemSafety(it.id)} · ต้องเพิ่ม <strong style="color:var(--accent)">${fmtQty(it.s.reorderQty)}</strong> ${it.unit}</div>
       </div>
       <div class="alert-action">${it.s.label}</div>
     </div>
@@ -4182,7 +4182,7 @@ function renderItemsTable() {
   let items = ITEMS.slice();
   if (state.filter === 'accounting') items = items.filter(i => i.by === 'accounting');
   if (state.filter === 'isourcing') items = items.filter(i => i.by === 'isourcing');
-  if (state.filter === 'low') items = items.filter(i => (curStock()[i.id] || 0) < itemMin(i.id));
+  if (state.filter === 'low') items = items.filter(i => (curStock()[i.id] || 0) < itemSafety(i.id));
   if (q) items = items.filter(i => i.name.toLowerCase().includes(q) || ('item-' + i.id).includes(q));
 
   let totalStock = 0, totalValue = 0, totalReorder = 0, lowCount = 0;
@@ -4190,13 +4190,13 @@ function renderItemsTable() {
     totalStock += curStock()[it.id] || 0;
     totalValue += valueOf(it);
     totalReorder += reorderValue(it);
-    if ((curStock()[it.id] || 0) < itemMin(it.id)) lowCount++;
+    if ((curStock()[it.id] || 0) < itemSafety(it.id)) lowCount++;
   });
 
   tbody.innerHTML = items.map(it => {
     const s = statusOf(it);
     const stock = curStock()[it.id] || 0;
-    const pct = Math.min(100, (stock / Math.max(itemMin(it.id), 1)) * 50);
+    const pct = Math.min(100, (stock / Math.max(itemSafety(it.id), 1)) * 50);
     const v = valueOf(it);
     return `
       <tr onclick="showItemDetail(${it.id})">
@@ -4204,7 +4204,7 @@ function renderItemsTable() {
         <td class="item-name">${it.name}</td>
         <td class="center text-mute">${it.unit}</td>
         <td class="num">฿${fmt(itemPrice(it.id))}</td>
-        <td class="num text-mute">${itemMin(it.id)}</td>
+        <td class="num text-mute">${itemSafety(it.id)}</td>
         <td class="num">
           <span class="stock-cell ${s.key}">
             <span class="stock-bar"><div style="width:${pct}%"></div></span>
@@ -4241,7 +4241,7 @@ function showItemDetail(id) {
   document.getElementById('dtPrice').innerHTML = '฿' + fmt(itemPrice(it.id)) +
     (priceIsOverridden(it.id) ? ` <span class="set-changed-flag" style="font-size:9px">🟠 แก้ไข (เดิม ฿${fmt(ITEM_MAP[it.id].price)})</span>` : '');
   document.getElementById('dtStock').textContent = fmtQty(stock) + ' ' + it.unit;
-  document.getElementById('dtMin').textContent = itemMin(it.id) + ' ' + it.unit;
+  document.getElementById('dtSafety').textContent = itemSafety(it.id) + ' ' + it.unit;
   document.getElementById('dtValue').textContent = '฿' + fmt(valueOf(it));
   document.getElementById('dtOrderer').textContent = it.by === 'accounting' ? 'จัดซื้อ' : 'รายการเพิ่มเติม';
   document.getElementById('dtStatus').innerHTML = `<span class="badge badge-${s.key === 'ok' ? 'ok' : s.key === 'warn' ? 'warn' : 'danger'}">${s.label}</span>`;
@@ -4280,7 +4280,7 @@ function renderMonthly() {
       });
     }
     const stock = curStock()[it.id] || 0;
-    const reord = stock < itemMin(it.id) ? Math.ceil(itemMin(it.id) - stock) : 0;
+    const reord = stock < itemSafety(it.id) ? Math.ceil(itemSafety(it.id) - stock) : 0;
     const reordValue = reord * itemPrice(it.id);
     mIn += inQty * itemPrice(it.id);
     mOut += outQty * itemPrice(it.id);
@@ -4343,8 +4343,8 @@ function renderOrderSummary(by) {
           <div class="oc-grid">
             <div class="item">หน่วย <span class="v">${it.unit}</span></div>
             <div class="item">ราคา <span class="v">฿${fmt(itemPrice(it.id))}</span></div>
-            <div class="item">คงเหลือ <span class="v ${stock < itemMin(it.id) ? 'danger' : ''}">${fmtQty(stock)}</span></div>
-            <div class="item">MinStock <span class="v">${itemMin(it.id)}</span></div>
+            <div class="item">คงเหลือ <span class="v ${stock < itemSafety(it.id) ? 'danger' : ''}">${fmtQty(stock)}</span></div>
+            <div class="item">Safety Stock <span class="v">${itemSafety(it.id)}</span></div>
             <div class="item" style="grid-column: 1 / -1; padding-top: 8px; border-top: 1px dashed var(--line)">
               ต้องสั่งเพิ่ม <span class="v accent">${fmtQty(reord)} ${it.unit} ≈ ฿${fmt(reord * itemPrice(it.id))}</span>
             </div>
@@ -4428,11 +4428,11 @@ function renderOrderList() {
     const draft = orderDraft[it.id] || 0;
     const stock = curStock()[it.id] || 0;
     const suggested = reorderQty(it);
-    const lowFlag = stock < itemMin(it.id) ? `<span class="badge badge-danger" style="margin-left:6px">ต่ำกว่า Min</span>` : '';
+    const lowFlag = stock < itemSafety(it.id) ? `<span class="badge badge-danger" style="margin-left:6px">ต่ำกว่า Safety Stock</span>` : '';
     return `
       <div class="txn-row ${draft > 0 ? 'dirty' : ''}" data-id="${it.id}">
         <div class="ti">#${String(it.id).padStart(2,'0')}</div>
-        <div class="tn">${it.name}${lowFlag}<div class="sub">คงเหลือ ${fmtQty(stock)} ${it.unit} · Min ${itemMin(it.id)} · ฿${fmt(itemPrice(it.id))}/หน่วย${suggested>0?` · แนะนำ ${fmtQty(suggested)}`:''}</div></div>
+        <div class="tn">${it.name}${lowFlag}<div class="sub">คงเหลือ ${fmtQty(stock)} ${it.unit} · Safety Stock ${itemSafety(it.id)} · ฿${fmt(itemPrice(it.id))}/หน่วย${suggested>0?` · แนะนำ ${fmtQty(suggested)}`:''}</div></div>
         <div class="tc"><div class="l">รวม</div>฿${fmt(draft * itemPrice(it.id))}</div>
         <div class="qty-input in">
           <button onclick="adjOrderQty(${it.id},-1)">−</button>
@@ -4771,14 +4771,14 @@ function renderLog() {
 const SHEETS = {
   itemMaster: {
     title: "Sheet 1: Item_Master — ทะเบียนสินค้าหลัก",
-    desc: "รายการสินค้าทั้งหมด 38 รายการ ใช้เป็นตัวอ้างอิงกลาง (ราคา/Min เริ่มต้น) — ใช้ร่วมทุกอาคาร",
+    desc: "รายการสินค้าทั้งหมด 38 รายการ ใช้เป็นตัวอ้างอิงกลาง (ราคา/Safety Stock เริ่มต้น) — ใช้ร่วมทุกอาคาร",
     cols: [
       ["item_id", "INTEGER (PK)", "1–38 รหัสสินค้า"],
       ["item_code", "TEXT", "ITEM-001 … ITEM-038"],
       ["item_name", "TEXT", "ชื่อสินค้า"],
       ["unit", "TEXT", "หน่วยนับ เช่น ม้วน/แพ็ค/ด้าม"],
       ["base_price", "NUMBER(2)", "ราคาตั้งต้นของระบบ"],
-      ["base_min", "INTEGER", "MinStock ตั้งต้น"],
+      ["base_safety", "INTEGER", "Safety Stock ตั้งต้น"],
       ["ordered_by", "TEXT", "accounting / isourcing"],
       ["category", "TEXT", "หมวดสินค้า (option)"],
       ["active", "BOOL", "TRUE/FALSE"],
@@ -4786,7 +4786,7 @@ const SHEETS = {
   },
   buildings: {
     title: "Sheet 2: Buildings — ทะเบียนอาคาร",
-    desc: "รายชื่ออาคารทั้งหมดในระบบ แต่ละอาคารมีสต๊อก/Min แยกกัน",
+    desc: "รายชื่ออาคารทั้งหมดในระบบ แต่ละอาคารมีสต๊อก/Safety Stock แยกกัน",
     cols: [
       ["building_id", "TEXT (PK)", "B-001 …"],
       ["building_name", "TEXT", "ชื่ออาคาร เช่น Ari Hills"],
@@ -4807,14 +4807,14 @@ const SHEETS = {
       ["updated_at", "DATETIME", "อัปเดตล่าสุด"],
     ]
   },
-  minstock: {
-    title: "Sheet 4: MinStock — จุดสั่งซื้อขั้นต่ำรายอาคาร",
-    desc: "ค่า MinStock ที่กำหนดเองแยกตามอาคาร (เก็บเฉพาะที่ต่างจาก base_min ใน Item_Master)",
+  safetystock: {
+    title: "Sheet 4: SafetyStock — จุดสั่งซื้อขั้นต่ำรายอาคาร",
+    desc: "ค่า Safety Stock ที่กำหนดเองแยกตามอาคาร (เก็บเฉพาะที่ต่างจาก base_safety ใน Item_Master)",
     cols: [
       ["row_key", "TEXT (PK)", "building_name|item_id"],
       ["building_name", "TEXT", "ชื่ออาคาร"],
       ["item_id", "INTEGER", "รหัสสินค้า"],
-      ["min_stock", "INTEGER", "ค่าขั้นต่ำของอาคารนี้"],
+      ["safety_stock", "INTEGER", "ค่า Safety Stock ของอาคารนี้"],
       ["updated_by", "TEXT", "ผู้แก้ไข"],
       ["updated_at", "DATETIME", "วันที่แก้ไข"],
     ]
@@ -4892,7 +4892,7 @@ const SHEETS = {
       ["item_name", "TEXT", "ชื่อสินค้า"],
       ["unit", "TEXT", "หน่วย"],
       ["unit_price", "NUMBER(2)", "ราคาที่ใช้คำนวณ"],
-      ["min_stock", "INTEGER", "MinStock อาคารนี้"],
+      ["safety_stock", "INTEGER", "Safety Stock อาคารนี้"],
       ["stock_in", "INTEGER", "นำเข้ารวมในเดือน"],
       ["stock_out", "INTEGER", "เบิกรวมในเดือน"],
       ["closing_qty", "INTEGER", "คงเหลือสิ้นเดือน"],
@@ -4986,10 +4986,10 @@ function renderAppsScript() {
  *  Version: 1.0  (สำหรับระบบสต๊อกอุปโภคบริโภค stock_system-2)
  *
  *  11 Sheets:
- *    Item_Master   — ทะเบียนสินค้า 38 รายการ (ราคา/Min ตั้งต้น)
+ *    Item_Master   — ทะเบียนสินค้า 38 รายการ (ราคา/Safety Stock ตั้งต้น)
  *    Buildings     — รายชื่ออาคาร
  *    Stock_Current — คงเหลือปัจจุบัน (อาคาร × สินค้า)
- *    MinStock      — Min รายอาคาร (เก็บเฉพาะที่ต่างจากตั้งต้น)
+ *    SafetyStock   — Safety Stock รายอาคาร (เก็บเฉพาะที่ต่างจากตั้งต้น)
  *    Price_Current — ราคาปัจจุบัน (global ทุกอาคาร)
  *    Price_History — ประวัติการเปลี่ยนราคา ⭐
  *    StockIn       — บันทึกนำเข้า (มีอาคาร)
@@ -5014,7 +5014,7 @@ const TZ = 'Asia/Bangkok';
 const SH_ITEMS    = 'Item_Master';
 const SH_BLD      = 'Buildings';
 const SH_STOCK    = 'Stock_Current';
-const SH_MIN      = 'MinStock';
+const SH_SAFETY      = 'SafetyStock';
 const SH_PRICE    = 'Price_Current';
 const SH_PRICE_H  = 'Price_History';
 const SH_IN       = 'StockIn';
@@ -5027,15 +5027,15 @@ const DEFAULT_BUILDINGS = ['Ari Hills', 'BTS', 'KSL', 'ESV'];
 
 // ── หัวคอลัมน์ของแต่ละ Sheet ──
 const HEADERS = {
-  [SH_ITEMS]:   ['item_id','item_code','item_name','unit','base_price','base_min','ordered_by','category','active'],
+  [SH_ITEMS]:   ['item_id','item_code','item_name','unit','base_price','base_safety','ordered_by','category','active'],
   [SH_BLD]:     ['building_id','building_name','active','created_at'],
   [SH_STOCK]:   ['row_key','building_name','item_id','item_name','unit','current_qty','updated_at'],
-  [SH_MIN]:     ['row_key','building_name','item_id','min_stock','updated_by','updated_at'],
+  [SH_SAFETY]:     ['row_key','building_name','item_id','safety_stock','updated_by','updated_at'],
   [SH_PRICE]:   ['item_id','item_name','current_price','base_price','is_overridden','updated_at'],
   [SH_PRICE_H]: ['history_id','item_id','item_name','old_price','new_price','effective_month','changed_by','changed_at'],
   [SH_IN]:      ['txn_id','timestamp','month_key','building_name','item_id','item_name','unit','qty','unit_price','total_value','operator','note'],
   [SH_OUT]:     ['txn_id','timestamp','month_key','building_name','item_id','item_name','unit','qty','unit_price','total_value','operator','note'],
-  [SH_MONTHLY]: ['row_key','month_key','building_name','item_id','item_name','unit','unit_price','min_stock','stock_in','stock_out','closing_qty','reorder_qty','reorder_value','status'],
+  [SH_MONTHLY]: ['row_key','month_key','building_name','item_id','item_name','unit','unit_price','safety_stock','stock_in','stock_out','closing_qty','reorder_qty','reorder_value','status'],
   [SH_ORDERS]:  ['order_id','line_no','created_at','building_name','ordered_by','delivery_month','item_id','item_name','unit','unit_price','qty','line_total','operator','status'],
   [SH_ADMIN]:   ['user_id','email','display_name','role','can_stock_in','can_stock_out','can_order','can_edit_price','active','last_login'],
 };
@@ -5059,7 +5059,7 @@ function doGet(e) {
       case 'getItems':        return cors(getItems());
       case 'getBuildings':    return cors(getBuildings());
       case 'getStock':        return cors(getStock(e.parameter));
-      case 'getMinStock':     return cors(getMinStock(e.parameter));
+      case 'getSafetyStock':     return cors(getSafetyStock(e.parameter));
       case 'getPrices':       return cors(getPrices());
       case 'getPriceHistory': return cors(getPriceHistory(e.parameter));
       case 'getMovements':    return cors(getMovements(e.parameter));
@@ -5086,7 +5086,7 @@ function doPost(e) {
       case 'stockIn':       return cors(handleMovement(body, 'in'));
       case 'stockOut':      return cors(handleMovement(body, 'out'));
       case 'savePrice':     return cors(savePrice(body));
-      case 'saveMinStock':  return cors(saveMinStock(body));
+      case 'saveSafetyStock':  return cors(saveSafetyStock(body));
       case 'createOrder':   return cors(createOrder(body));
       case 'addBuilding':   return cors(addBuilding(body));
       case 'deleteBuilding':return cors(deleteBuilding(body));
@@ -5123,10 +5123,10 @@ function getStock(p) {
   if (p &amp;&amp; p.building &amp;&amp; p.building !== 'all') list = list.filter(r =&gt; r.building_name === p.building);
   return { ok: true, stock: list };
 }
-function getMinStock(p) {
-  let list = rowsToObjects(SH_MIN);
+function getSafetyStock(p) {
+  let list = rowsToObjects(SH_SAFETY);
   if (p &amp;&amp; p.building &amp;&amp; p.building !== 'all') list = list.filter(r =&gt; r.building_name === p.building);
-  return { ok: true, minstock: list };
+  return { ok: true, safetystock: list };
 }
 function getPriceHistory(p) {
   let list = rowsToObjects(SH_PRICE_H);
@@ -5159,7 +5159,7 @@ function getAll() {
     items:     rowsToObjects(SH_ITEMS),
     buildings: rowsToObjects(SH_BLD),
     stock:     rowsToObjects(SH_STOCK),
-    minstock:  rowsToObjects(SH_MIN),
+    safetystock:  rowsToObjects(SH_SAFETY),
     prices:    rowsToObjects(SH_PRICE),
     orders:    rowsToObjects(SH_ORDERS),
     users:     rowsToObjects(SH_ADMIN),
@@ -5214,7 +5214,7 @@ function updateMonthly(building, it, type, mk) {
   const sh = SS.getSheetByName(SH_MONTHLY);
   const key = building + '|' + mk + '|' + it.item_id;
   const price = getCurrentPrice(it.item_id);
-  const min = getMinStockValue(building, it.item_id);
+  const safety = getSafetyStockValue(building, it.item_id);
   const rows = sh.getDataRange().getValues();
   for (let i = 1; i &lt; rows.length; i++) {
     if (rows[i][0] === key) {
@@ -5226,13 +5226,13 @@ function updateMonthly(building, it, type, mk) {
   }
   const sIn = type === 'in' ? it.qty : 0;
   const sOut = type === 'out' ? it.qty : 0;
-  sh.appendRow([key, mk, building, it.item_id, it.item_name, it.unit, price, min, sIn, sOut, 0, 0, 0, 'ok']);
+  sh.appendRow([key, mk, building, it.item_id, it.item_name, it.unit, price, safety, sIn, sOut, 0, 0, 0, 'ok']);
   recalcMonthlyRow(sh, sh.getLastRow());
 }
 
 function recalcMonthlyRow(sh, row) {
   const r = sh.getRange(row, 1, 1, 14).getValues()[0];
-  const price = Number(r[6]), min = Number(r[7]);
+  const price = Number(r[6]), safety = Number(r[7]);
   const closing = getStockQty(r[2], r[3]); // คงเหลือจริงจาก Stock_Current
   const reorder = closing &lt; min ? Math.ceil(min - closing) : 0;
   const status = closing &lt;= 0 ? 'danger' : (closing &lt; min ? 'danger' : (closing &lt; min * 1.5 ? 'warn' : 'ok'));
@@ -5265,21 +5265,21 @@ function upsertPrice(sh, itemId, itemName, newPrice) {
   sh.appendRow([itemId, itemName, newPrice, base, newPrice !== base, new Date()]);
 }
 
-// ── บันทึก MinStock รายอาคาร ──
-// body = { building, updated_by, items: [{item_id, min_stock}] }
-function saveMinStock(body) {
-  const sh = SS.getSheetByName(SH_MIN);
+// ── บันทึก Safety Stock รายอาคาร ──
+// body = { building, updated_by, items: [{item_id, safety_stock}] }
+function saveSafetyStock(body) {
+  const sh = SS.getSheetByName(SH_SAFETY);
   const rows = sh.getDataRange().getValues();
   (body.items || []).forEach(function (it) {
     const key = body.building + '|' + it.item_id;
     let found = false;
     for (let i = 1; i &lt; rows.length; i++) {
       if (rows[i][0] === key) {
-        sh.getRange(i + 1, 4, 1, 3).setValues([[it.min_stock, body.updated_by || '', new Date()]]);
+        sh.getRange(i + 1, 4, 1, 3).setValues([[it.safety_stock, body.updated_by || '', new Date()]]);
         found = true; break;
       }
     }
-    if (!found) sh.appendRow([key, body.building, it.item_id, it.min_stock, body.updated_by || '', new Date()]);
+    if (!found) sh.appendRow([key, body.building, it.item_id, it.safety_stock, body.updated_by || '', new Date()]);
   });
   return { ok: true };
 }
@@ -5328,8 +5328,8 @@ function getCurrentPrice(id) {
   const v = lookup(SH_PRICE, 0, id, 2);
   return v != null ? Number(v) : getBasePrice(id);
 }
-function getMinStockValue(building, id) {
-  const v = lookup(SH_MIN, 0, building + '|' + id, 3);
+function getSafetyStockValue(building, id) {
+  const v = lookup(SH_SAFETY, 0, building + '|' + id, 3);
   if (v != null) return Number(v);
   const base = lookup(SH_ITEMS, 0, id, 5);
   return base != null ? Number(base) : 0;
@@ -5392,7 +5392,7 @@ function createSheetWithHeaders(name, headers) {
 // ════════════════════════════════════════════════════════════
 //  SEED DATA  (สินค้า 38 รายการ ตรงกับ HTML)
 // ════════════════════════════════════════════════════════════
-// [item_id, item_name, unit, base_price, base_min, ordered_by]
+// [item_id, item_name, unit, base_price, base_safety, ordered_by]
 const ITEM_SEED = [
   [1,  'เชือกฟาง 500 กรัม ความยาว 100 เมตร (1 ม้วน)', 'ม้วน', 29, 5, 'accounting'],
   [2,  'ถ่านอัลคาไลน์ AA แบบไม่ชาร์จ (แพ็ค 4 ก้อน) Panasonic', 'แพ็ค', 67, 10, 'accounting'],
@@ -5501,13 +5501,13 @@ function closeModal(id) {
 
 /* ==================== EXPORT ==================== */
 function exportCSV() {
-  const headers = ['ID','รายการ','หน่วย','ราคา','MinStock','คงเหลือ','มูลค่า','สถานะ','สั่งโดย','ต้องสั่งเพิ่ม'];
+  const headers = ['ID','รายการ','หน่วย','ราคา','SafetyStock','คงเหลือ','มูลค่า','สถานะ','สั่งโดย','ต้องสั่งเพิ่ม'];
   const rows = ITEMS.map(it => {
     const s = statusOf(it);
     return [
       'ITEM-' + String(it.id).padStart(3,'0'),
       '"' + it.name.replace(/"/g, '""') + '"',
-      it.unit, itemPrice(it.id), itemMin(it.id),
+      it.unit, itemPrice(it.id), itemSafety(it.id),
       curStock()[it.id] || 0,
       Math.round(valueOf(it) * 100) / 100,
       s.label, it.by === 'accounting' ? 'จัดซื้อ' : 'รายการเพิ่มเติม',
