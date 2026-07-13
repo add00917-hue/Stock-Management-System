@@ -1044,6 +1044,39 @@
     display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
   }
   .user-list .uitem .info .r { font-size: 11px; color: var(--ink-mute); margin-top: 2px; }
+  .user-list .uitem.inactive { opacity: .55; }
+  .perm-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+  .perm-chip {
+    font-size: 10.5px; font-weight: 600; line-height: 1;
+    padding: 3px 7px; border-radius: 999px;
+    background: var(--ok-soft); color: var(--ok-ink);
+  }
+  .perm-chip.muted { background: #ECEAE3; color: var(--ink-mute); }
+  .u-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .u-btn {
+    border: 1px solid var(--line); background: #fff; cursor: pointer;
+    border-radius: 8px; padding: 5px 9px; font-size: 12px; font-weight: 600;
+    color: var(--ink); white-space: nowrap;
+  }
+  .u-btn:hover { background: var(--surface-2); }
+  .u-btn.danger { color: var(--danger); border-color: var(--danger); }
+  /* user edit modal */
+  .ue-field { margin-bottom: 14px; }
+  .ue-field > label { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+  .ue-field input[type=text], .ue-field select {
+    width: 100%; padding: 10px 12px; border-radius: 10px;
+    border: 1px solid var(--line); font-size: 14px; background: #fff;
+  }
+  .ue-caps { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ue-cap {
+    display: flex; align-items: center; gap: 7px; cursor: pointer;
+    font-size: 13px; padding: 9px 11px; border-radius: 10px;
+    background: var(--surface-2); border: 1px solid var(--line-soft);
+  }
+  .ue-cap input { width: 16px; height: 16px; }
+  .ue-hint { font-size: 12px; color: var(--ink-mute); margin-top: 4px; }
+  .ue-active { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+  .ue-active input { width: 17px; height: 17px; }
 
   /* google sheets */
   .gs-section {
@@ -1603,7 +1636,7 @@
   /* toast */
   .toast-stack {
     position: fixed; top: 20px; right: 20px;
-    z-index: 9999;
+    z-index: 21000;
     display: flex; flex-direction: column; gap: 8px;
     pointer-events: none;
   }
@@ -1623,6 +1656,45 @@
   .toast.warn { background: var(--warn); }
   .toast.danger { background: var(--danger); }
   @keyframes toastIn { from { transform: translateX(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+  /* ===== กล่องสรุปผลการบันทึก (กลางจอ ลอยเหนือ popup) ===== */
+  .result-overlay {
+    position: fixed; inset: 0; z-index: 30000;
+    background: rgba(20,20,26,.55);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    animation: resultFade .18s ease;
+  }
+  @keyframes resultFade { from { opacity: 0; } to { opacity: 1; } }
+  .result-card {
+    background: #fff; border-radius: 18px;
+    width: 100%; max-width: 340px;
+    padding: 26px 22px 20px;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+    animation: resultPop .22s cubic-bezier(.2,.8,.3,1.2);
+  }
+  @keyframes resultPop { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .result-icon {
+    width: 58px; height: 58px; margin: 0 auto 12px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 30px; color: #fff; font-weight: 700;
+  }
+  .result-icon.ok   { background: var(--ok); }
+  .result-icon.warn { background: var(--warn); }
+  .result-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
+  .result-count { font-size: 34px; font-weight: 800; color: var(--ink); line-height: 1.1; }
+  .result-count .rc-saved { color: var(--ok); }
+  .result-count.warn .rc-saved { color: var(--warn); }
+  .result-count .rc-unit { font-size: 15px; font-weight: 600; color: var(--ink-mute); }
+  .result-note { font-size: 13px; color: var(--ink-mute); margin-top: 8px; }
+  .result-sync {
+    margin-top: 14px; padding: 9px 12px; border-radius: 10px;
+    font-size: 12.5px; font-weight: 600;
+    background: #F2EFE8; color: var(--ink-mute);
+  }
+  .result-sync.ok   { background: rgba(42,127,79,.12);  color: var(--ok); }
+  .result-sync.warn { background: rgba(216,139,31,.14); color: var(--warn); }
 
   /* sub-tabs (for order summary pages) */
   .sub-tabs { display: flex; gap: 4px; background: var(--surface); padding: 5px; border-radius: 10px; border: 1px solid var(--line); margin-bottom: 16px; width: fit-content; }
@@ -2202,34 +2274,10 @@
       </div>
       <div class="admin-card user">
         <div class="a-icon">👥</div>
-        <h3>จัดการผู้ใช้ <span class="text-mute" style="font-size:13px; font-weight:500">· 3 คน</span></h3>
-        <p>ADDI และ PONK เป็น Admin (ทำได้ทุกอย่าง) · POP เป็นผู้ใช้งาน (เบิกสินค้าได้อย่างเดียว)</p>
-        <div class="user-list" id="userList">
-          <div class="uitem main-admin">
-            <div class="av" style="background:var(--gold)">AD</div>
-            <div class="info">
-              <div class="n">ADDI <span class="badge badge-gold" style="margin-left:2px">★ ADMIN</span></div>
-              <div class="r">ADMIN · นำเข้า/เบิก/สั่งซื้อ/ตั้งค่า/จัดการผู้ใช้</div>
-            </div>
-            <span class="badge badge-ok">Active</span>
-          </div>
-          <div class="uitem">
-            <div class="av" style="background:var(--accent)">PK</div>
-            <div class="info">
-              <div class="n">PONK</div>
-              <div class="r">ADMIN · นำเข้า/เบิก/สั่งซื้อ/ตั้งค่า</div>
-            </div>
-            <span class="badge badge-ok">Active</span>
-          </div>
-          <div class="uitem">
-            <div class="av" style="background:var(--info)">PP</div>
-            <div class="info">
-              <div class="n">POP</div>
-              <div class="r">ผู้ใช้งาน · เบิกสินค้าได้อย่างเดียว</div>
-            </div>
-            <span class="badge badge-ok">Active</span>
-          </div>
-        </div>
+        <h3>จัดการผู้ใช้ <span class="text-mute" style="font-size:13px; font-weight:500">· <span id="userCount">0</span> คน</span></h3>
+        <p id="userCardHint">แสดงรายชื่อผู้ใช้และสิทธิ์ทั้งหมด · เฉพาะ <b>GNR Admin</b> เท่านั้นที่เพิ่ม/แก้ไข/ให้สิทธิ์ได้</p>
+        <button class="btn btn-accent btn-sm" id="addUserBtn" style="display:none; margin-bottom:12px" onclick="openUserEdit(null)">+ เพิ่มผู้ใช้</button>
+        <div class="user-list" id="userList"></div>
       </div>
 
       <div class="admin-card bld">
@@ -2612,6 +2660,53 @@
 <!-- toast stack -->
 <div class="toast-stack" id="toastStack"></div>
 
+<!-- ==================== USER ADD / EDIT MODAL (GNR Admin) ==================== -->
+<div class="modal-overlay" id="modalUserEdit" onclick="if(event.target===this)closeModal('modalUserEdit')">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-head">
+      <h2 id="userEditTitle">เพิ่มผู้ใช้</h2>
+      <button class="modal-close" onclick="closeModal('modalUserEdit')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="ue-field">
+        <label>ชื่อผู้ใช้ (username)</label>
+        <input type="text" id="ueUsername" placeholder="เช่น somchai" autocomplete="off">
+      </div>
+      <div class="ue-field">
+        <label>ชื่อที่แสดง</label>
+        <input type="text" id="ueDisplay" placeholder="เช่น สมชาย" autocomplete="off">
+      </div>
+      <div class="ue-field">
+        <label id="uePassLabel">รหัสผ่าน</label>
+        <input type="text" id="uePassword" placeholder="ตั้งรหัสผ่าน" autocomplete="off">
+      </div>
+      <div class="ue-field">
+        <label>ระดับสิทธิ์ (role)</label>
+        <select id="ueRole" onchange="onUeRoleChange()">
+          <option value="user">ผู้ใช้งาน — ตามสิทธิ์ที่เลือก</option>
+          <option value="admin">Admin — ทำได้ทุกอย่าง (ยกเว้นจัดการผู้ใช้)</option>
+          <option value="gnradmin">GNR Admin — ผู้ดูแลสูงสุด (จัดการผู้ใช้ได้)</option>
+        </select>
+      </div>
+      <div class="ue-field">
+        <label>สิทธิ์การใช้งาน</label>
+        <div class="ue-caps" id="ueCaps">
+          <label class="ue-cap"><input type="checkbox" id="ueCanIn"> นำเข้าสินค้า</label>
+          <label class="ue-cap"><input type="checkbox" id="ueCanOut"> เบิกสินค้า</label>
+          <label class="ue-cap"><input type="checkbox" id="ueCanOrder"> จัดทำใบสั่งซื้อ</label>
+          <label class="ue-cap"><input type="checkbox" id="ueCanPrice"> แก้ไขราคา</label>
+        </div>
+        <div class="ue-hint" id="ueCapsHint" style="display:none">Admin / GNR Admin ได้ทุกสิทธิ์อยู่แล้ว</div>
+      </div>
+      <label class="ue-active"><input type="checkbox" id="ueActive" checked> เปิดใช้งานบัญชีนี้</label>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalUserEdit')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveUserToCloud()">✓ บันทึกผู้ใช้</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ==================== DATA ==================== */
 const ITEMS = [
@@ -2872,15 +2967,31 @@ function applyCloudData(r) {
     });
     state.stock = stk;
   }
+
+  // users (จัดการผู้ใช้) — โหลดรายชื่อ/สิทธิ์จาก Sheet Admin
+  if (Array.isArray(r.users) && r.users.length) {
+    USERS = r.users.map(u => ({
+      user_id: u.user_id,
+      username: String(u.username || '').toLowerCase().trim(),
+      display_name: u.display_name || u.username,
+      role: u.role || 'user',
+      can_stock_in:  truthyClient(u.can_stock_in),
+      can_stock_out: truthyClient(u.can_stock_out),
+      can_order:     truthyClient(u.can_order),
+      can_edit_price:truthyClient(u.can_edit_price),
+      active: (u.active === '' || u.active == null) ? true : truthyClient(u.active),
+    }));
+    if (typeof renderUsers === 'function') renderUsers();
+  }
 }
 
 // ─── ยิง action ขึ้น Sheet แบบไม่บล็อก UI (fire-and-forget + แจ้งผล) ───
 function pushToCloud(action, payload, okMsg) {
-  if (!gasOnline) return;            // ออฟไลน์ → เก็บแค่ใน localStorage
+  if (!gasOnline) return Promise.resolve({ offline: true });   // ออฟไลน์ → เก็บแค่ใน localStorage
   setGasStatus('syncing');
-  gasPost(action, payload)
-    .then(() => { setGasStatus('online'); if (okMsg) toast(okMsg); })
-    .catch(e => { setGasStatus('offline'); gasOnline = false; toast('ซิงค์ขึ้น Sheet ไม่สำเร็จ: ' + e.message, 'warn'); });
+  return gasPost(action, payload)
+    .then(() => { setGasStatus('online'); if (okMsg) toast(okMsg); return { ok: true }; })
+    .catch(e => { setGasStatus('offline'); gasOnline = false; toast('ซิงค์ขึ้น Sheet ไม่สำเร็จ: ' + e.message, 'warn'); return { ok: false, error: e.message }; });
 }
 
 
@@ -3099,33 +3210,49 @@ const SESSION_KEY = 'stock_mgmt_session';
 let currentUser = null;
 let pendingAction = null;   // งานที่รอทำหลัง login สำเร็จ
 
-const ROLE_LABEL = { admin: 'ADMIN', user: 'ผู้ใช้งาน (เบิกได้)' };
+const ROLE_LABEL = { gnradmin: 'GNR ADMIN', admin: 'ADMIN', user: 'ผู้ใช้งาน (เบิกได้)' };
+const ROLE_DESC  = {
+  gnradmin: 'ผู้ดูแลสูงสุด · จัดการผู้ใช้และให้สิทธิ์ได้',
+  admin:    'ผู้ดูแลระบบ · ทำได้ทุกอย่าง ยกเว้นจัดการผู้ใช้',
+  user:     'ผู้ใช้งานทั่วไป · ตามสิทธิ์ที่ได้รับ',
+};
+const ROLE_RANK  = { user: 1, admin: 2, gnradmin: 3 };
+const CAP_LABEL  = { can_stock_in: 'นำเข้า', can_stock_out: 'เบิก', can_order: 'สั่งซื้อ', can_edit_price: 'แก้ราคา' };
 
-// สิทธิ์ที่แต่ละ action ต้องการ: 'admin' = เฉพาะแอดมิน, 'any' = ผู้ใช้ที่ login แล้ว
+// สิทธิ์ที่แต่ละ action ต้องการ — role: ต้องมี role ระดับนี้ขึ้นไป · cap: ต้องมีสิทธิ์เฉพาะทาง (admin/gnradmin ผ่านอัตโนมัติ)
 const PERMISSIONS = {
-  stockOut:   'any',     // เบิก — user ทำได้
-  stockIn:    'admin',   // นำเข้า — admin เท่านั้น
-  order:      'admin',   // จัดทำใบสั่งซื้อ
-  safetystock:   'admin',   // ตั้งค่า Safety Stock
-  price:      'admin',   // ตั้งค่าราคา
-  building:   'admin',   // จัดการอาคาร
-  manageUser: 'admin',   // จัดการผู้ใช้
-  adminPage:  'admin',   // เข้าหน้า Admin
+  stockOut:    { cap: 'can_stock_out' },   // เบิก
+  stockIn:     { cap: 'can_stock_in'  },   // นำเข้า
+  order:       { cap: 'can_order'     },   // จัดทำใบสั่งซื้อ
+  price:       { cap: 'can_edit_price'},   // ตั้งค่าราคา
+  safetystock: { role: 'admin' },          // ตั้งค่า Safety Stock
+  building:    { role: 'admin' },          // จัดการอาคาร
+  adminPage:   { role: 'admin' },          // เข้าหน้า Admin
+  manageUser:  { role: 'gnradmin' },       // จัดการผู้ใช้ — เฉพาะ GNR Admin
 };
 
+function truthyClient(v){ return v === true || v === 'TRUE' || v === 1 || v === '1'; }
+function roleRank(r){ return ROLE_RANK[r] || 0; }
 function isLoggedIn() { return !!currentUser; }
-function isAdmin() { return currentUser && currentUser.role === 'admin'; }
+function isAdmin() { return !!currentUser && roleRank(currentUser.role) >= 2; }   // admin หรือ gnradmin
+function isGnrAdmin() { return !!currentUser && currentUser.role === 'gnradmin'; }
 
 // ตรวจสิทธิ์ก่อนทำงาน — ถ้าผ่านให้รัน cb, ถ้าไม่ผ่านเปิด login / แจ้งเตือน
 function requireAuth(permKey, cb) {
-  const need = PERMISSIONS[permKey] || 'any';
+  const perm = PERMISSIONS[permKey] || {};
   if (!isLoggedIn()) {
     pendingAction = { permKey, cb };
     openLogin('กรุณาเข้าสู่ระบบก่อนดำเนินการ');
     return false;
   }
-  if (need === 'admin' && !isAdmin()) {
-    toast('เฉพาะผู้ดูแลระบบ (Admin) เท่านั้นที่ทำรายการนี้ได้', 'warn');
+  if (perm.role && roleRank(currentUser.role) < roleRank(perm.role)) {
+    toast(perm.role === 'gnradmin'
+      ? 'เฉพาะ GNR Admin (ผู้ดูแลสูงสุด) เท่านั้นที่จัดการส่วนนี้ได้'
+      : 'เฉพาะผู้ดูแลระบบ (Admin) เท่านั้นที่ทำรายการนี้ได้', 'warn');
+    return false;
+  }
+  if (perm.cap && !isAdmin() && !truthyClient(currentUser[perm.cap])) {
+    toast('บัญชีนี้ไม่มีสิทธิ์ทำรายการนี้ · ติดต่อ GNR Admin เพื่อขอสิทธิ์', 'warn');
     return false;
   }
   if (cb) cb();
@@ -3192,9 +3319,14 @@ function onLoginSuccess(user) {
   currentUser = {
     username: user.username, name: user.name, role: user.role,
     avatar: user.avatar || String(user.name || '').substring(0,2).toUpperCase(),
+    can_stock_in:  truthyClient(user.can_stock_in),
+    can_stock_out: truthyClient(user.can_stock_out),
+    can_order:     truthyClient(user.can_order),
+    can_edit_price:truthyClient(user.can_edit_price),
   };
   try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentUser)); } catch(e){}
   applyUserToUI();
+  if (typeof renderUsers === 'function') renderUsers();
   const ov = document.getElementById('loginOverlay');
   ov.classList.add('hidden');
   document.getElementById('loginPass').value = '';
@@ -3207,9 +3339,8 @@ function onLoginSuccess(user) {
   if (pendingAction) {
     const { permKey, cb } = pendingAction;
     pendingAction = null;
-    const need = PERMISSIONS[permKey] || 'any';
-    if (need === 'admin' && !isAdmin()) {
-      toast('บัญชีนี้เป็นผู้ใช้งานทั่วไป ทำรายการนี้ไม่ได้ (เฉพาะ Admin)', 'warn');
+    if (permLocked(permKey)) {
+      toast('บัญชีนี้ไม่มีสิทธิ์ทำรายการนี้ · ติดต่อ GNR Admin', 'warn');
     } else if (cb) {
       setTimeout(cb, 150);
     }
@@ -3239,14 +3370,24 @@ function applyUserToUI() {
     if (mUser) mUser.style.display = 'none';
   }
   refreshPermissionUI();
+  if (typeof renderUsers === 'function') renderUsers();
+}
+
+// คำนวณว่าการ์ด/ปุ่มควรถูกล็อกตามสิทธิ์ปัจจุบันหรือไม่
+function permLocked(permKey) {
+  const perm = PERMISSIONS[permKey] || {};
+  if (perm.role && roleRank(currentUser ? currentUser.role : '') < roleRank(perm.role)) return true;
+  if (perm.cap) {
+    if (isAdmin()) return false;
+    return !truthyClient(currentUser && currentUser[perm.cap]);
+  }
+  return false;
 }
 
 // อัปเดตหน้าตาปุ่มตามสิทธิ์ (เช่น การ์ด admin แสดงไอคอนล็อก)
 function refreshPermissionUI() {
   document.querySelectorAll('[data-perm]').forEach(el => {
-    const need = PERMISSIONS[el.dataset.perm] || 'any';
-    const locked = (need === 'admin' && !isAdmin());
-    el.classList.toggle('perm-locked', locked);
+    el.classList.toggle('perm-locked', permLocked(el.dataset.perm));
   });
 }
 
@@ -3267,6 +3408,141 @@ function initAuth() {
     if (s && s.username && s.role) currentUser = s;
   } catch(e){}
   applyUserToUI();
+}
+
+/* ==================== USER MANAGEMENT (GNR Admin) ==================== */
+let USERS = [
+  { user_id:'U-001', username:'addi', display_name:'ADDI', role:'gnradmin', can_stock_in:true,  can_stock_out:true, can_order:true,  can_edit_price:true,  active:true },
+  { user_id:'U-002', username:'ponk', display_name:'PONK', role:'admin',    can_stock_in:true,  can_stock_out:true, can_order:true,  can_edit_price:true,  active:true },
+  { user_id:'U-003', username:'pop',  display_name:'POP',  role:'user',     can_stock_in:false, can_stock_out:true, can_order:false, can_edit_price:false, active:true },
+];
+
+function roleBadge(role){
+  if (role==='gnradmin') return '<span class="badge badge-gold">★ GNR ADMIN</span>';
+  if (role==='admin')    return '<span class="badge badge-info">ADMIN</span>';
+  return '<span class="badge" style="background:#ECEAE3;color:var(--ink-mute)">ผู้ใช้งาน</span>';
+}
+function avatarColor(role){ return role==='gnradmin' ? 'var(--gold)' : role==='admin' ? 'var(--accent)' : 'var(--info)'; }
+
+function permChips(u){
+  if (u.role==='gnradmin' || u.role==='admin'){
+    const chips = ['นำเข้า','เบิก','สั่งซื้อ','แก้ราคา','ตั้งค่า'];
+    if (u.role==='gnradmin') chips.unshift('จัดการผู้ใช้');
+    return chips.map(c=>`<span class="perm-chip">${c}</span>`).join('');
+  }
+  const caps = ['can_stock_in','can_stock_out','can_order','can_edit_price'];
+  const on = caps.filter(c=>truthyClient(u[c]));
+  if (!on.length) return '<span class="perm-chip muted">ยังไม่ได้รับสิทธิ์</span>';
+  return on.map(c=>`<span class="perm-chip">${CAP_LABEL[c]}</span>`).join('');
+}
+
+function renderUsers(){
+  const list = document.getElementById('userList');
+  if (!list) return;
+  const cnt = document.getElementById('userCount'); if (cnt) cnt.textContent = USERS.length;
+  const gnr = isGnrAdmin();
+  const addBtn = document.getElementById('addUserBtn'); if (addBtn) addBtn.style.display = gnr ? '' : 'none';
+  const hint = document.getElementById('userCardHint');
+  if (hint) hint.innerHTML = gnr
+    ? 'คุณเป็น <b>GNR Admin</b> — เพิ่ม/แก้ไขผู้ใช้และให้สิทธิ์ได้'
+    : 'แสดงรายชื่อผู้ใช้และสิทธิ์ทั้งหมด · เฉพาะ <b>GNR Admin</b> เท่านั้นที่แก้ไขได้';
+
+  list.innerHTML = USERS.map(u=>{
+    const active = truthyClient(u.active);
+    const av = String(u.display_name||u.username||'?').substring(0,2).toUpperCase();
+    const uEsc = String(u.username).replace(/'/g,"\\'");
+    const actions = gnr ? `
+      <div class="u-actions">
+        <button class="u-btn" onclick="openUserEdit('${uEsc}')">แก้ไข</button>
+        <button class="u-btn ${active?'danger':''}" onclick="toggleUserActive('${uEsc}',${!active})">${active?'ปิด':'เปิด'}</button>
+      </div>` : `<span class="badge ${active?'badge-ok':''}" style="${active?'':'background:#ECEAE3;color:var(--ink-mute)'}">${active?'Active':'ปิดใช้งาน'}</span>`;
+    return `<div class="uitem ${u.role==='gnradmin'?'main-admin':''} ${active?'':'inactive'}">
+      <div class="av" style="background:${avatarColor(u.role)}">${av}</div>
+      <div class="info">
+        <div class="n">${u.display_name||u.username} ${roleBadge(u.role)}</div>
+        <div class="r">@${u.username} · ${ROLE_DESC[u.role]||''}</div>
+        <div class="perm-chips">${permChips(u)}</div>
+      </div>
+      ${actions}
+    </div>`;
+  }).join('');
+}
+
+function openUserEdit(username){
+  if (!isGnrAdmin()){ toast('เฉพาะ GNR Admin เท่านั้น','warn'); return; }
+  const editing = !!username;
+  const u = editing ? USERS.find(x=>x.username===username) : null;
+  document.getElementById('userEditTitle').textContent = editing ? 'แก้ไขผู้ใช้' : 'เพิ่มผู้ใช้';
+  const set=(id,v)=>{const el=document.getElementById(id); if(el) el.value=v;};
+  const chk=(id,v)=>{const el=document.getElementById(id); if(el) el.checked=!!v;};
+  set('ueUsername', u?u.username:'');
+  document.getElementById('ueUsername').disabled = editing;   // ห้ามแก้ username เดิม
+  set('ueDisplay', u?u.display_name:'');
+  set('uePassword','');
+  document.getElementById('uePassLabel').textContent = editing ? 'รหัสผ่านใหม่ (เว้นว่าง = ไม่เปลี่ยน)' : 'รหัสผ่าน';
+  set('ueRole', u?u.role:'user');
+  chk('ueCanIn',    u?truthyClient(u.can_stock_in):false);
+  chk('ueCanOut',   u?truthyClient(u.can_stock_out):true);
+  chk('ueCanOrder', u?truthyClient(u.can_order):false);
+  chk('ueCanPrice', u?truthyClient(u.can_edit_price):false);
+  chk('ueActive',   u?truthyClient(u.active):true);
+  onUeRoleChange();
+  openModal('modalUserEdit');
+}
+
+function onUeRoleChange(){
+  const role = document.getElementById('ueRole').value;
+  const isAdm = (role==='admin'||role==='gnradmin');
+  ['ueCanIn','ueCanOut','ueCanOrder','ueCanPrice'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(isAdm){ el.checked=true; el.disabled=true; } else { el.disabled=false; }
+  });
+  document.getElementById('ueCaps').style.opacity = isAdm ? .5 : 1;
+  document.getElementById('ueCapsHint').style.display = isAdm ? '' : 'none';
+}
+
+function saveUserToCloud(){
+  if (!isGnrAdmin()){ toast('เฉพาะ GNR Admin เท่านั้น','warn'); return; }
+  const uname = (document.getElementById('ueUsername').value||'').trim().toLowerCase();
+  const disp  = (document.getElementById('ueDisplay').value||'').trim();
+  const pass  = document.getElementById('uePassword').value||'';
+  const role  = document.getElementById('ueRole').value;
+  const editing = USERS.some(x=>x.username===uname);
+  if (!uname){ toast('กรุณากรอก username','warn'); return; }
+  if (!disp){ toast('กรุณากรอกชื่อที่แสดง','warn'); return; }
+  if (!editing && !pass){ toast('กรุณาตั้งรหัสผ่านสำหรับผู้ใช้ใหม่','warn'); return; }
+  const isAdm = (role==='admin'||role==='gnradmin');
+  const rec = {
+    actor: currentUser.username,
+    username: uname, display_name: disp, password: pass, role: role,
+    can_stock_in:  isAdm || document.getElementById('ueCanIn').checked,
+    can_stock_out: isAdm || document.getElementById('ueCanOut').checked,
+    can_order:     isAdm || document.getElementById('ueCanOrder').checked,
+    can_edit_price:isAdm || document.getElementById('ueCanPrice').checked,
+    active: document.getElementById('ueActive').checked,
+  };
+  // อัปเดตในเครื่องทันที
+  const local = Object.assign({}, rec); delete local.actor; delete local.password;
+  const idx = USERS.findIndex(x=>x.username===uname);
+  if (idx>=0) USERS[idx] = Object.assign({}, USERS[idx], local);
+  else USERS.push(Object.assign({ user_id:'U-'+String(USERS.length+1).padStart(3,'0') }, local));
+  renderUsers();
+  closeModal('modalUserEdit');
+  const cloudPromise = pushToCloud('saveUser', rec);
+  showSaveResult({
+    title: editing ? `แก้ไขผู้ใช้ · ${disp}` : `เพิ่มผู้ใช้ · ${disp}`,
+    saved: 1, total: 1,
+    note: `สิทธิ์: ${ROLE_LABEL[role]}`,
+    cloudPromise,
+  });
+}
+
+function toggleUserActive(username, next){
+  if (!isGnrAdmin()){ toast('เฉพาะ GNR Admin เท่านั้น','warn'); return; }
+  const u = USERS.find(x=>x.username===username); if(!u) return;
+  u.active = next; renderUsers();
+  pushToCloud('setUserActive', { actor: currentUser.username, username, active: next })
+    .then(r=>{ if(r&&r.ok) toast(next?`เปิดใช้งาน @${username} แล้ว`:`ปิดใช้งาน @${username} แล้ว`); });
 }
 
 /* ==================== BUILDING HELPERS ==================== */
@@ -3330,6 +3606,48 @@ function toast(msg, kind='ok') {
   t.innerHTML = (kind === 'ok' ? '✓ ' : kind === 'warn' ? '⚠ ' : kind === 'danger' ? '✕ ' : '') + msg;
   stack.appendChild(t);
   setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .25s'; setTimeout(()=>t.remove(), 250); }, 2400);
+}
+
+/* กล่องสรุปผลการบันทึก กลางจอ ลอยเหนือ popup — แสดง "บันทึกแล้ว X / Y รายการ" + สถานะซิงค์ Sheet */
+function showSaveResult({ title, saved, total, note, cloudPromise }) {
+  const prev = document.getElementById('saveResultOverlay');
+  if (prev) prev.remove();
+  const complete = Number(saved) >= Number(total) && Number(total) > 0;
+  const ov = document.createElement('div');
+  ov.id = 'saveResultOverlay';
+  ov.className = 'result-overlay';
+  ov.onclick = (e) => { if (e.target === ov) ov.remove(); };
+  ov.innerHTML = `
+    <div class="result-card">
+      <div class="result-icon ${complete ? 'ok' : 'warn'}">${complete ? '✓' : '!'}</div>
+      <div class="result-title">${title}</div>
+      <div class="result-count ${complete ? '' : 'warn'}">
+        <span class="rc-saved">${saved}</span> / ${total} <span class="rc-unit">รายการ</span>
+      </div>
+      ${note ? `<div class="result-note">${note}</div>` : ''}
+      <div class="result-sync" id="resultSync">⏳ กำลังบันทึกขึ้น Google Sheet…</div>
+      <button class="btn btn-primary" style="width:100%;margin-top:16px"
+        onclick="document.getElementById('saveResultOverlay').remove()">ตกลง</button>
+    </div>`;
+  document.body.appendChild(ov);
+  const syncEl = ov.querySelector('#resultSync');
+  if (cloudPromise && typeof cloudPromise.then === 'function') {
+    cloudPromise.then(r => {
+      if (r && r.ok) {
+        syncEl.className = 'result-sync ok';
+        syncEl.innerHTML = '✓ ซิงค์ขึ้น Google Sheet แล้ว';
+      } else if (r && r.offline) {
+        syncEl.className = 'result-sync warn';
+        syncEl.innerHTML = '⚠ ออฟไลน์ — บันทึกในเครื่องแล้ว · ยังไม่ได้ขึ้น Sheet';
+      } else {
+        syncEl.className = 'result-sync warn';
+        syncEl.innerHTML = '⚠ ซิงค์ Sheet ไม่สำเร็จ — บันทึกในเครื่องแล้ว<br><span style="font-weight:500">' +
+          ((r && r.error) ? String(r.error).slice(0,80) : '') + '</span>';
+      }
+    });
+  } else {
+    syncEl.style.display = 'none';
+  }
 }
 
 /* ==================== TAB SWITCHING ==================== */
@@ -3651,10 +3969,16 @@ function saveSafetyStockSettings() {
   });
   saveState();
   // ── ส่ง Safety Stock รายอาคารขึ้น Google Sheets ──
-  pushToCloud('saveSafetyStock', { building: b, updated_by: 'ADDI', items: cloudItems });
+  const cloudPromise = pushToCloud('saveSafetyStock', { building: b, updated_by: 'ADDI', items: cloudItems });
   safetyStockDirty = false;
   renderSafetyStockBldPills();  // refresh override counts on pills
-  toast(`บันทึก Safety Stock อาคาร ${b} แล้ว · มีการกำหนดเอง ${changeCount} รายการ`);
+  showSaveResult({
+    title: `บันทึก Safety Stock · อาคาร ${b}`,
+    saved: cloudItems.length,
+    total: ITEMS.length,
+    note: `กำหนดค่าเอง ${changeCount} รายการ · ที่เหลือใช้ค่าตั้งต้น`,
+    cloudPromise,
+  });
   // refresh dependent views
   renderDashboard(); renderItemsTable(); renderMonthly();
   renderOrderSummary('accounting'); renderOrderSummary('isourcing');
@@ -4732,13 +5056,21 @@ function commitTxn(kind) {
     }
   });
   if (!any) { toast('ยังไม่ได้ใส่จำนวน', 'warn'); return; }
+  const savedCount = cloudItems.length;
   txnDraft[kind] = {};
   saveState();
   // ── ส่งขึ้น Google Sheets ──
-  pushToCloud(kind === 'in' ? 'stockIn' : 'stockOut',
+  const cloudPromise = pushToCloud(kind === 'in' ? 'stockIn' : 'stockOut',
     { building: state.currentBuilding, operator: 'ADDI', items: cloudItems });
   closeModal('modal' + (kind === 'in' ? 'StockIn' : 'StockOut'));
-  toast(kind === 'in' ? 'บันทึกนำเข้าเรียบร้อย' : 'บันทึกเบิกเรียบร้อย', kind === 'in' ? 'ok' : 'ok');
+  const totalQty = cloudItems.reduce((s, c) => s + Number(c.qty || 0), 0);
+  showSaveResult({
+    title: kind === 'in' ? `บันทึกนำเข้าสินค้า · ${state.currentBuilding}` : `บันทึกการเบิก · ${state.currentBuilding}`,
+    saved: savedCount,
+    total: savedCount,
+    note: `รวม ${totalQty} หน่วย`,
+    cloudPromise,
+  });
   renderDashboard();
   renderItemsTable();
   renderMonthly();
