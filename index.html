@@ -2902,6 +2902,11 @@ async function gasPing() {
 // ─── โหลดข้อมูลทั้งหมดจาก Sheet มาประกอบเป็น state ───
 async function pullFromCloud() {
   if (gasSyncing) return;
+  if (pendingPushes > 0) {   // กำลังบันทึกขึ้น Sheet อยู่ — ซิงค์ตอนนี้จะได้ค่าเก่ามาทับ รอให้เสร็จก่อนแล้วซิงค์อัตโนมัติ
+    pullQueued = true;
+    toast('กำลังบันทึกขึ้น Sheet อยู่ · จะซิงค์ให้อัตโนมัติเมื่อเสร็จ', 'warn');
+    return;
+  }
   gasSyncing = true;
   setGasStatus('syncing');
   try {
@@ -2983,15 +2988,46 @@ function applyCloudData(r) {
     }));
     if (typeof renderUsers === 'function') renderUsers();
   }
+
+  // monthly (รายงานรายเดือน) — สร้างจาก Monthly_Stock บน Sheet ให้ทุกอาคาร/ทุกเดือน
+  // ทำให้เปิดจากเครื่องอื่น หรือมีผู้อื่นบันทึก ก็เห็นยอด in/out ตรงกับ Sheet เสมอ
+  if (Array.isArray(r.monthly)) {
+    const mo = {};
+    r.monthly.forEach(m => {
+      const b = m.building_name, mk = m.month_key, id = m.item_id;
+      if (!b || !mk || id == null) return;
+      if (!mo[b]) mo[b] = {};
+      if (!mo[b][mk]) mo[b][mk] = {};
+      mo[b][mk][id] = { in: Number(m.stock_in) || 0, out: Number(m.stock_out) || 0 };
+    });
+    state.monthly = mo;
+  }
+
+  // movements (ประวัตินำเข้า/เบิกจาก Sheet) — ใช้เป็นแหล่งข้อมูล log หลัก
+  if (Array.isArray(r.movements) && r.movements.length) {
+    state.log = r.movements.map(m => ({
+      ts: m.timestamp, kind: m.kind,
+      id: Number(m.item_id), name: m.item_name,
+      qty: Number(m.qty) || 0, unit: m.unit,
+      by: m.operator || '', building: m.building_name,
+    })).sort((a, b) => new Date(b.ts) - new Date(a.ts)).slice(0, 300);
+  }
 }
 
 // ─── ยิง action ขึ้น Sheet แบบไม่บล็อก UI (fire-and-forget + แจ้งผล) ───
+let pendingPushes = 0;      // จำนวนคำสั่งเขียนที่กำลังส่งขึ้น Sheet
+let pullQueued = false;     // มีคำขอซิงค์รอไว้ระหว่าง push หรือไม่
 function pushToCloud(action, payload, okMsg) {
   if (!gasOnline) return Promise.resolve({ offline: true });   // ออฟไลน์ → เก็บแค่ใน localStorage
   setGasStatus('syncing');
+  pendingPushes++;
   return gasPost(action, payload)
     .then(() => { setGasStatus('online'); if (okMsg) toast(okMsg); return { ok: true }; })
-    .catch(e => { setGasStatus('offline'); gasOnline = false; toast('ซิงค์ขึ้น Sheet ไม่สำเร็จ: ' + e.message, 'warn'); return { ok: false, error: e.message }; });
+    .catch(e => { setGasStatus('offline'); gasOnline = false; toast('ซิงค์ขึ้น Sheet ไม่สำเร็จ: ' + e.message, 'warn'); return { ok: false, error: e.message }; })
+    .finally(() => {
+      pendingPushes = Math.max(0, pendingPushes - 1);
+      if (pendingPushes === 0 && pullQueued) { pullQueued = false; pullFromCloud(); }
+    });
 }
 
 
@@ -4597,8 +4633,10 @@ function renderMonthly() {
       const mData = (curMonthly()[monthKey] || {})[it.id];
       if (mData) { inQty = mData.in || 0; outQty = mData.out || 0; }
     } else {
-      // sum all months
+      // sum all months (เฉพาะปีที่เลือก ไม่ปนปีอื่น)
+      const yearPrefix = state.currentYear + '-';
       Object.keys(curMonthly()).forEach(k => {
+        if (!k.startsWith(yearPrefix)) return;
         const mData = curMonthly()[k][it.id];
         if (mData) { inQty += mData.in || 0; outQty += mData.out || 0; }
       });
@@ -5037,9 +5075,12 @@ function updateTxnSummary(kind) {
 
 function commitTxn(kind) {
   let any = false;
-  const monthKey = state.currentYear + '-' + String(new Date().getMonth() + 1).padStart(2,'0');
+  // ใช้วันที่จริงเสมอ (ไม่อิงปี/เดือนที่เลือกดูบนหน้าจอ) — ให้ตรงกับ month_key ฝั่ง Google Sheet
+  const now = new Date();
+  const monthKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2,'0');
   if (!curMonthly()[monthKey]) curMonthly()[monthKey] = {};
-  const ts = new Date().toISOString();
+  const ts = now.toISOString();
+  const operator = currentUser ? currentUser.name : 'ไม่ระบุ';
   const cloudItems = [];   // รายการที่จะส่งขึ้น Sheet
   Object.keys(txnDraft[kind]).forEach(id => {
     const q = txnDraft[kind][id];
@@ -5050,8 +5091,8 @@ function commitTxn(kind) {
       if (kind === 'in') curStock()[id] = Math.round(cur + q);
       else curStock()[id] = Math.max(0, Math.round(cur - q));
       if (!curMonthly()[monthKey][id]) curMonthly()[monthKey][id] = { in: 0, out: 0 };
-      curMonthly()[monthKey][id][kind] = Math.round(curMonthly()[monthKey][id][kind] + q);
-      state.log.unshift({ ts, kind, id: Number(id), name: item.name, qty: q, unit: item.unit, by: 'ADDI', building: state.currentBuilding });
+      curMonthly()[monthKey][id][kind] = Math.round((Number(curMonthly()[monthKey][id][kind]) || 0) + q);
+      state.log.unshift({ ts, kind, id: Number(id), name: item.name, qty: q, unit: item.unit, by: operator, building: state.currentBuilding });
       cloudItems.push({ item_id: Number(id), item_name: item.name, unit: item.unit, qty: q });
     }
   });
@@ -5061,7 +5102,7 @@ function commitTxn(kind) {
   saveState();
   // ── ส่งขึ้น Google Sheets ──
   const cloudPromise = pushToCloud(kind === 'in' ? 'stockIn' : 'stockOut',
-    { building: state.currentBuilding, operator: 'ADDI', items: cloudItems });
+    { building: state.currentBuilding, operator: operator, items: cloudItems });
   closeModal('modal' + (kind === 'in' ? 'StockIn' : 'StockOut'));
   const totalQty = cloudItems.reduce((s, c) => s + Number(c.qty || 0), 0);
   showSaveResult({
