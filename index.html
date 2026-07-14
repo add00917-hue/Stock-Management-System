@@ -1336,7 +1336,7 @@
     transform: translateZ(0);
   }
   .mob-nav-items {
-    display: grid; grid-template-columns: repeat(6, 1fr);
+    display: grid; grid-template-columns: repeat(7, 1fr);
     gap: 2px; width: 100%;
   }
   .mob-nav-item {
@@ -1785,6 +1785,212 @@
   }
   .app-footer .heart { color: var(--accent); }
 
+  /* ==================== CALENDAR PAGE ==================== */
+  .cal-layout {
+    display: grid; grid-template-columns: minmax(400px, 44%) 1fr;
+    gap: 20px; align-items: start;
+  }
+  .cal-left { position: sticky; top: 82px; }
+  .cal-card { padding: 0; overflow: hidden; }
+  .cal-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line-soft);
+    background: linear-gradient(180deg, var(--surface-2), var(--surface));
+  }
+  .cal-nav { display: flex; align-items: center; gap: 8px; }
+  .cal-nav-btn {
+    width: 34px; height: 34px; border-radius: 9px;
+    border: 1px solid var(--line); background: var(--surface);
+    font-size: 18px; font-weight: 700; color: var(--ink-soft);
+    display: grid; place-items: center;
+    transition: all .15s; box-shadow: var(--shadow-sm);
+  }
+  .cal-nav-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: translateY(-1px); }
+  .cal-month-title { text-align: center; min-width: 150px; }
+  .cal-mt-th {
+    font-family: var(--font-display); font-size: 18px; font-weight: 800;
+    color: var(--ink); line-height: 1.2; letter-spacing: -.01em;
+  }
+  .cal-mt-en {
+    font-size: 11px; font-weight: 600; color: var(--ink-mute);
+    text-transform: uppercase; letter-spacing: .12em; margin-top: 1px;
+  }
+  .cal-filters {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .cal-chipset { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .cal-chip-btn {
+    padding: 5px 11px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--surface);
+    font-size: 12px; font-weight: 600; color: var(--ink-soft);
+    display: inline-flex; align-items: center; gap: 5px;
+    transition: all .15s;
+  }
+  .cal-chip-btn:hover { border-color: var(--ink-mute); color: var(--ink); }
+  .cal-chip-btn.active { background: var(--ink); color: #fff; border-color: var(--ink); box-shadow: var(--shadow-sm); }
+  .cal-chip-btn .cdot { width: 8px; height: 8px; border-radius: 999px; flex: none; }
+  .cal-grid-wrap { padding: 10px 12px 12px; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .cal-dow {
+    text-align: center; padding: 6px 0 8px;
+    font-family: var(--font-display); font-size: 11px; font-weight: 700;
+    color: var(--ink-mute); letter-spacing: .04em;
+  }
+  .cal-dow .en { display: block; font-size: 8.5px; font-weight: 600; color: var(--ink-mute); opacity: .6; letter-spacing: .1em; }
+  .cal-dow.wk-sun { color: var(--danger); }
+  .cal-dow.wk-sat { color: var(--info); }
+  .cal-day {
+    position: relative; min-height: 62px;
+    border: 1px solid var(--line-soft); border-radius: 9px;
+    background: var(--surface); padding: 5px 5px 5px;
+    display: flex; flex-direction: column; gap: 3px;
+    transition: all .15s; text-align: left;
+  }
+  .cal-day.clickable { cursor: pointer; }
+  .cal-day.clickable:hover {
+    border-color: var(--primary); box-shadow: 0 3px 10px rgba(31,61,43,.14);
+    transform: translateY(-1px);
+  }
+  .cal-day.blank { background: transparent; border-color: transparent; }
+  .cal-day.today { border-color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); background: linear-gradient(180deg, #FBFDF9, var(--surface)); }
+  .cal-day.selected {
+    border-color: var(--accent); background: var(--accent-soft);
+    box-shadow: inset 0 0 0 1.5px var(--accent), 0 3px 10px rgba(232,93,47,.18);
+  }
+  .cal-day .dnum {
+    font-family: var(--font-display); font-size: 12px; font-weight: 700;
+    color: var(--ink-soft); line-height: 1;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .cal-day.today .dnum { color: var(--primary); }
+  .cal-day.selected .dnum { color: var(--accent-ink); }
+  .cal-day .dnum .today-dot { width: 7px; height: 7px; border-radius: 999px; background: var(--primary); }
+  .cal-day.wk-sun .dnum { color: var(--danger); }
+  .cal-day.wk-sat .dnum { color: var(--info); }
+  .cal-ev { display: flex; flex-direction: column; gap: 2px; margin-top: auto; }
+  .cal-ev-row { display: flex; gap: 3px; flex-wrap: wrap; }
+  .cal-pill {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 9.5px; font-weight: 700; line-height: 1;
+    border-radius: 5px; padding: 3px 5px;
+  }
+  .cal-pill.pin  { background: var(--ok-soft); color: var(--ok-ink); }
+  .cal-pill.pout { background: var(--accent-soft); color: var(--accent-ink); }
+  .cal-day.selected .cal-pill.pout { background: #fff; }
+  .cal-bdots { display: flex; gap: 2.5px; flex-wrap: wrap; }
+  .cal-bdots .bd { width: 7px; height: 7px; border-radius: 999px; box-shadow: 0 0 0 1.5px var(--surface); }
+  .cal-legend {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 10px 16px 13px;
+    border-top: 1px solid var(--line-soft);
+    font-size: 11px; color: var(--ink-soft);
+  }
+  .cal-legend .lg-item { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; }
+  .cal-legend .lg-dot { width: 9px; height: 9px; border-radius: 999px; }
+  .cal-legend .lg-sep { width: 1px; height: 14px; background: var(--line); }
+  .cal-loading {
+    grid-column: 1 / -1; text-align: center;
+    padding: 48px 0; color: var(--ink-mute); font-weight: 600;
+  }
+  /* ── RIGHT: transaction list panel ── */
+  .cal-right {
+    padding: 0; overflow: hidden;
+    display: flex; flex-direction: column;
+    max-height: calc(100vh - 105px);
+    min-height: 480px;
+  }
+  .cal-list-head {
+    padding: 14px 18px 0;
+    border-bottom: 1px solid var(--line-soft);
+    background: linear-gradient(180deg, var(--surface-2), var(--surface));
+    flex: none;
+  }
+  .cal-list-toprow { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .cal-list-title { font-family: var(--font-display); font-weight: 800; font-size: 15.5px; }
+  .cal-list-title .sub { display: block; font-size: 11.5px; font-weight: 500; color: var(--ink-mute); margin-top: 1px; }
+  .cal-list-actions { display: flex; align-items: center; gap: 8px; }
+  .cal-tabs { display: flex; gap: 4px; margin-top: 12px; }
+  .cal-tab {
+    padding: 9px 16px 10px; font-size: 13px; font-weight: 700;
+    font-family: var(--font-display);
+    color: var(--ink-mute); border-radius: 10px 10px 0 0;
+    border: 1px solid transparent; border-bottom: none;
+    position: relative; top: 1px;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: all .15s;
+  }
+  .cal-tab:hover { color: var(--ink); background: var(--bg-grain); }
+  .cal-tab.active {
+    color: var(--primary-ink); background: var(--surface);
+    border-color: var(--line-soft);
+    box-shadow: 0 -2px 6px rgba(20,20,30,.03);
+  }
+  .cal-tab .tcount {
+    font-size: 10.5px; font-weight: 800; padding: 1px 7px; border-radius: 999px;
+    background: var(--bg-grain); color: var(--ink-soft);
+  }
+  .cal-tab.active .tcount { background: var(--primary-soft); color: var(--primary-ink); }
+  .cal-daybar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 18px;
+    background: var(--accent-soft); border-bottom: 1px solid var(--line-soft);
+    font-size: 12.5px; font-weight: 700; color: var(--accent-ink);
+    flex: none;
+  }
+  .cal-daybar .clear-btn {
+    margin-left: auto;
+    padding: 4px 12px; border-radius: 999px;
+    background: #fff; border: 1px solid rgba(138,52,22,.25);
+    font-size: 11.5px; font-weight: 700; color: var(--accent-ink);
+    transition: all .15s;
+  }
+  .cal-daybar .clear-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .cal-list-scroll { flex: 1; overflow-y: auto; overflow-x: auto; position: relative; }
+  .cal-list-scroll thead th {
+    position: sticky; top: 0; z-index: 5;
+    background: var(--surface-2);
+    box-shadow: 0 1px 0 var(--line);
+  }
+  .cal-list-foot {
+    flex: none;
+    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    padding: 11px 18px;
+    border-top: 1px solid var(--line);
+    background: var(--surface-2);
+    font-size: 12px;
+  }
+  .cal-list-foot .f-item { display: flex; flex-direction: column; }
+  .cal-list-foot .f-item .l { font-size: 10px; font-weight: 700; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .08em; }
+  .cal-list-foot .f-item .v { font-family: var(--font-display); font-size: 15px; font-weight: 800; }
+  .cal-list-foot .f-item .v.ok { color: var(--ok); }
+  .cal-list-foot .f-item .v.dg { color: var(--accent); }
+  .cald-empty { text-align: center; color: var(--ink-mute); padding: 48px 0; }
+  @media (max-width: 1080px) {
+    .cal-layout { grid-template-columns: 1fr; }
+    .cal-left { position: static; }
+    .cal-right { max-height: 72vh; }
+  }
+  @media (max-width: 760px) {
+    .cal-grid { gap: 3px; }
+    .cal-grid-wrap { padding: 8px 8px 10px; }
+    .cal-day { min-height: 56px; padding: 4px; border-radius: 8px; }
+    .cal-day .dnum { font-size: 11px; }
+    .cal-pill { font-size: 8.5px; padding: 2.5px 4px; }
+    .cal-month-title { min-width: 120px; }
+    .cal-mt-th { font-size: 15.5px; }
+    .cal-toolbar { padding: 12px 12px; }
+    .cal-filters { padding: 8px 12px; }
+    .cal-dow .en { display: none; }
+    .cal-tab { padding: 8px 12px 9px; font-size: 12px; }
+    .cal-list-head { padding: 12px 12px 0; }
+    .cal-list-foot { gap: 14px; padding: 10px 12px; }
+  }
+
+
 </style>
 </head>
 <body>
@@ -1858,6 +2064,7 @@
       <button class="nav-tab active" data-tab="dashboard">📊 Dashboard</button>
       <button class="nav-tab" data-tab="items">📦 รายการสินค้า</button>
       <button class="nav-tab" data-tab="monthly">📅 รายเดือน</button>
+      <button class="nav-tab" data-tab="calendar">📆 ปฏิทิน</button>
       <button class="nav-tab" data-tab="acct">🧾 สรุปจัดซื้อ</button>
       <button class="nav-tab" data-tab="isourcing">🛒 รายการเพิ่มเติม</button>
       <button class="nav-tab" data-tab="approve" data-perm="adminPage">✅ อนุมัติเบิก <span class="tab-badge" id="approveTabBadge" style="display:none">0</span></button>
@@ -2118,6 +2325,101 @@
           </thead>
           <tbody id="monthlyTbody"></tbody>
         </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CALENDAR ==================== -->
+  <section class="page" id="page-calendar">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title"><span class="small">ปฏิทินรายการ · TRANSACTION CALENDAR</span>ปฏิทินการนำเข้า–เบิกสินค้า</h1>
+        <p class="page-sub">กดที่วันในปฏิทินด้านซ้ายเพื่อดูรายการของวันนั้นทางขวา — สลับดูนำเข้า/เบิกด้วยแท็บ และส่งออกเป็น Excel ได้</p>
+      </div>
+    </div>
+
+    <div class="cal-layout">
+      <!-- ── LEFT: ปฏิทิน (sticky) ── -->
+      <div class="cal-left">
+        <div class="card cal-card">
+          <div class="cal-toolbar">
+            <div class="cal-nav">
+              <button class="cal-nav-btn" onclick="calShift(-1)" title="เดือนก่อนหน้า">‹</button>
+              <div class="cal-month-title">
+                <div class="cal-mt-th" id="calTitleTh">—</div>
+                <div class="cal-mt-en" id="calTitleEn">—</div>
+              </div>
+              <button class="cal-nav-btn" onclick="calShift(1)" title="เดือนถัดไป">›</button>
+            </div>
+            <div style="display:flex; gap:6px">
+              <button class="btn btn-sm btn-ghost" onclick="calGoToday()">วันนี้</button>
+              <button class="btn btn-sm btn-ghost" onclick="renderCalendar(true)" title="โหลดข้อมูลใหม่">⟳</button>
+            </div>
+          </div>
+
+          <div class="cal-filters">
+            <div class="cal-chipset" id="calBldChips"></div>
+          </div>
+
+          <div class="cal-grid-wrap">
+            <div class="cal-grid" style="margin-bottom:3px">
+              <div class="cal-dow wk-sun">อา<span class="en">SUN</span></div>
+              <div class="cal-dow">จ<span class="en">MON</span></div>
+              <div class="cal-dow">อ<span class="en">TUE</span></div>
+              <div class="cal-dow">พ<span class="en">WED</span></div>
+              <div class="cal-dow">พฤ<span class="en">THU</span></div>
+              <div class="cal-dow">ศ<span class="en">FRI</span></div>
+              <div class="cal-dow wk-sat">ส<span class="en">SAT</span></div>
+            </div>
+            <div class="cal-grid" id="calGrid"></div>
+          </div>
+
+          <div class="cal-legend" id="calLegend"></div>
+        </div>
+      </div>
+
+      <!-- ── RIGHT: ตารางรายการ ── -->
+      <div class="card cal-right">
+        <div class="cal-list-head">
+          <div class="cal-list-toprow">
+            <div class="cal-list-title" id="calListTitle">รายการทั้งหมด
+              <span class="sub" id="calListSub">—</span>
+            </div>
+            <div class="cal-list-actions">
+              <span class="badge badge-info" id="calTableCount">0 รายการ</span>
+              <button class="btn btn-sm btn-primary" onclick="exportCalExcel()">⬇ Export Excel</button>
+            </div>
+          </div>
+          <div class="cal-tabs">
+            <button class="cal-tab active" data-calkind="all" onclick="setCalKind('all')">📋 ทั้งหมด <span class="tcount" id="calCntAll">0</span></button>
+            <button class="cal-tab" data-calkind="in" onclick="setCalKind('in')">📥 นำเข้า <span class="tcount" id="calCntIn">0</span></button>
+            <button class="cal-tab" data-calkind="out" onclick="setCalKind('out')">📤 เบิก <span class="tcount" id="calCntOut">0</span></button>
+          </div>
+        </div>
+
+        <div class="cal-daybar" id="calDayBar" style="display:none">
+          <span>📅</span><span id="calDayBarText">—</span>
+          <button class="clear-btn" onclick="clearCalDay()">✕ ดูทั้งเดือน</button>
+        </div>
+
+        <div class="cal-list-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:96px">วันที่</th>
+                <th class="center" style="width:58px">เวลา</th>
+                <th class="center" style="width:84px">ประเภท</th>
+                <th style="width:104px">อาคาร</th>
+                <th>รายการสินค้า</th>
+                <th class="num" style="width:104px">จำนวน</th>
+                <th style="width:110px">ผู้บันทึก</th>
+              </tr>
+            </thead>
+            <tbody id="calTableTbody"></tbody>
+          </table>
+        </div>
+
+        <div class="cal-list-foot" id="calListFoot"></div>
       </div>
     </div>
   </section>
@@ -2387,6 +2689,10 @@
       <span class="mn-icon">📅</span>
       <span class="mn-label">รายเดือน</span>
     </button>
+    <button class="mob-nav-item" data-tab="calendar" onclick="setTab('calendar')">
+      <span class="mn-icon">📆</span>
+      <span class="mn-label">ปฏิทิน</span>
+    </button>
     <button class="mob-nav-item" data-tab="acct" onclick="setTab('acct')">
       <span class="mn-icon">🧾</span>
       <span class="mn-label">จัดซื้อ</span>
@@ -2437,6 +2743,7 @@
     </div>
   </div>
 </div>
+
 
 <!-- Stock IN Modal -->
 <div class="modal-overlay" id="modalStockIn" onclick="if(event.target===this)closeModal('modalStockIn')">
@@ -3703,6 +4010,7 @@ function setTab(tab) {
   document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + tab));
   if (tab === 'items') renderItemsTable();
   if (tab === 'monthly') renderMonthly();
+  if (tab === 'calendar') initCalendarPage();
   if (tab === 'acct') renderOrderSummary('accounting');
   if (tab === 'isourcing') renderOrderSummary('isourcing');
   if (tab === 'approve') loadPendingWithdrawals();
@@ -5103,6 +5411,7 @@ function commitTxn(kind) {
   // ── ส่งขึ้น Google Sheets ──
   const cloudPromise = pushToCloud(kind === 'in' ? 'stockIn' : 'stockOut',
     { building: state.currentBuilding, operator: operator, items: cloudItems });
+  calInvalidate(monthKey);   // ให้ปฏิทินโหลดข้อมูลเดือนนี้ใหม่
   closeModal('modal' + (kind === 'in' ? 'StockIn' : 'StockOut'));
   const totalQty = cloudItems.reduce((s, c) => s + Number(c.qty || 0), 0);
   showSaveResult({
@@ -5115,6 +5424,319 @@ function commitTxn(kind) {
   renderDashboard();
   renderItemsTable();
   renderMonthly();
+}
+
+
+/* ==================== CALENDAR (ปฏิทินรายการนำเข้า–เบิก) ==================== */
+const THAI_DOW_FULL = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+const MONTHS_EN_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+// สีประจำอาคาร — วนตามลำดับใน state.buildings
+const CAL_BLD_PALETTE = ['#1F3D2B', '#2D5C8F', '#D4A857', '#E85D2F', '#7B4FA6', '#2A7F4F', '#C13B3B', '#5B8A9E'];
+
+const _calNow = new Date();
+let calYear  = _calNow.getFullYear();
+let calMonth = _calNow.getMonth();          // 0-11
+let calBld   = 'all';                       // ตัวกรองอาคาร
+let calKind  = 'all';                       // all | in | out  (แท็บฝั่งขวา)
+let calMovCache = {};                       // { 'YYYY-MM': [movement,...] }
+let calSelectedDate = null;                 // 'YYYY-MM-DD' — วันที่เลือกดูอยู่ (null = ทั้งเดือน)
+let calRenderSeq = 0;                       // กันผลลัพธ์เก่ามาทับตอนเปลี่ยนเดือนเร็วๆ
+
+function calBldColor(name) {
+  const idx = state.buildings.indexOf(name);
+  return CAL_BLD_PALETTE[(idx >= 0 ? idx : CAL_BLD_PALETTE.length - 1) % CAL_BLD_PALETTE.length];
+}
+function calMonthKey() { return calYear + '-' + String(calMonth + 1).padStart(2, '0'); }
+function calInvalidate(mk) { if (mk) delete calMovCache[mk]; else calMovCache = {}; }
+function calLocalDateStr(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+function initCalendarPage() {
+  renderCalBldChips();
+  renderCalendar();
+}
+
+function calShift(dir) {
+  calMonth += dir;
+  if (calMonth < 0)  { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0;  calYear++; }
+  calSelectedDate = null;
+  renderCalendar();
+}
+function calGoToday() {
+  const n = new Date();
+  calYear = n.getFullYear(); calMonth = n.getMonth();
+  calSelectedDate = null;
+  renderCalendar();
+}
+function setCalBld(name) {
+  calBld = name;
+  document.querySelectorAll('#calBldChips .cal-chip-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.calbld === name));
+  renderCalendarGrid();
+}
+function setCalKind(k) {
+  calKind = k;
+  document.querySelectorAll('[data-calkind]').forEach(b =>
+    b.classList.toggle('active', b.dataset.calkind === k));
+  renderCalTable();
+}
+
+function renderCalBldChips() {
+  const el = document.getElementById('calBldChips');
+  if (!el) return;
+  el.innerHTML = ['all', ...state.buildings].map(b => {
+    const active = calBld === b ? ' active' : '';
+    if (b === 'all') return `<button class="cal-chip-btn${active}" data-calbld="all" onclick="setCalBld('all')">🏢 ทุกอาคาร</button>`;
+    return `<button class="cal-chip-btn${active}" data-calbld="${b}" onclick="setCalBld('${b.replace(/'/g, "\\'")}')">
+      <span class="cdot" style="background:${calBldColor(b)}"></span>${b}</button>`;
+  }).join('');
+}
+
+// ── โหลดรายการนำเข้า/เบิกของเดือน (จาก Google Sheet · fallback = log ในเครื่อง) ──
+async function loadCalMovements(mk, force) {
+  if (!force && calMovCache[mk]) return calMovCache[mk];
+  if (gasOnline) {
+    try {
+      const [ri, ro] = await Promise.all([
+        gasGet('getMovements', { kind: 'in',  month_key: mk }),
+        gasGet('getMovements', { kind: 'out', month_key: mk }),
+      ]);
+      const mapRow = (m, kind) => ({
+        ts: m.timestamp, kind,
+        building: m.building_name || '—',
+        id: m.item_id, name: m.item_name || '—', unit: m.unit || '',
+        qty: Number(m.qty) || 0,
+        price: Number(m.unit_price) || 0,
+        value: Number(m.total_value) || 0,
+        by: m.operator || '', note: m.note || '',
+      });
+      const list = [
+        ...(ri.movements || []).map(m => mapRow(m, 'in')),
+        ...(ro.movements || []).map(m => mapRow(m, 'out')),
+      ].filter(m => m.ts).sort((a, b) => new Date(a.ts) - new Date(b.ts));
+      calMovCache[mk] = list;
+      return list;
+    } catch (e) { /* ตกไปใช้ log ในเครื่อง */ }
+  }
+  // fallback: ใช้ log ล่าสุดในเครื่อง (อาจไม่ครบทั้งเดือน)
+  return state.log.filter(l => {
+    const d = new Date(l.ts);
+    return !isNaN(d) && (d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')) === mk;
+  }).map(l => ({
+    ts: l.ts, kind: l.kind, building: l.building || '—', id: l.id, name: l.name,
+    unit: l.unit || '', qty: Number(l.qty) || 0, price: 0, value: 0, by: l.by || '', note: '',
+  })).sort((a, b) => new Date(a.ts) - new Date(b.ts));
+}
+
+// รายการของเดือนหลังกรองอาคาร (ปฏิทินฝั่งซ้ายใช้ชุดนี้ — ไม่กรอง kind เพื่อให้เห็นทั้งนำเข้าและเบิกบนปฏิทิน)
+function calMonthList() {
+  const all = calMovCache[calMonthKey()] || [];
+  return all.filter(m => calBld === 'all' || m.building === calBld);
+}
+// รายการที่ตารางฝั่งขวาแสดงอยู่ (กรองอาคาร + แท็บ + วันที่เลือก)
+function calViewList() {
+  return calMonthList().filter(m =>
+    (calKind === 'all' || m.kind === calKind) &&
+    (!calSelectedDate || calLocalDateStr(new Date(m.ts)) === calSelectedDate));
+}
+
+async function renderCalendar(force) {
+  const grid = document.getElementById('calGrid');
+  if (!grid) return;
+  // หัวเดือน ไทย + อังกฤษ + พ.ศ.
+  document.getElementById('calTitleTh').textContent = MONTHS[calMonth] + ' ' + (calYear + 543);
+  document.getElementById('calTitleEn').textContent = MONTHS_EN_FULL[calMonth] + ' ' + calYear;
+  grid.innerHTML = '<div class="cal-loading">⏳ กำลังโหลดรายการ…</div>';
+  const seq = ++calRenderSeq;
+  const mk = calMonthKey();
+  await loadCalMovements(mk, force);
+  if (seq !== calRenderSeq) return;   // มีการเปลี่ยนเดือนระหว่างโหลด
+  renderCalendarGrid();
+}
+
+function renderCalendarGrid() {
+  const grid = document.getElementById('calGrid');
+  if (!grid) return;
+  const mk = calMonthKey();
+  const list = calMonthList();
+
+  // จัดกลุ่มรายการตามวัน
+  const byDay = {};   // { 'YYYY-MM-DD': { in, out, blds:Set } }
+  list.forEach(m => {
+    const d = new Date(m.ts); if (isNaN(d)) return;
+    const key = calLocalDateStr(d);
+    if (!byDay[key]) byDay[key] = { in: 0, out: 0, blds: new Set() };
+    byDay[key][m.kind === 'in' ? 'in' : 'out']++;
+    byDay[key].blds.add(m.building);
+  });
+
+  // ── สร้างตารางปฏิทิน ──
+  const firstDow  = new Date(calYear, calMonth, 1).getDay();
+  const daysInMon = new Date(calYear, calMonth + 1, 0).getDate();
+  const todayStr  = calLocalDateStr(new Date());
+  let html = '';
+  for (let i = 0; i < firstDow; i++) html += '<div class="cal-day blank"></div>';
+  for (let d = 1; d <= daysInMon; d++) {
+    const dateStr = mk + '-' + String(d).padStart(2, '0');
+    const dow = (firstDow + d - 1) % 7;
+    const ev = byDay[dateStr];
+    const cls = ['cal-day'];
+    if (dow === 0) cls.push('wk-sun');
+    if (dow === 6) cls.push('wk-sat');
+    if (dateStr === todayStr) cls.push('today');
+    if (dateStr === calSelectedDate) cls.push('selected');
+    if (ev) cls.push('clickable');
+    let inner = `<div class="dnum"><span>${d}</span>${dateStr === todayStr ? '<span class="today-dot" title="วันนี้"></span>' : ''}</div>`;
+    if (ev) {
+      inner += '<div class="cal-ev"><div class="cal-ev-row">';
+      if (ev.in)  inner += `<span class="cal-pill pin">📥${ev.in}</span>`;
+      if (ev.out) inner += `<span class="cal-pill pout">📤${ev.out}</span>`;
+      inner += '</div><div class="cal-bdots">' +
+        [...ev.blds].map(b => `<span class="bd" style="background:${calBldColor(b)}" title="${b}"></span>`).join('') +
+        '</div></div>';
+    }
+    const click = ev ? ` onclick="openCalDay('${dateStr}')" title="ดูรายการวันที่ ${d} ${MONTHS[calMonth]}"` : '';
+    html += `<div class="${cls.join(' ')}"${click}>${inner}</div>`;
+  }
+  grid.innerHTML = html;
+
+  // ── legend อาคาร ──
+  document.getElementById('calLegend').innerHTML =
+    '<span class="lg-item"><span class="lg-dot" style="background:var(--ok)"></span>📥 นำเข้า</span>' +
+    '<span class="lg-item"><span class="lg-dot" style="background:var(--accent)"></span>📤 เบิก</span>' +
+    '<span class="lg-sep"></span>' +
+    state.buildings.map(b =>
+      `<span class="lg-item"><span class="lg-dot" style="background:${calBldColor(b)}"></span>${b}</span>`).join('');
+
+  renderCalTable();
+}
+
+// ── เลือก / ยกเลิกเลือกวัน ──
+function openCalDay(dateStr) {
+  calSelectedDate = (calSelectedDate === dateStr) ? null : dateStr;   // กดวันเดิมซ้ำ = ยกเลิก
+  renderCalendarGrid();
+  // จอแคบ (ปฏิทินซ้อนบนตาราง) เลื่อนลงไปที่ตารางให้อัตโนมัติ
+  if (calSelectedDate && window.innerWidth < 1080) {
+    const panel = document.querySelector('.cal-right');
+    if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+function clearCalDay() {
+  calSelectedDate = null;
+  renderCalendarGrid();
+}
+
+// ── ตารางรายการฝั่งขวา ──
+function renderCalTable() {
+  const tbody = document.getElementById('calTableTbody');
+  if (!tbody) return;
+  const monthList = calMonthList();
+  const dayList = calSelectedDate
+    ? monthList.filter(m => calLocalDateStr(new Date(m.ts)) === calSelectedDate)
+    : monthList;
+  const list = calViewList();
+
+  // หัวเรื่อง + แถบวันที่เลือก
+  const monthLabel = `${MONTHS[calMonth]} ${calYear + 543}`;
+  document.getElementById('calListTitle').childNodes[0].textContent =
+    calSelectedDate ? 'รายการประจำวัน' : 'รายการทั้งเดือน';
+  document.getElementById('calListSub').textContent =
+    (calBld === 'all' ? 'ทุกอาคาร' : calBld) + ' · ' + monthLabel;
+  const dayBar = document.getElementById('calDayBar');
+  if (calSelectedDate) {
+    const d = new Date(calSelectedDate + 'T00:00:00');
+    document.getElementById('calDayBarText').textContent =
+      `วัน${THAI_DOW_FULL[d.getDay()]}ที่ ${d.getDate()} ${MONTHS[calMonth]} ${calYear + 543} (${MONTHS_EN_FULL[calMonth]} ${d.getDate()}, ${calYear})`;
+    dayBar.style.display = 'flex';
+  } else {
+    dayBar.style.display = 'none';
+  }
+
+  // ตัวเลขบนแท็บ (นับจากขอบเขตวัน/เดือนที่เลือกอยู่ ไม่สนแท็บ)
+  document.getElementById('calCntAll').textContent = dayList.length;
+  document.getElementById('calCntIn').textContent  = dayList.filter(m => m.kind === 'in').length;
+  document.getElementById('calCntOut').textContent = dayList.filter(m => m.kind === 'out').length;
+  document.getElementById('calTableCount').textContent = list.length.toLocaleString() + ' รายการ';
+
+  // เนื้อตาราง — เรียงล่าสุดก่อน
+  if (list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="cald-empty">ไม่มีรายการตามตัวกรองที่เลือก</div></td></tr>';
+  } else {
+    const rows = [...list].sort((a, b) => new Date(b.ts) - new Date(a.ts));
+    tbody.innerHTML = rows.map(m => {
+      const d = new Date(m.ts);
+      const dateStr = isNaN(d) ? '' : calLocalDateStr(d);
+      const dstr = isNaN(d) ? '—' : d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
+      const tstr = isNaN(d) ? '—' : d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+      return `<tr style="cursor:pointer" onclick="openCalDay('${dateStr}')" title="ดูรายการทั้งวันนี้">
+        <td style="font-size:12.5px; white-space:nowrap">${dstr}</td>
+        <td class="center" style="font-family:var(--font-mono); font-size:12px; color:var(--ink-mute)">${tstr}</td>
+        <td class="center"><span class="badge ${m.kind === 'in' ? 'badge-ok' : 'badge-danger'}">${m.kind === 'in' ? '📥 นำเข้า' : '📤 เบิก'}</span></td>
+        <td><span style="display:inline-flex; align-items:center; gap:6px; font-weight:600; font-size:12.5px">
+          <span style="width:9px;height:9px;border-radius:999px;background:${calBldColor(m.building)};flex:none"></span>${m.building}</span></td>
+        <td><strong>${m.name}</strong>${m.note ? `<span style="display:block;font-size:11px;color:var(--ink-mute)">${m.note}</span>` : ''}${m.by ? '' : ''}</td>
+        <td class="num"><strong style="color:${m.kind === 'in' ? 'var(--ok)' : 'var(--accent)'}">${m.kind === 'in' ? '+' : '−'}${m.qty.toLocaleString()}</strong> <span style="font-size:11.5px;color:var(--ink-mute)">${m.unit}</span></td>
+        <td style="font-size:12.5px">${m.by || '—'}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // แถบสรุปท้ายตาราง
+  const tIn  = list.filter(m => m.kind === 'in');
+  const tOut = list.filter(m => m.kind === 'out');
+  document.getElementById('calListFoot').innerHTML = `
+    <div class="f-item"><span class="l">รายการที่แสดง</span><span class="v">${list.length.toLocaleString()}</span></div>
+    <div class="f-item"><span class="l">นำเข้า (ครั้ง / หน่วย)</span><span class="v ok">${tIn.length} / ${tIn.reduce((s, m) => s + m.qty, 0).toLocaleString()}</span></div>
+    <div class="f-item"><span class="l">เบิก (ครั้ง / หน่วย)</span><span class="v dg">${tOut.length} / ${tOut.reduce((s, m) => s + m.qty, 0).toLocaleString()}</span></div>`;
+}
+
+// ── Export Excel — ส่งออกตามมุมมองที่กำลังดูอยู่ (ทั้งเดือน หรือเฉพาะวันที่เลือก) ──
+function calBuildAoa(list, titleRows) {
+  const head = ['วันที่', 'เวลา', 'ประเภท', 'อาคาร', 'รหัส', 'รายการสินค้า', 'หน่วย', 'จำนวน', 'ราคา/หน่วย', 'มูลค่า (บาท)', 'ผู้บันทึก', 'หมายเหตุ'];
+  const rows = list.map(m => {
+    const d = new Date(m.ts);
+    return [
+      isNaN(d) ? '' : d.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }),
+      isNaN(d) ? '' : d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
+      m.kind === 'in' ? 'นำเข้า' : 'เบิก',
+      m.building, m.id, m.name, m.unit, m.qty, m.price, m.value, m.by, m.note,
+    ];
+  });
+  return [...titleRows, [], head, ...rows];
+}
+function calWriteXlsx(aoa, sheetName, fileName) {
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = [ {wch:14},{wch:8},{wch:8},{wch:12},{wch:6},{wch:38},{wch:8},{wch:9},{wch:11},{wch:13},{wch:14},{wch:20} ];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  XLSX.writeFile(wb, fileName);
+}
+function exportCalExcel() {
+  if (typeof XLSX === 'undefined') { toast('ไลบรารี Excel ยังโหลดไม่เสร็จ ลองใหม่อีกครั้ง', 'warn'); return; }
+  const list = [...calViewList()].sort((a, b) => new Date(a.ts) - new Date(b.ts));
+  if (list.length === 0) { toast('ไม่มีรายการตามตัวกรองที่เลือก', 'warn'); return; }
+  const bldTag  = calBld === 'all' ? 'ทุกอาคาร' : calBld;
+  const kindTag = calKind === 'all' ? 'นำเข้า+เบิก' : (calKind === 'in' ? 'นำเข้า' : 'เบิก');
+  let scopeLine, sheetName, fileName;
+  if (calSelectedDate) {
+    const d = new Date(calSelectedDate + 'T00:00:00');
+    scopeLine = `วัน${THAI_DOW_FULL[d.getDay()]}ที่ ${d.getDate()} ${MONTHS[calMonth]} ${calYear + 543} · อาคาร: ${bldTag} · ประเภท: ${kindTag}`;
+    sheetName = `${d.getDate()} ${MONTHS_SHORT[calMonth]}`;
+    fileName  = `รายการประจำวัน-${bldTag}-${d.getDate()}${MONTHS_SHORT[calMonth]}${calYear + 543}.xlsx`;
+  } else {
+    scopeLine = `เดือน ${MONTHS[calMonth]} ${calYear + 543} (${MONTHS_EN_FULL[calMonth]} ${calYear}) · อาคาร: ${bldTag} · ประเภท: ${kindTag}`;
+    sheetName = `${MONTHS_SHORT[calMonth]}${String(calYear + 543).slice(-2)}`;
+    fileName  = `ปฏิทินรายการ-${bldTag}-${MONTHS[calMonth]}-${calYear + 543}.xlsx`;
+  }
+  const title = [
+    ['ปฏิทินรายการนำเข้า–เบิกสินค้า · GNR3 Stock Management'],
+    [scopeLine],
+    [`ส่งออกเมื่อ ${new Date().toLocaleString('th-TH')}`],
+  ];
+  calWriteXlsx(calBuildAoa(list, title), sheetName, fileName);
+  toast('ส่งออก Excel เรียบร้อย');
 }
 
 /* ==================== LOG ==================== */
