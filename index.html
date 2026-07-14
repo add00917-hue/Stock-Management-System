@@ -1336,11 +1336,13 @@
     transform: translateZ(0);
   }
   .mob-nav-items {
-    display: grid; grid-template-columns: repeat(7, 1fr);
+    display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
     gap: 2px; width: 100%;
   }
   .mob-nav-item {
     display: flex; flex-direction: column; align-items: center;
+    flex: 0 0 auto; min-width: 64px;
     gap: 3px; padding: 6px 4px;
     border-radius: 12px; transition: all .15s;
     color: var(--ink-mute); font-size: 10px; font-weight: 600;
@@ -1991,6 +1993,67 @@
   }
 
 
+  /* ==================== ITEM MANAGEMENT ==================== */
+  .im-toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+  .im-toolbar input { flex: 1; min-width: 200px; }
+  .im-scroll { max-height: 56vh; overflow-y: auto; border: 1px solid var(--line-soft); border-radius: var(--radius); }
+  .im-scroll thead th { position: sticky; top: 0; z-index: 5; background: var(--surface-2); box-shadow: 0 1px 0 var(--line); }
+  .im-row-inactive td { opacity: .45; }
+  .im-row-inactive td:last-child { opacity: 1; }
+
+  /* ==================== WATER DELIVERY PAGE ==================== */
+  .wt-layout { display: grid; grid-template-columns: minmax(380px, 42%) 1fr; gap: 20px; align-items: start; }
+  @media (max-width: 1080px) { .wt-layout { grid-template-columns: 1fr; } }
+  .wt-floor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-top: 4px; }
+  .wt-floor {
+    border: 1px solid var(--line-soft); border-radius: var(--radius);
+    padding: 10px 12px; background: var(--surface);
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    transition: all .15s;
+  }
+  .wt-floor.has-qty { border-color: var(--primary); background: var(--primary-soft); }
+  .wt-floor .fl { font-family: var(--font-display); font-weight: 700; font-size: 14px; }
+  .wt-step { display: flex; align-items: center; gap: 4px; }
+  .wt-step button {
+    width: 28px; height: 28px; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--surface);
+    font-size: 15px; font-weight: 800; color: var(--ink-soft);
+    display: grid; place-items: center; transition: all .12s;
+  }
+  .wt-step button:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .wt-step input {
+    width: 44px; text-align: center; padding: 5px 2px;
+    border: 1px solid var(--line); border-radius: 8px;
+    font-family: var(--font-display); font-weight: 800; font-size: 14px;
+  }
+  .wt-sum-bar {
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    padding: 12px 16px; margin-top: 14px;
+    background: var(--surface-2); border: 1px solid var(--line-soft); border-radius: var(--radius);
+    font-size: 13px;
+  }
+  .wt-sum-bar b { font-family: var(--font-display); font-size: 18px; }
+  /* ==================== REPAIR PAGE ==================== */
+  .rp-scroll { max-height: 62vh; overflow-y: auto; border: 1px solid var(--line-soft); border-radius: var(--radius); }
+  .rp-scroll thead th { position: sticky; top: 0; z-index: 5; background: var(--surface-2); box-shadow: 0 1px 0 var(--line); }
+  /* ==================== INDEX PERMS ==================== */
+  .ip-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px; border-bottom: 1px solid var(--line-soft);
+  }
+  .ip-row:last-child { border-bottom: none; }
+  .ip-row .nm { flex: 1; min-width: 0; font-weight: 600; font-size: 13.5px; }
+  .ip-row .nm .un { display: block; font-size: 11px; font-weight: 500; color: var(--ink-mute); }
+  .ip-toggle {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--surface);
+    font-size: 12px; font-weight: 700; color: var(--ink-mute);
+    transition: all .15s; white-space: nowrap;
+  }
+  .ip-toggle.on { background: var(--ok-soft); color: var(--ok-ink); border-color: rgba(46,125,82,.35); }
+  .ip-toggle:disabled { opacity: .55; cursor: not-allowed; }
+
 </style>
 </head>
 <body>
@@ -2065,6 +2128,8 @@
       <button class="nav-tab" data-tab="items">📦 รายการสินค้า</button>
       <button class="nav-tab" data-tab="monthly">📅 รายเดือน</button>
       <button class="nav-tab" data-tab="calendar">📆 ปฏิทิน</button>
+      <button class="nav-tab" data-tab="water">🚰 น้ำดื่ม</button>
+      <button class="nav-tab" data-tab="repair">🔧 งานซ่อม</button>
       <button class="nav-tab" data-tab="acct">🧾 สรุปจัดซื้อ</button>
       <button class="nav-tab" data-tab="isourcing">🛒 รายการเพิ่มเติม</button>
       <button class="nav-tab" data-tab="approve" data-perm="adminPage">✅ อนุมัติเบิก <span class="tab-badge" id="approveTabBadge" style="display:none">0</span></button>
@@ -2206,7 +2271,7 @@
   <section class="page" id="page-items">
     <div class="page-header">
       <div>
-        <h1 class="page-title"><span class="small">รายการสินค้าทั้งหมด · INVENTORY</span>รายการสินค้า 38 รายการ</h1>
+        <h1 class="page-title"><span class="small">รายการสินค้าทั้งหมด · INVENTORY</span>รายการสินค้าทั้งหมด</h1>
         <p class="page-sub">คลิกที่รายการเพื่อดูรายละเอียดสินค้า ค้นหา กรอง หรือบันทึกการเคลื่อนไหวสินค้า</p>
       </div>
       <div class="row" style="flex-wrap:wrap; gap:10px">
@@ -2253,7 +2318,7 @@
           <div class="t-item"><span class="l">ต้องสั่งเพิ่ม (มูลค่า)</span><span class="v accent">฿<span id="ftReorder">0</span></span></div>
           <div class="t-item"><span class="l">ต่ำกว่า Safety Stock</span><span class="v danger" id="ftLow">0</span></div>
         </div>
-        <div class="text-sm text-mute">แสดง <span id="ftShow">0</span> จาก 38 รายการ</div>
+        <div class="text-sm text-mute">แสดง <span id="ftShow">0</span> จาก <span id="ftTotal">38</span> รายการ</div>
       </div>
     </div>
   </section>
@@ -2420,6 +2485,121 @@
         </div>
 
         <div class="cal-list-foot" id="calListFoot"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== WATER DELIVERY ==================== -->
+  <section class="page" id="page-water">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title"><span class="small">น้ำดื่ม · WATER DELIVERY</span>บันทึกการจัดส่งน้ำดื่ม</h1>
+        <p class="page-sub">บันทึกจำนวนน้ำดื่มที่จัดส่งแยกรายชั้นของแต่ละอาคาร และดูประวัติย้อนหลังพร้อมส่งออก Excel</p>
+      </div>
+    </div>
+
+    <div class="wt-layout">
+      <!-- ── ฟอร์มบันทึก ── -->
+      <div class="card">
+        <h3 style="font-family:var(--font-display); font-weight:800; font-size:16px; margin-bottom:12px">🚰 บันทึกการส่งรอบใหม่</h3>
+        <div class="ue-field">
+          <label>อาคาร</label>
+          <select id="wtBuilding" onchange="renderWtFloors()"></select>
+        </div>
+        <div class="row" style="gap:10px">
+          <div class="ue-field" style="flex:1">
+            <label>วันที่จัดส่ง</label>
+            <input type="date" id="wtDate">
+          </div>
+          <div class="ue-field" style="flex:1">
+            <label>หน่วย</label>
+            <select id="wtUnit">
+              <option value="ถัง">ถัง</option>
+              <option value="แพ็ค">แพ็ค</option>
+              <option value="ขวด">ขวด</option>
+            </select>
+          </div>
+        </div>
+        <div class="ue-field">
+          <label>จำนวนที่ส่งแต่ละชั้น</label>
+          <div class="wt-floor-grid" id="wtFloorGrid"></div>
+        </div>
+        <div class="ue-field">
+          <label>หมายเหตุ (ไม่บังคับ)</label>
+          <input type="text" id="wtNote" placeholder="เช่น ส่งเพิ่มรอบบ่าย" autocomplete="off">
+        </div>
+        <div class="wt-sum-bar">
+          <div>รวม <b id="wtTotal">0</b> <span id="wtUnitLabel">ถัง</span> · <span id="wtFloorCount">0</span> ชั้น</div>
+          <button class="btn btn-primary" style="margin-left:auto" id="wtSaveBtn" onclick="gatedWaterSave()">✓ บันทึกการส่ง</button>
+        </div>
+      </div>
+
+      <!-- ── ประวัติ ── -->
+      <div class="card" style="padding:0; overflow:hidden">
+        <div class="cal-toolbar" style="padding:14px 18px">
+          <div>
+            <div style="font-family:var(--font-display); font-weight:800; font-size:15.5px">ประวัติการจัดส่ง</div>
+            <div style="font-size:11.5px; color:var(--ink-mute); margin-top:1px" id="wtHistSub">—</div>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center">
+            <input type="month" id="wtHistMonth" style="padding:7px 10px; border:1px solid var(--line); border-radius:9px; font-family:inherit; font-size:12.5px" onchange="loadWaterHistory()">
+            <button class="btn btn-sm btn-ghost" onclick="loadWaterHistory()">⟳</button>
+            <button class="btn btn-sm btn-primary" onclick="exportWaterExcel()">⬇ Excel</button>
+          </div>
+        </div>
+        <div class="rp-scroll" style="border:none; border-radius:0; max-height:520px">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:100px">วันที่ส่ง</th>
+                <th style="width:110px">อาคาร</th>
+                <th class="center" style="width:64px">ชั้น</th>
+                <th class="num" style="width:90px">จำนวน</th>
+                <th style="width:110px">ผู้บันทึก</th>
+                <th>หมายเหตุ</th>
+              </tr>
+            </thead>
+            <tbody id="wtHistTbody"></tbody>
+          </table>
+        </div>
+        <div class="cal-list-foot" id="wtHistFoot"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== REPAIR ITEMS ==================== -->
+  <section class="page" id="page-repair">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title"><span class="small">งานซ่อม · REPAIR SUPPLIES</span>รายการอุปกรณ์งานซ่อม</h1>
+        <p class="page-sub">ทะเบียนอุปกรณ์สำหรับงานซ่อมบำรุง เช่น หลอดไฟ ก๊อกน้ำ — เพิ่ม/แก้ไขรายการได้ที่หน้า Admin</p>
+      </div>
+    </div>
+
+    <div class="card" style="padding:0; overflow:hidden">
+      <div class="cal-toolbar" style="padding:14px 18px">
+        <div class="im-toolbar" style="margin:0; flex:1">
+          <input type="text" id="rpSearch" placeholder="🔍 ค้นหาอุปกรณ์ หรือหมวดหมู่…" oninput="rpQuery=this.value.toLowerCase().trim(); renderRepairTable()">
+        </div>
+        <div style="display:flex; gap:8px; align-items:center">
+          <span class="badge badge-info" id="rpCount">0 รายการ</span>
+          <button class="btn btn-sm btn-accent" id="rpManageBtn" style="display:none" onclick="gatedRepairManage()">🗂️ จัดการรายการ</button>
+        </div>
+      </div>
+      <div class="rp-scroll" style="border:none; border-radius:0">
+        <table>
+          <thead>
+            <tr>
+              <th class="center" style="width:48px">#</th>
+              <th>อุปกรณ์</th>
+              <th style="width:130px">หมวดหมู่</th>
+              <th class="center" style="width:70px">หน่วย</th>
+              <th class="num" style="width:90px">คงเหลือ</th>
+              <th>หมายเหตุ</th>
+            </tr>
+          </thead>
+          <tbody id="rpTbody"></tbody>
+        </table>
       </div>
     </div>
   </section>
@@ -2593,6 +2773,27 @@
         <div class="bld-list" id="buildingList"></div>
       </div>
 
+      <div class="admin-card" style="border-top:3px solid var(--gold)">
+        <div class="a-icon">🗂️</div>
+        <h3>จัดการรายการสินค้า <span class="text-mute" style="font-size:13px; font-weight:500">· <span id="itemMgmtCount">0</span> รายการ</span></h3>
+        <p>เพิ่มสินค้าใหม่ แก้ไขชื่อ/หน่วย/ราคาตั้งต้น/Safety Stock ตั้งต้น/ประเภทการสั่งซื้อ หรือปิดการใช้งานสินค้าที่เลิกใช้ (ประวัติเดิมยังอยู่ครบ) · เฉพาะ <b>Admin</b> ขึ้นไป</p>
+        <button class="btn btn-accent" onclick="gatedItemManage()">จัดการรายการสินค้า →</button>
+      </div>
+
+      <div class="admin-card" style="border-top:3px solid var(--info)">
+        <div class="a-icon">🔧</div>
+        <h3>จัดการอุปกรณ์งานซ่อม <span class="text-mute" style="font-size:13px; font-weight:500">· <span id="rpMgmtCount">0</span> รายการ</span></h3>
+        <p>เพิ่ม/แก้ไขรายการอุปกรณ์งานซ่อม เช่น หลอดไฟ ก๊อกน้ำ พร้อมหมวดหมู่และจำนวนคงเหลือ · เฉพาะ <b>Admin</b> ขึ้นไป</p>
+        <button class="btn btn-accent" onclick="gatedRepairManage()">จัดการอุปกรณ์ →</button>
+      </div>
+
+      <div class="admin-card" style="border-top:3px solid var(--purple, #7B4FA6)">
+        <div class="a-icon">📱</div>
+        <h3>ตั้งค่าระบบ index</h3>
+        <p>กำหนดว่าผู้ใช้แต่ละคนเข้าใช้ส่วนไหนของระบบ index (หน้า QR) ได้บ้าง — เบิกของอุปโภคบริโภค / บันทึกส่งน้ำดื่ม · เฉพาะ <b>GNR Admin</b></p>
+        <button class="btn btn-primary" onclick="gatedIndexPerms()">ตั้งค่าสิทธิ์ →</button>
+      </div>
+
       <div class="admin-card" style="border-top:3px solid var(--accent)" data-perm="safetystock" onclick="gatedSafetyStock()">
         <div class="a-icon">📊</div>
         <h3>ตั้งค่า Safety Stock รายอาคาร</h3>
@@ -2692,6 +2893,14 @@
     <button class="mob-nav-item" data-tab="calendar" onclick="setTab('calendar')">
       <span class="mn-icon">📆</span>
       <span class="mn-label">ปฏิทิน</span>
+    </button>
+    <button class="mob-nav-item" data-tab="water" onclick="setTab('water')">
+      <span class="mn-icon">🚰</span>
+      <span class="mn-label">น้ำดื่ม</span>
+    </button>
+    <button class="mob-nav-item" data-tab="repair" onclick="setTab('repair')">
+      <span class="mn-icon">🔧</span>
+      <span class="mn-label">งานซ่อม</span>
     </button>
     <button class="mob-nav-item" data-tab="acct" onclick="setTab('acct')">
       <span class="mn-icon">🧾</span>
@@ -3014,9 +3223,198 @@
   </div>
 </div>
 
+<!-- ==================== MODAL: ITEM MANAGEMENT (รายการ) ==================== -->
+<div class="modal-overlay" id="modalItemManage" onclick="if(event.target===this)closeModal('modalItemManage')">
+  <div class="modal wide" style="max-width:880px">
+    <div class="modal-head">
+      <div>
+        <h2>🗂️ จัดการรายการสินค้า</h2>
+        <div class="text-sm text-mute" style="margin-top:2px">แสดง <span id="itemMgmtShown">0</span> จาก <span id="itemMgmtTotal">0</span> รายการ · สินค้าที่ปิดใช้งานจะไม่แสดงในหน้ารายการ/นำเข้า/เบิก แต่ประวัติเดิมยังอยู่ครบ</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modalItemManage')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="im-toolbar">
+        <input type="text" id="itemMgmtSearch" placeholder="🔍 ค้นหาชื่อสินค้า หรือรหัส…" oninput="itemMgmtQuery=this.value.toLowerCase().trim(); renderItemMgmtList()">
+        <button class="btn btn-accent btn-sm" style="white-space:nowrap" onclick="openItemEdit(null)">+ เพิ่มสินค้าใหม่</button>
+      </div>
+      <div class="im-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th class="center" style="width:48px">#</th>
+              <th>รายการสินค้า</th>
+              <th class="center" style="width:66px">หน่วย</th>
+              <th class="num" style="width:88px">ราคา (฿)</th>
+              <th class="num" style="width:80px">Safety</th>
+              <th class="center" style="width:96px">สั่งโดย</th>
+              <th class="center" style="width:88px">สถานะ</th>
+              <th class="center" style="width:120px">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="itemMgmtTbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalItemManage')">ปิด</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL: ITEM EDIT (ฟอร์มเพิ่ม/แก้ไข) ==================== -->
+<div class="modal-overlay" id="modalItemEdit" onclick="if(event.target===this)closeModal('modalItemEdit')">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-head">
+      <h2 id="itemEditTitle">เพิ่มสินค้าใหม่</h2>
+      <button class="modal-close" onclick="closeModal('modalItemEdit')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="ue-field">
+        <label>ชื่อสินค้า <span style="color:var(--danger)">*</span></label>
+        <input type="text" id="imName" placeholder="เช่น กระดาษ A4 80 แกรม (1 รีม)" autocomplete="off">
+      </div>
+      <div class="row" style="gap:10px">
+        <div class="ue-field" style="flex:1">
+          <label>หน่วยนับ <span style="color:var(--danger)">*</span></label>
+          <input type="text" id="imUnit" placeholder="เช่น รีม, กล่อง, ชิ้น" autocomplete="off">
+        </div>
+        <div class="ue-field" style="flex:1">
+          <label>ราคาตั้งต้น (฿/หน่วย)</label>
+          <input type="number" id="imPrice" min="0" step="0.01" placeholder="0">
+        </div>
+      </div>
+      <div class="row" style="gap:10px">
+        <div class="ue-field" style="flex:1">
+          <label>Safety Stock ตั้งต้น</label>
+          <input type="number" id="imSafety" min="0" step="1" placeholder="0">
+        </div>
+        <div class="ue-field" style="flex:1">
+          <label>สั่งซื้อโดย</label>
+          <select id="imBy">
+            <option value="accounting">จัดซื้อ (Accounting)</option>
+            <option value="isourcing">รายการเพิ่มเติม (iSourcing)</option>
+          </select>
+        </div>
+      </div>
+      <div class="ue-field">
+        <label>หมวดหมู่ (ไม่บังคับ)</label>
+        <input type="text" id="imCategory" placeholder="เช่น เครื่องเขียน, ของใช้ในครัว" autocomplete="off">
+      </div>
+      <label class="ue-active"><input type="checkbox" id="imActive" checked> เปิดใช้งานสินค้านี้</label>
+      <div class="ue-hint" id="imHint" style="margin-top:8px">Safety Stock ตั้งต้นใช้เป็นค่าเริ่มต้นทุกอาคาร — ปรับแยกรายอาคารได้ที่เมนู "ตั้งค่า Safety Stock"</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalItemEdit')">ยกเลิก</button>
+      <button class="btn btn-primary" id="imSaveBtn" onclick="saveItemEdit()">✓ บันทึกสินค้า</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL: REPAIR MANAGE ==================== -->
+<div class="modal-overlay" id="modalRepairManage" onclick="if(event.target===this)closeModal('modalRepairManage')">
+  <div class="modal wide" style="max-width:820px">
+    <div class="modal-head">
+      <div>
+        <h2>🔧 จัดการอุปกรณ์งานซ่อม</h2>
+        <div class="text-sm text-mute" style="margin-top:2px">แสดง <span id="rpMgmtShown">0</span> จาก <span id="rpMgmtTotal">0</span> รายการ · รายการที่ปิดใช้งานจะไม่แสดงในหน้างานซ่อม</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modalRepairManage')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="im-toolbar">
+        <input type="text" id="rpMgmtSearch" placeholder="🔍 ค้นหาอุปกรณ์…" oninput="rpMgmtQuery=this.value.toLowerCase().trim(); renderRpMgmtList()">
+        <button class="btn btn-accent btn-sm" style="white-space:nowrap" onclick="openRepairEdit(null)">+ เพิ่มอุปกรณ์ใหม่</button>
+      </div>
+      <div class="im-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th class="center" style="width:48px">#</th>
+              <th>อุปกรณ์</th>
+              <th style="width:110px">หมวดหมู่</th>
+              <th class="center" style="width:64px">หน่วย</th>
+              <th class="num" style="width:80px">คงเหลือ</th>
+              <th class="center" style="width:84px">สถานะ</th>
+              <th class="center" style="width:118px">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="rpMgmtTbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalRepairManage')">ปิด</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL: REPAIR EDIT ==================== -->
+<div class="modal-overlay" id="modalRepairEdit" onclick="if(event.target===this)closeModal('modalRepairEdit')">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-head">
+      <h2 id="repairEditTitle">เพิ่มอุปกรณ์ใหม่</h2>
+      <button class="modal-close" onclick="closeModal('modalRepairEdit')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="ue-field">
+        <label>ชื่ออุปกรณ์ <span style="color:var(--danger)">*</span></label>
+        <input type="text" id="rpName" placeholder="เช่น หลอดไฟ LED 18W" autocomplete="off">
+      </div>
+      <div class="row" style="gap:10px">
+        <div class="ue-field" style="flex:1">
+          <label>หน่วยนับ</label>
+          <input type="text" id="rpUnit" placeholder="เช่น หลอด, ตัว, อัน" autocomplete="off">
+        </div>
+        <div class="ue-field" style="flex:1">
+          <label>จำนวนคงเหลือ</label>
+          <input type="number" id="rpQty" min="0" step="1" placeholder="0">
+        </div>
+      </div>
+      <div class="ue-field">
+        <label>หมวดหมู่</label>
+        <input type="text" id="rpCategory" placeholder="เช่น ไฟฟ้า, ประปา, ทั่วไป" autocomplete="off" list="rpCatList">
+        <datalist id="rpCatList">
+          <option value="ไฟฟ้า"><option value="ประปา"><option value="แอร์/ระบายอากาศ"><option value="ทั่วไป">
+        </datalist>
+      </div>
+      <div class="ue-field">
+        <label>หมายเหตุ (ไม่บังคับ)</label>
+        <input type="text" id="rpNote" placeholder="เช่น เก็บที่ห้องช่าง ชั้น 9" autocomplete="off">
+      </div>
+      <label class="ue-active"><input type="checkbox" id="rpActive" checked> เปิดใช้งานรายการนี้</label>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalRepairEdit')">ยกเลิก</button>
+      <button class="btn btn-primary" id="rpSaveBtn" onclick="saveRepairEdit()">✓ บันทึกอุปกรณ์</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL: INDEX PERMS ==================== -->
+<div class="modal-overlay" id="modalIndexPerms" onclick="if(event.target===this)closeModal('modalIndexPerms')">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-head">
+      <div>
+        <h2>📱 ตั้งค่าสิทธิ์ระบบ index</h2>
+        <div class="text-sm text-mute" style="margin-top:2px">กำหนดรายผู้ใช้ว่าเข้าใช้ส่วนไหนของหน้า QR (index) ได้บ้าง · กดปุ่มเพื่อเปิด/ปิด บันทึกขึ้น Sheet ทันที</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modalIndexPerms')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:0">
+      <div id="ipList"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalIndexPerms')">ปิด</button>
+    </div>
+  </div>
+</div>
+
+
+
 <script>
 /* ==================== DATA ==================== */
-const ITEMS = [
+let ITEMS = [
   // 1-33: จัดซื้อ (accounting)
   { id:  1, name: "เชือกฟาง 500 กรัม ความยาว 100 เมตร (1 ม้วน)", unit: "ม้วน", price: 29, min: 5, by: "accounting" },
   { id:  2, name: "ถ่านอัลคาไลน์ AA แบบไม่ชาร์จ (แพ็ค 4 ก้อน) Panasonic", unit: "แพ็ค", price: 67, min: 10, by: "accounting" },
@@ -3240,6 +3638,18 @@ async function pullFromCloud() {
 
 // แปลงข้อมูลจาก Sheet → state ของหน้าเว็บ
 function applyCloudData(r) {
+  // items (Item_Master) → ITEMS / ALL_ITEMS — รองรับสินค้าที่เพิ่ม/แก้ไข/ปิดใช้งานจากหน้า Admin
+  if (Array.isArray(r.items) && r.items.length) {
+    ALL_ITEMS = r.items.map(it => ({
+      id: Number(it.item_id), name: it.item_name || '', unit: it.unit || '',
+      price: Number(it.base_price) || 0, min: Number(it.base_safety) || 0,
+      by: it.ordered_by === 'isourcing' ? 'isourcing' : 'accounting',
+      category: it.category || '',
+      active: !(it.active === false || it.active === 'FALSE' || it.active === 0),
+    })).sort((a, b) => a.id - b.id);
+    ITEMS = ALL_ITEMS.filter(it => it.active);
+    rebuildItemMap();
+  }
   // buildings
   if (Array.isArray(r.buildings) && r.buildings.length) {
     const active = r.buildings.filter(b => b.active === true || b.active === 'TRUE' || b.active === 1);
@@ -3291,9 +3701,21 @@ function applyCloudData(r) {
       can_stock_out: truthyClient(u.can_stock_out),
       can_order:     truthyClient(u.can_order),
       can_edit_price:truthyClient(u.can_edit_price),
+      // สิทธิ์ระบบ index — ช่องว่าง = อนุญาต (default เปิด)
+      idx_withdraw: (u.idx_withdraw === '' || u.idx_withdraw == null) ? true : truthyClient(u.idx_withdraw),
+      idx_water:    (u.idx_water === ''    || u.idx_water == null)    ? true : truthyClient(u.idx_water),
       active: (u.active === '' || u.active == null) ? true : truthyClient(u.active),
     }));
     if (typeof renderUsers === 'function') renderUsers();
+  }
+
+  // repair items (อุปกรณ์งานซ่อม)
+  if (Array.isArray(r.repair)) {
+    REPAIR_ITEMS = r.repair.map(x => ({
+      id: Number(x.repair_id), name: x.item_name || '', unit: x.unit || '',
+      category: x.category || '', qty: Number(x.qty) || 0, note: x.note || '',
+      active: !(x.active === false || x.active === 'FALSE' || x.active === 0),
+    })).sort((a, b) => a.id - b.id);
   }
 
   // monthly (รายงานรายเดือน) — สร้างจาก Monthly_Stock บน Sheet ให้ทุกอาคาร/ทุกเดือน
@@ -3572,6 +3994,10 @@ const PERMISSIONS = {
   building:    { role: 'admin' },          // จัดการอาคาร
   adminPage:   { role: 'admin' },          // เข้าหน้า Admin
   manageUser:  { role: 'gnradmin' },       // จัดการผู้ใช้ — เฉพาะ GNR Admin
+  manageItems: { role: 'admin' },          // จัดการรายการสินค้า
+  manageRepair:{ role: 'admin' },          // จัดการอุปกรณ์งานซ่อม
+  indexPerms:  { role: 'gnradmin' },       // ตั้งค่าสิทธิ์ระบบ index
+  water:       {},                         // บันทึกส่งน้ำ — แค่ล็อกอิน
 };
 
 function truthyClient(v){ return v === true || v === 'TRUE' || v === 1 || v === '1'; }
@@ -3904,9 +4330,12 @@ function curOrders() {
 }
 
 /* ==================== PRICE & MINSTOCK OVERRIDE HELPERS ==================== */
-// Base lookup map for ITEMS
-const ITEM_MAP = {};
-ITEMS.forEach(it => { ITEM_MAP[it.id] = it; });
+// Base lookup map for ITEMS (rebuild ใหม่ได้เมื่อรายการสินค้าเปลี่ยน)
+let ITEM_MAP = {};
+function rebuildItemMap() { ITEM_MAP = {}; ITEMS.forEach(it => { ITEM_MAP[it.id] = it; }); }
+rebuildItemMap();
+// รายการสินค้าทั้งหมดรวมที่ปิดใช้งาน (ใช้ในหน้าจัดการสินค้า)
+let ALL_ITEMS = ITEMS.map(it => Object.assign({ active: true, category: '' }, it));
 
 // Current effective price (global override across all buildings, else base price)
 function itemPrice(id) {
@@ -4011,10 +4440,12 @@ function setTab(tab) {
   if (tab === 'items') renderItemsTable();
   if (tab === 'monthly') renderMonthly();
   if (tab === 'calendar') initCalendarPage();
+  if (tab === 'water') initWaterPage();
+  if (tab === 'repair') renderRepairPage();
   if (tab === 'acct') renderOrderSummary('accounting');
   if (tab === 'isourcing') renderOrderSummary('isourcing');
   if (tab === 'approve') loadPendingWithdrawals();
-  if (tab === 'admin') { renderLog(); renderGsContent(); renderBuildingList(); initQrSection(); }
+  if (tab === 'admin') { renderLog(); renderGsContent(); renderBuildingList(); initQrSection(); updateItemMgmtCard(); updateRpMgmtCard(); }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 document.querySelectorAll('.nav-tab').forEach(btn => btn.addEventListener('click', () => setTab(btn.dataset.tab)));
@@ -4892,6 +5323,7 @@ function renderItemsTable() {
   document.getElementById('ftReorder').textContent = fmtInt(totalReorder);
   document.getElementById('ftLow').textContent = lowCount;
   document.getElementById('ftShow').textContent = items.length;
+  const ftT = document.getElementById('ftTotal'); if (ftT) ftT.textContent = ITEMS.length;
 }
 
 /* ==================== ITEM DETAIL MODAL ==================== */
@@ -5737,6 +6169,473 @@ function exportCalExcel() {
   ];
   calWriteXlsx(calBuildAoa(list, title), sheetName, fileName);
   toast('ส่งออก Excel เรียบร้อย');
+}
+
+/* ==================== ITEM MANAGEMENT (จัดการรายการสินค้า) ==================== */
+let itemMgmtQuery = '';
+let itemEditId = null;   // null = เพิ่มสินค้าใหม่
+
+function updateItemMgmtCard() {
+  const el = document.getElementById('itemMgmtCount');
+  if (el) el.textContent = ALL_ITEMS.length;
+}
+function gatedItemManage() { requireAuth('manageItems', openItemManage); }
+function openItemManage() {
+  itemMgmtQuery = '';
+  const q = document.getElementById('itemMgmtSearch'); if (q) q.value = '';
+  renderItemMgmtList();
+  openModal('modalItemManage');
+}
+
+function renderItemMgmtList() {
+  const tbody = document.getElementById('itemMgmtTbody');
+  if (!tbody) return;
+  const list = ALL_ITEMS.filter(it =>
+    !itemMgmtQuery || it.name.toLowerCase().includes(itemMgmtQuery) ||
+    String(it.id) === itemMgmtQuery || (it.category || '').toLowerCase().includes(itemMgmtQuery));
+  document.getElementById('itemMgmtShown').textContent = list.length;
+  document.getElementById('itemMgmtTotal').textContent = ALL_ITEMS.length;
+  if (list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:32px; color:var(--ink-mute)">ไม่พบสินค้าที่ค้นหา</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(it => `
+    <tr class="${it.active ? '' : 'im-row-inactive'}">
+      <td class="center" style="font-family:var(--font-mono); font-size:12px; color:var(--ink-mute)">${it.id}</td>
+      <td><strong style="font-size:13px">${it.name}</strong>${it.category ? `<span style="display:block; font-size:11px; color:var(--ink-mute)">${it.category}</span>` : ''}</td>
+      <td class="center" style="font-size:12.5px">${it.unit}</td>
+      <td class="num" style="font-size:12.5px">${(it.price || 0).toLocaleString('th-TH', { minimumFractionDigits: (it.price % 1 ? 2 : 0) })}</td>
+      <td class="num" style="font-size:12.5px">${it.min || 0}</td>
+      <td class="center"><span class="badge ${it.by === 'accounting' ? 'badge-info' : 'badge-warn'}" style="font-size:10.5px">${it.by === 'accounting' ? 'จัดซื้อ' : 'เพิ่มเติม'}</span></td>
+      <td class="center"><span class="badge ${it.active ? 'badge-ok' : 'badge-danger'}" style="font-size:10.5px">${it.active ? 'ใช้งาน' : 'ปิดอยู่'}</span></td>
+      <td class="center" style="white-space:nowrap">
+        <button class="btn btn-ghost btn-sm" style="padding:4px 10px" onclick="openItemEdit(${it.id})">✏️ แก้ไข</button>
+        <button class="btn btn-ghost btn-sm" style="padding:4px 8px" title="${it.active ? 'ปิดการใช้งาน' : 'เปิดใช้งาน'}" onclick="toggleItemActive(${it.id})">${it.active ? '🚫' : '✅'}</button>
+      </td>
+    </tr>`).join('');
+}
+
+function openItemEdit(id) {
+  itemEditId = id;
+  const it = id != null ? ALL_ITEMS.find(x => x.id === id) : null;
+  document.getElementById('itemEditTitle').textContent = it ? `แก้ไขสินค้า #${it.id}` : 'เพิ่มสินค้าใหม่';
+  document.getElementById('imName').value     = it ? it.name : '';
+  document.getElementById('imUnit').value     = it ? it.unit : '';
+  document.getElementById('imPrice').value    = it ? it.price : '';
+  document.getElementById('imSafety').value   = it ? it.min : '';
+  document.getElementById('imBy').value       = it ? it.by : 'accounting';
+  document.getElementById('imCategory').value = it ? (it.category || '') : '';
+  document.getElementById('imActive').checked = it ? !!it.active : true;
+  openModal('modalItemEdit');
+  setTimeout(() => document.getElementById('imName').focus(), 60);
+}
+
+async function saveItemEdit() {
+  const name = document.getElementById('imName').value.trim();
+  const unit = document.getElementById('imUnit').value.trim();
+  if (!name) { toast('กรุณากรอกชื่อสินค้า', 'warn'); return; }
+  if (!unit) { toast('กรุณากรอกหน่วยนับ', 'warn'); return; }
+  const payload = {
+    actor: currentUser ? currentUser.username : '',
+    item_id: itemEditId,
+    item_name: name,
+    unit: unit,
+    base_price: Number(document.getElementById('imPrice').value) || 0,
+    base_safety: Math.max(0, Math.round(Number(document.getElementById('imSafety').value) || 0)),
+    ordered_by: document.getElementById('imBy').value,
+    category: document.getElementById('imCategory').value.trim(),
+    active: document.getElementById('imActive').checked,
+  };
+  const btn = document.getElementById('imSaveBtn');
+  btn.disabled = true; btn.textContent = '⏳ กำลังบันทึก…';
+  try {
+    const r = await gasPost('saveItem', payload);
+    if (!r.ok) throw new Error(r.error || 'บันทึกไม่สำเร็จ');
+    const rec = {
+      id: r.item_id, name, unit: unit,
+      price: payload.base_price, min: payload.base_safety,
+      by: payload.ordered_by, category: payload.category, active: payload.active,
+    };
+    const i = ALL_ITEMS.findIndex(x => x.id === r.item_id);
+    if (i >= 0) ALL_ITEMS[i] = rec; else ALL_ITEMS.push(rec);
+    ALL_ITEMS.sort((a, b) => a.id - b.id);
+    applyItemsChange();
+    closeModal('modalItemEdit');
+    renderItemMgmtList();
+    toast(r.mode === 'create' ? `เพิ่มสินค้าใหม่ #${r.item_id} เรียบร้อย` : `บันทึกสินค้า #${r.item_id} เรียบร้อย`);
+  } catch (e) {
+    toast('บันทึกไม่สำเร็จ: ' + e.message, 'warn');
+  } finally {
+    btn.disabled = false; btn.textContent = '✓ บันทึกสินค้า';
+  }
+}
+
+async function toggleItemActive(id) {
+  const it = ALL_ITEMS.find(x => x.id === id); if (!it) return;
+  const next = !it.active;
+  if (!next && !confirm(`ปิดการใช้งาน "${it.name}" ?\n\nสินค้าจะไม่แสดงในหน้ารายการ/นำเข้า/เบิก/ใบสั่งซื้อ แต่ประวัติการนำเข้า–เบิกเดิมยังอยู่ครบ และเปิดกลับมาใช้ได้ทุกเมื่อ`)) return;
+  try {
+    const r = await gasPost('setItemActive', { actor: currentUser ? currentUser.username : '', item_id: id, active: next });
+    if (!r.ok) throw new Error(r.error || 'ไม่สำเร็จ');
+    it.active = next;
+    applyItemsChange();
+    renderItemMgmtList();
+    toast(next ? `เปิดใช้งาน "${it.name}" แล้ว` : `ปิดการใช้งาน "${it.name}" แล้ว`);
+  } catch (e) {
+    toast('ไม่สำเร็จ: ' + e.message, 'warn');
+  }
+}
+
+// อัปเดต ITEMS/ITEM_MAP แล้ววาดทุกหน้าที่เกี่ยวข้องใหม่
+function applyItemsChange() {
+  ITEMS = ALL_ITEMS.filter(x => x.active);
+  rebuildItemMap();
+  saveState();
+  renderDashboard(); renderItemsTable(); renderMonthly();
+  renderOrderSummary('accounting'); renderOrderSummary('isourcing');
+  updateItemMgmtCard();
+}
+
+/* ==================== WATER DELIVERY (บันทึกส่งน้ำดื่ม) ==================== */
+let wtQty = {};          // { floor: qty } ร่างการบันทึกปัจจุบัน
+let wtHistCache = [];    // ประวัติที่โหลดล่าสุด (ใช้ตอน export)
+
+async function initWaterPage() {
+  const sel = document.getElementById('wtBuilding');
+  sel.innerHTML = state.buildings.map(b => `<option value="${b}">${b}</option>`).join('');
+  if (state.buildings.includes(state.currentBuilding)) sel.value = state.currentBuilding;
+  const d = new Date();
+  document.getElementById('wtDate').value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  document.getElementById('wtHistMonth').value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+  wtQty = {};
+  // โหลดผังชั้นจาก Sheet ถ้ายังไม่เคยโหลด
+  if (!Object.keys(cloudFloors).length && gasOnline) { try { await loadFloors(); } catch (e) {} }
+  renderWtFloors();
+}
+
+function wtFloorsOf(building) {
+  const fls = cloudFloors[building];
+  if (fls && fls.length) return fls;
+  // fallback ถ้ายังไม่เคยตั้งค่าชั้น
+  return ['1', '2', '3', '4', '5'];
+}
+
+function renderWtFloors() {
+  const b = document.getElementById('wtBuilding').value;
+  wtQty = {};
+  const grid = document.getElementById('wtFloorGrid');
+  grid.innerHTML = wtFloorsOf(b).map(fl => `
+    <div class="wt-floor" data-floor="${fl}">
+      <span class="fl">ชั้น ${fl}</span>
+      <span class="wt-step">
+        <button onclick="wtAdj('${fl.replace(/'/g, "\\'")}', -1)">−</button>
+        <input type="number" min="0" step="1" value="0" id="wtQty-${fl}" oninput="wtSet('${fl.replace(/'/g, "\\'")}', this.value)">
+        <button onclick="wtAdj('${fl.replace(/'/g, "\\'")}', 1)">+</button>
+      </span>
+    </div>`).join('');
+  updateWtSummary();
+  loadWaterHistory();
+}
+
+function wtAdj(fl, d) {
+  const cur = Math.max(0, (wtQty[fl] || 0) + d);
+  wtQty[fl] = cur;
+  const inp = document.getElementById('wtQty-' + fl);
+  if (inp) inp.value = cur;
+  updateWtSummary();
+}
+function wtSet(fl, v) {
+  wtQty[fl] = Math.max(0, Math.round(Number(v) || 0));
+  updateWtSummary();
+}
+function updateWtSummary() {
+  let total = 0, floors = 0;
+  Object.keys(wtQty).forEach(fl => {
+    const q = wtQty[fl] || 0;
+    if (q > 0) { total += q; floors++; }
+    const cell = document.querySelector(`.wt-floor[data-floor="${fl}"]`);
+    if (cell) cell.classList.toggle('has-qty', q > 0);
+  });
+  document.getElementById('wtTotal').textContent = total.toLocaleString();
+  document.getElementById('wtFloorCount').textContent = floors;
+  document.getElementById('wtUnitLabel').textContent = document.getElementById('wtUnit').value;
+}
+
+function gatedWaterSave() { requireAuth('water', saveWaterLog); }
+async function saveWaterLog() {
+  const floors = Object.keys(wtQty).filter(fl => (wtQty[fl] || 0) > 0)
+    .map(fl => ({ floor: fl, qty: wtQty[fl] }));
+  if (!floors.length) { toast('กรุณากรอกจำนวนอย่างน้อย 1 ชั้น', 'warn'); return; }
+  const payload = {
+    building: document.getElementById('wtBuilding').value,
+    delivery_date: document.getElementById('wtDate').value,
+    unit: document.getElementById('wtUnit').value,
+    operator: currentUser ? (currentUser.name || currentUser.username) : '',
+    note: document.getElementById('wtNote').value.trim(),
+    floors,
+  };
+  const btn = document.getElementById('wtSaveBtn');
+  btn.disabled = true; btn.textContent = '⏳ กำลังบันทึก…';
+  try {
+    const r = await gasPost('logWater', payload);
+    if (!r.ok) throw new Error(r.error || 'บันทึกไม่สำเร็จ');
+    toast(`บันทึกส่งน้ำ ${r.total_qty} ${payload.unit} · ${r.lines} ชั้น เรียบร้อย`);
+    wtQty = {};
+    document.getElementById('wtNote').value = '';
+    renderWtFloors();
+  } catch (e) {
+    toast('บันทึกไม่สำเร็จ: ' + e.message, 'warn');
+  } finally {
+    btn.disabled = false; btn.textContent = '✓ บันทึกการส่ง';
+  }
+}
+
+async function loadWaterHistory() {
+  const tbody = document.getElementById('wtHistTbody');
+  if (!tbody) return;
+  const b = document.getElementById('wtBuilding').value;
+  const mk = document.getElementById('wtHistMonth').value;
+  document.getElementById('wtHistSub').textContent = `${b} · เดือน ${mk || '—'}`;
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:28px; color:var(--ink-mute)">⏳ กำลังโหลด…</td></tr>';
+  try {
+    const r = await gasGet('getWaterLog', { month_key: mk, building: b });
+    if (!r.ok) throw new Error(r.error || 'โหลดไม่สำเร็จ');
+    wtHistCache = r.logs || [];
+    if (!wtHistCache.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:28px; color:var(--ink-mute)">ยังไม่มีบันทึกในเดือนนี้</td></tr>';
+    } else {
+      tbody.innerHTML = wtHistCache.map(l => {
+        const d = new Date(l.delivery_date || l.timestamp);
+        const dstr = isNaN(d) ? String(l.delivery_date || '—') : d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
+        return `<tr>
+          <td style="font-size:12.5px; white-space:nowrap">${dstr}</td>
+          <td style="font-size:12.5px">${l.building_name}</td>
+          <td class="center" style="font-family:var(--font-display); font-weight:700">${l.floor}</td>
+          <td class="num"><strong style="color:var(--info)">${Number(l.qty).toLocaleString()}</strong> <span style="font-size:11.5px; color:var(--ink-mute)">${l.unit || 'ถัง'}</span></td>
+          <td style="font-size:12.5px">${l.operator || '—'}</td>
+          <td style="font-size:12px; color:var(--ink-soft)">${l.note || ''}</td>
+        </tr>`;
+      }).join('');
+    }
+    const total = wtHistCache.reduce((s, l) => s + (Number(l.qty) || 0), 0);
+    const days = new Set(wtHistCache.map(l => String(l.delivery_date).substring(0, 10))).size;
+    document.getElementById('wtHistFoot').innerHTML = `
+      <div class="f-item"><span class="l">รายการ</span><span class="v">${wtHistCache.length}</span></div>
+      <div class="f-item"><span class="l">รวมจำนวน</span><span class="v ok">${total.toLocaleString()}</span></div>
+      <div class="f-item"><span class="l">วันที่มีการส่ง</span><span class="v">${days}</span></div>`;
+  } catch (e) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:28px; color:var(--ink-mute)">โหลดไม่สำเร็จ — ลองกด ⟳ อีกครั้ง</td></tr>';
+  }
+}
+
+function exportWaterExcel() {
+  if (typeof XLSX === 'undefined') { toast('ไลบรารี Excel ยังโหลดไม่เสร็จ', 'warn'); return; }
+  if (!wtHistCache.length) { toast('ไม่มีข้อมูลให้ส่งออก', 'warn'); return; }
+  const b = document.getElementById('wtBuilding').value;
+  const mk = document.getElementById('wtHistMonth').value;
+  const aoa = [
+    ['บันทึกการจัดส่งน้ำดื่ม · GNR3 Stock Management'],
+    [`อาคาร ${b} · เดือน ${mk} · ส่งออกเมื่อ ${new Date().toLocaleString('th-TH')}`],
+    [],
+    ['วันที่ส่ง', 'อาคาร', 'ชั้น', 'จำนวน', 'หน่วย', 'ผู้บันทึก', 'หมายเหตุ'],
+    ...wtHistCache.map(l => [
+      String(l.delivery_date).substring(0, 10), l.building_name, l.floor,
+      Number(l.qty), l.unit || 'ถัง', l.operator || '', l.note || '',
+    ]),
+  ];
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = [{wch:12},{wch:12},{wch:6},{wch:9},{wch:7},{wch:14},{wch:24}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'น้ำดื่ม ' + mk);
+  XLSX.writeFile(wb, `บันทึกส่งน้ำดื่ม-${b}-${mk}.xlsx`);
+  toast('ส่งออก Excel เรียบร้อย');
+}
+
+/* ==================== REPAIR ITEMS (อุปกรณ์งานซ่อม) ==================== */
+let REPAIR_ITEMS = [];   // ซิงค์จากชีต Repair_Items ตอน pullFromCloud
+let rpQuery = '';
+let rpMgmtQuery = '';
+let rpEditId = null;
+
+function renderRepairPage() {
+  const btn = document.getElementById('rpManageBtn');
+  if (btn) btn.style.display = isAdmin() ? '' : 'none';
+  renderRepairTable();
+  // ถ้ายังไม่เคยโหลด — ดึงจาก Sheet
+  if (!REPAIR_ITEMS.length && gasOnline) refreshRepairItems();
+}
+
+async function refreshRepairItems() {
+  try {
+    const r = await gasGet('getRepairItems', {});
+    if (r.ok && Array.isArray(r.repair)) {
+      REPAIR_ITEMS = r.repair.map(x => ({
+        id: Number(x.repair_id), name: x.item_name || '', unit: x.unit || '',
+        category: x.category || '', qty: Number(x.qty) || 0, note: x.note || '',
+        active: !(x.active === false || x.active === 'FALSE' || x.active === 0),
+      })).sort((a, b) => a.id - b.id);
+      renderRepairTable();
+      updateRpMgmtCard();
+    }
+  } catch (e) {}
+}
+
+function renderRepairTable() {
+  const tbody = document.getElementById('rpTbody');
+  if (!tbody) return;
+  const list = REPAIR_ITEMS.filter(x => x.active &&
+    (!rpQuery || x.name.toLowerCase().includes(rpQuery) || (x.category || '').toLowerCase().includes(rpQuery)));
+  document.getElementById('rpCount').textContent = list.length + ' รายการ';
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:36px; color:var(--ink-mute)">${REPAIR_ITEMS.length ? 'ไม่พบอุปกรณ์ที่ค้นหา' : 'ยังไม่มีรายการอุปกรณ์ — เพิ่มได้ที่หน้า Admin › จัดการอุปกรณ์งานซ่อม'}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(x => `
+    <tr>
+      <td class="center" style="font-family:var(--font-mono); font-size:12px; color:var(--ink-mute)">${x.id}</td>
+      <td><strong style="font-size:13px">${x.name}</strong></td>
+      <td>${x.category ? `<span class="badge badge-info" style="font-size:10.5px">${x.category}</span>` : '—'}</td>
+      <td class="center" style="font-size:12.5px">${x.unit}</td>
+      <td class="num"><strong style="color:${x.qty > 0 ? 'var(--ok)' : 'var(--danger)'}">${x.qty.toLocaleString()}</strong></td>
+      <td style="font-size:12px; color:var(--ink-soft)">${x.note || ''}</td>
+    </tr>`).join('');
+}
+
+function updateRpMgmtCard() {
+  const el = document.getElementById('rpMgmtCount');
+  if (el) el.textContent = REPAIR_ITEMS.length;
+}
+function gatedRepairManage() { requireAuth('manageRepair', openRepairManage); }
+function openRepairManage() {
+  rpMgmtQuery = '';
+  const q = document.getElementById('rpMgmtSearch'); if (q) q.value = '';
+  renderRpMgmtList();
+  openModal('modalRepairManage');
+  if (!REPAIR_ITEMS.length) refreshRepairItems().then(renderRpMgmtList);
+}
+
+function renderRpMgmtList() {
+  const tbody = document.getElementById('rpMgmtTbody');
+  if (!tbody) return;
+  const list = REPAIR_ITEMS.filter(x =>
+    !rpMgmtQuery || x.name.toLowerCase().includes(rpMgmtQuery) || (x.category || '').toLowerCase().includes(rpMgmtQuery));
+  document.getElementById('rpMgmtShown').textContent = list.length;
+  document.getElementById('rpMgmtTotal').textContent = REPAIR_ITEMS.length;
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:28px; color:var(--ink-mute)">ยังไม่มีรายการ — กด "+ เพิ่มอุปกรณ์ใหม่"</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(x => `
+    <tr class="${x.active ? '' : 'im-row-inactive'}">
+      <td class="center" style="font-family:var(--font-mono); font-size:12px; color:var(--ink-mute)">${x.id}</td>
+      <td><strong style="font-size:13px">${x.name}</strong>${x.note ? `<span style="display:block; font-size:11px; color:var(--ink-mute)">${x.note}</span>` : ''}</td>
+      <td style="font-size:12px">${x.category || '—'}</td>
+      <td class="center" style="font-size:12.5px">${x.unit}</td>
+      <td class="num" style="font-size:12.5px">${x.qty.toLocaleString()}</td>
+      <td class="center"><span class="badge ${x.active ? 'badge-ok' : 'badge-danger'}" style="font-size:10.5px">${x.active ? 'ใช้งาน' : 'ปิดอยู่'}</span></td>
+      <td class="center" style="white-space:nowrap">
+        <button class="btn btn-ghost btn-sm" style="padding:4px 10px" onclick="openRepairEdit(${x.id})">✏️ แก้ไข</button>
+        <button class="btn btn-ghost btn-sm" style="padding:4px 8px" title="${x.active ? 'ปิดการใช้งาน' : 'เปิดใช้งาน'}" onclick="toggleRepairActive(${x.id})">${x.active ? '🚫' : '✅'}</button>
+      </td>
+    </tr>`).join('');
+}
+
+function openRepairEdit(id) {
+  rpEditId = id;
+  const x = id != null ? REPAIR_ITEMS.find(r => r.id === id) : null;
+  document.getElementById('repairEditTitle').textContent = x ? `แก้ไขอุปกรณ์ #${x.id}` : 'เพิ่มอุปกรณ์ใหม่';
+  document.getElementById('rpName').value     = x ? x.name : '';
+  document.getElementById('rpUnit').value     = x ? x.unit : '';
+  document.getElementById('rpQty').value      = x ? x.qty : '';
+  document.getElementById('rpCategory').value = x ? (x.category || '') : '';
+  document.getElementById('rpNote').value     = x ? (x.note || '') : '';
+  document.getElementById('rpActive').checked = x ? !!x.active : true;
+  openModal('modalRepairEdit');
+  setTimeout(() => document.getElementById('rpName').focus(), 60);
+}
+
+async function saveRepairEdit() {
+  const name = document.getElementById('rpName').value.trim();
+  if (!name) { toast('กรุณากรอกชื่ออุปกรณ์', 'warn'); return; }
+  const payload = {
+    actor: currentUser ? currentUser.username : '',
+    repair_id: rpEditId,
+    item_name: name,
+    unit: document.getElementById('rpUnit').value.trim() || 'ชิ้น',
+    qty: Math.max(0, Math.round(Number(document.getElementById('rpQty').value) || 0)),
+    category: document.getElementById('rpCategory').value.trim(),
+    note: document.getElementById('rpNote').value.trim(),
+    active: document.getElementById('rpActive').checked,
+  };
+  const btn = document.getElementById('rpSaveBtn');
+  btn.disabled = true; btn.textContent = '⏳ กำลังบันทึก…';
+  try {
+    const r = await gasPost('saveRepairItem', payload);
+    if (!r.ok) throw new Error(r.error || 'บันทึกไม่สำเร็จ');
+    const rec = { id: r.repair_id, name, unit: payload.unit, category: payload.category,
+                  qty: payload.qty, note: payload.note, active: payload.active };
+    const i = REPAIR_ITEMS.findIndex(x => x.id === r.repair_id);
+    if (i >= 0) REPAIR_ITEMS[i] = rec; else REPAIR_ITEMS.push(rec);
+    REPAIR_ITEMS.sort((a, b) => a.id - b.id);
+    renderRpMgmtList(); renderRepairTable(); updateRpMgmtCard();
+    closeModal('modalRepairEdit');
+    toast(r.mode === 'create' ? `เพิ่มอุปกรณ์ #${r.repair_id} เรียบร้อย` : `บันทึกอุปกรณ์ #${r.repair_id} เรียบร้อย`);
+  } catch (e) {
+    toast('บันทึกไม่สำเร็จ: ' + e.message, 'warn');
+  } finally {
+    btn.disabled = false; btn.textContent = '✓ บันทึกอุปกรณ์';
+  }
+}
+
+async function toggleRepairActive(id) {
+  const x = REPAIR_ITEMS.find(r => r.id === id); if (!x) return;
+  const next = !x.active;
+  if (!next && !confirm(`ปิดการใช้งาน "${x.name}" ?`)) return;
+  try {
+    const r = await gasPost('setRepairItemActive', { actor: currentUser ? currentUser.username : '', repair_id: id, active: next });
+    if (!r.ok) throw new Error(r.error || 'ไม่สำเร็จ');
+    x.active = next;
+    renderRpMgmtList(); renderRepairTable(); updateRpMgmtCard();
+    toast(next ? 'เปิดใช้งานแล้ว' : 'ปิดการใช้งานแล้ว');
+  } catch (e) { toast('ไม่สำเร็จ: ' + e.message, 'warn'); }
+}
+
+/* ==================== INDEX PERMS (สิทธิ์ระบบ index รายผู้ใช้) ==================== */
+function gatedIndexPerms() { requireAuth('indexPerms', openIndexPerms); }
+function openIndexPerms() {
+  renderIndexPermsList();
+  openModal('modalIndexPerms');
+}
+function renderIndexPermsList() {
+  const el = document.getElementById('ipList');
+  if (!el) return;
+  if (!USERS.length) {
+    el.innerHTML = '<div style="text-align:center; padding:32px; color:var(--ink-mute)">ยังไม่ได้โหลดรายชื่อผู้ใช้ — กดซิงค์ข้อมูลก่อน</div>';
+    return;
+  }
+  el.innerHTML = USERS.filter(u => u.active).map(u => {
+    const uEsc = String(u.username).replace(/'/g, "\\'");
+    const w = u.idx_withdraw !== false;
+    const wa = u.idx_water !== false;
+    return `<div class="ip-row">
+      <div class="nm">${u.display_name || u.username} ${roleBadge(u.role)}<span class="un">@${u.username}</span></div>
+      <button class="ip-toggle ${w ? 'on' : ''}" id="ipW-${u.username}" onclick="toggleIndexPerm('${uEsc}', 'idx_withdraw')">${w ? '✅' : '🚫'} เบิกของ</button>
+      <button class="ip-toggle ${wa ? 'on' : ''}" id="ipA-${u.username}" onclick="toggleIndexPerm('${uEsc}', 'idx_water')">${wa ? '✅' : '🚫'} ส่งน้ำดื่ม</button>
+    </div>`;
+  }).join('');
+}
+async function toggleIndexPerm(username, key) {
+  const u = USERS.find(x => x.username === username); if (!u) return;
+  const next = !(u[key] !== false);
+  const payload = { actor: currentUser ? currentUser.username : '', username };
+  payload[key] = next;
+  try {
+    const r = await gasPost('saveIndexPerms', payload);
+    if (!r.ok) throw new Error(r.error || 'ไม่สำเร็จ');
+    u[key] = next;
+    renderIndexPermsList();
+    toast(`${next ? 'เปิด' : 'ปิด'}สิทธิ์ ${key === 'idx_withdraw' ? 'เบิกของ' : 'ส่งน้ำดื่ม'} ของ @${username} แล้ว`);
+  } catch (e) { toast('บันทึกไม่สำเร็จ: ' + e.message, 'warn'); }
 }
 
 /* ==================== LOG ==================== */
