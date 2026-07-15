@@ -1340,15 +1340,16 @@
     scrollbar-width: none;
     gap: 2px; width: 100%;
   }
+  .mob-nav-items::-webkit-scrollbar { display: none; }
   .mob-nav-item {
     display: flex; flex-direction: column; align-items: center;
-    flex: 0 0 auto; min-width: 64px;
-    gap: 3px; padding: 6px 4px;
+    flex: 0 0 auto; width: auto; min-width: 62px;
+    gap: 3px; padding: 6px 6px;
     border-radius: 12px; transition: all .15s;
     color: var(--ink-mute); font-size: 10px; font-weight: 600;
     font-family: var(--font-display);
     letter-spacing: .01em; cursor: pointer;
-    border: none; background: none; width: 100%;
+    border: none; background: none;
     position: relative;
   }
   .mob-nav-item .mn-icon {
@@ -3214,6 +3215,14 @@
         </div>
         <div class="ue-hint" id="ueCapsHint" style="display:none">Admin / GNR Admin ได้ทุกสิทธิ์อยู่แล้ว</div>
       </div>
+      <div class="ue-field">
+        <label>สิทธิ์ระบบ index (หน้า QR — เบิกของ/ส่งน้ำ)</label>
+        <div class="ue-caps">
+          <label class="ue-cap"><input type="checkbox" id="ueIdxWithdraw" checked> 📦 เบิกของอุปโภคบริโภค</label>
+          <label class="ue-cap"><input type="checkbox" id="ueIdxWater" checked> 🚰 บันทึกส่งน้ำดื่ม</label>
+        </div>
+        <div class="ue-hint">สิทธิ์นี้ตั้งได้อิสระทุก role · ปรับภายหลังได้ที่การ์ด "ตั้งค่าระบบ index"</div>
+      </div>
       <label class="ue-active"><input type="checkbox" id="ueActive" checked> เปิดใช้งานบัญชีนี้</label>
     </div>
     <div class="modal-foot">
@@ -4194,15 +4203,22 @@ function roleBadge(role){
 function avatarColor(role){ return role==='gnradmin' ? 'var(--gold)' : role==='admin' ? 'var(--accent)' : 'var(--info)'; }
 
 function permChips(u){
+  // ชิปสิทธิ์ระบบ index (แสดงทุก role — ตั้งได้อิสระ)
+  const idxChips = [];
+  if (u.idx_withdraw !== false) idxChips.push('<span class="perm-chip" style="background:var(--accent-soft); color:var(--accent-ink)">📦 index:เบิกของ</span>');
+  if (u.idx_water !== false)    idxChips.push('<span class="perm-chip" style="background:#E3EDF5; color:#2D5C8F">🚰 index:ส่งน้ำ</span>');
+  const idxHtml = idxChips.join('');
+
   if (u.role==='gnradmin' || u.role==='admin'){
     const chips = ['นำเข้า','เบิก','สั่งซื้อ','แก้ราคา','ตั้งค่า'];
     if (u.role==='gnradmin') chips.unshift('จัดการผู้ใช้');
-    return chips.map(c=>`<span class="perm-chip">${c}</span>`).join('');
+    return chips.map(c=>`<span class="perm-chip">${c}</span>`).join('') + idxHtml;
   }
   const caps = ['can_stock_in','can_stock_out','can_order','can_edit_price'];
   const on = caps.filter(c=>truthyClient(u[c]));
-  if (!on.length) return '<span class="perm-chip muted">ยังไม่ได้รับสิทธิ์</span>';
-  return on.map(c=>`<span class="perm-chip">${CAP_LABEL[c]}</span>`).join('');
+  const capHtml = on.length ? on.map(c=>`<span class="perm-chip">${CAP_LABEL[c]}</span>`).join('') : '';
+  if (!capHtml && !idxHtml) return '<span class="perm-chip muted">ยังไม่ได้รับสิทธิ์</span>';
+  return capHtml + idxHtml;
 }
 
 function renderUsers(){
@@ -4254,6 +4270,8 @@ function openUserEdit(username){
   chk('ueCanOut',   u?truthyClient(u.can_stock_out):true);
   chk('ueCanOrder', u?truthyClient(u.can_order):false);
   chk('ueCanPrice', u?truthyClient(u.can_edit_price):false);
+  chk('ueIdxWithdraw', u ? (u.idx_withdraw !== false) : true);
+  chk('ueIdxWater',    u ? (u.idx_water !== false) : true);
   chk('ueActive',   u?truthyClient(u.active):true);
   onUeRoleChange();
   openModal('modalUserEdit');
@@ -4288,6 +4306,8 @@ function saveUserToCloud(){
     can_stock_out: isAdm || document.getElementById('ueCanOut').checked,
     can_order:     isAdm || document.getElementById('ueCanOrder').checked,
     can_edit_price:isAdm || document.getElementById('ueCanPrice').checked,
+    idx_withdraw: document.getElementById('ueIdxWithdraw').checked,
+    idx_water:    document.getElementById('ueIdxWater').checked,
     active: document.getElementById('ueActive').checked,
   };
   // อัปเดตในเครื่องทันที
@@ -4436,6 +4456,12 @@ function setTab(tab) {
   }
   document.querySelectorAll('.nav-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.querySelectorAll('.mob-nav-item').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  // เลื่อนแถบเมนูล่างให้ปุ่มที่เลือกอยู่กลางจอเสมอ
+  const mobAct = document.querySelector('.mob-nav-item.active');
+  if (mobAct && mobAct.parentElement && mobAct.parentElement.scrollWidth > mobAct.parentElement.clientWidth) {
+    const c = mobAct.parentElement;
+    c.scrollTo({ left: mobAct.offsetLeft - (c.clientWidth - mobAct.offsetWidth) / 2, behavior: 'smooth' });
+  }
   document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + tab));
   if (tab === 'items') renderItemsTable();
   if (tab === 'monthly') renderMonthly();
